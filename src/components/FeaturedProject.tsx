@@ -1,7 +1,10 @@
-import { ArrowUpRight, ImageOff } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ProjectShowcase } from "@/components/ProjectShowcase";
+
+const projectUrl = "https://einzelstueckbyelisa.de";
 
 const highlights = [
   "Modernes, responsives Design",
@@ -27,19 +30,14 @@ export function FeaturedProject() {
         </div>
 
         <Reveal delay={0.1} className="mt-14">
-          <div className="grid gap-0 overflow-hidden rounded-2xl border border-border bg-surface shadow-soft lg:grid-cols-2">
-            <div
-              className="relative flex min-h-[280px] flex-col items-center justify-center gap-3 border-b border-dashed border-border bg-surface-muted p-10 text-center lg:min-h-[420px] lg:border-b-0 lg:border-r"
-              role="img"
-              aria-label="Platzhalter für Screenshot der Website Einzelstück by Elisa"
-            >
-              <ImageOff className="h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
-              <p className="text-sm font-medium text-muted-foreground">
-                Screenshot folgt
-              </p>
-              <p className="max-w-[220px] text-xs text-muted-foreground/80">
-                Platzhalter – wird durch eine Aufnahme der fertigen Website ersetzt
-              </p>
+          <div className="grid gap-0 rounded-2xl border border-border bg-surface shadow-soft lg:grid-cols-2">
+            <div className="bg-surface-muted/40 lg:border-r lg:border-border">
+              <ProjectShowcase
+                title="Einzelstück by Elisa"
+                url={projectUrl}
+                mobileImage="/projects/einzelstueck-by-elisa-mobile.webp"
+                alt="Startseite von Einzelstück by Elisa auf dem Smartphone"
+              />
             </div>
 
             <div className="flex flex-col justify-center p-8 sm:p-10 lg:p-12">
@@ -62,7 +60,9 @@ export function FeaturedProject() {
               </ul>
 
               <a
-                href="#"
+                href={projectUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-8 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
               >
                 Projekt ansehen

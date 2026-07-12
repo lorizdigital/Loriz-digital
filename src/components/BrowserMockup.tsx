@@ -3,20 +3,27 @@
 import { useRef } from "react";
 import {
   motion,
-  useReducedMotion,
   useScroll,
   useTransform,
   type MotionValue,
 } from "framer-motion";
+import { LayoutGrid, Smartphone, Sparkles } from "lucide-react";
 import { easeGlass } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 type BrowserMockupProps = {
   mouseX: MotionValue<number>;
   mouseY: MotionValue<number>;
 };
 
+const features = [
+  { icon: LayoutGrid, tint: "bg-accent" },
+  { icon: Smartphone, tint: "bg-clay" },
+  { icon: Sparkles, tint: "bg-[#8a9bb0]" },
+];
+
 export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = usePrefersReducedMotion();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -39,6 +46,12 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
       transition={{ duration: 0.9, delay: 0.25, ease: easeGlass }}
       className="relative w-full"
     >
+      {/* Peekende zweite Glasfläche – erzeugt Tiefe ohne eigenen Inhalt */}
+      <div
+        aria-hidden="true"
+        className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] absolute -right-3 -top-3 h-full w-full rounded-[1.75rem]"
+      />
+
       <motion.div
         style={{
           x: driftX,
@@ -60,41 +73,57 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
         </div>
 
         {/* Abstrahierter Seiteninhalt – near-opak, damit er als echte Website lesbar bleibt */}
-        <div className="space-y-6 bg-white/[0.92] p-7 sm:p-9">
+        <div className="space-y-7 bg-white/[0.94] p-6 sm:p-8">
+          {/* Mini-Navigation */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-accent" />
               <div className="h-2 w-16 rounded-full bg-foreground/70" />
             </div>
             <div className="flex items-center gap-3">
-              <div className="h-2 w-8 rounded-full bg-surface-muted" />
-              <div className="h-2 w-8 rounded-full bg-surface-muted" />
-              <div className="h-6 w-16 rounded-full bg-accent/90" />
+              <div className="hidden h-2 w-8 rounded-full bg-surface-muted sm:block" />
+              <div className="hidden h-2 w-8 rounded-full bg-surface-muted sm:block" />
+              <div className="h-6 w-16 rounded-full bg-accent" />
             </div>
           </div>
 
-          <div className="space-y-3 pt-1">
-            <div className="h-2.5 w-20 rounded-full bg-clay/45" />
-            <div className="h-5 w-3/4 rounded-md bg-foreground/90" />
-            <div className="h-5 w-1/2 rounded-md bg-foreground/90" />
-          </div>
-          <div className="space-y-2.5">
-            <div className="h-2.5 w-full rounded-full bg-surface-muted" />
-            <div className="h-2.5 w-5/6 rounded-full bg-surface-muted" />
-          </div>
-          <div className="flex gap-3 pt-1">
-            <div className="h-9 w-28 rounded-full bg-accent" />
-            <div className="h-9 w-28 rounded-full border border-border" />
+          {/* Hero-innerhalb-des-Mockups: Text + farbige Bildfläche */}
+          <div className="grid grid-cols-5 gap-4">
+            <div className="col-span-3 flex flex-col justify-center space-y-3">
+              <div className="h-2 w-16 rounded-full bg-clay/60" />
+              <div className="h-4 w-full rounded-md bg-foreground/90" />
+              <div className="h-4 w-4/5 rounded-md bg-foreground/90" />
+              <div className="h-2 w-full rounded-full bg-surface-muted" />
+              <div className="flex gap-2 pt-1">
+                <div className="h-8 w-20 rounded-full bg-accent" />
+                <div className="h-8 w-8 rounded-full border border-border" />
+              </div>
+            </div>
+            <div className="relative col-span-2 aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-clay/35 via-accent-soft to-[#e4e9ee]">
+              <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-accent/15 blur-xl" />
+              <div className="absolute -top-4 right-2 h-16 w-16 rounded-full bg-white/40 blur-lg" />
+              <div className="absolute bottom-4 left-4 h-10 w-10 rounded-xl bg-white/50 shadow-sm" />
+            </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 pt-4">
-            <div className="aspect-square rounded-xl bg-clay/15" />
-            <div className="aspect-square rounded-xl bg-accent-soft" />
-            <div className="aspect-square rounded-xl bg-surface-muted" />
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2 aspect-[16/9] rounded-xl bg-surface-muted" />
-            <div className="aspect-[16/9] rounded-xl bg-clay/20" />
+          {/* Feature-Zeile mit echten Akzentfarben statt leerer Flächen */}
+          <div className="grid grid-cols-3 gap-3 border-t border-border pt-6">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2.5 rounded-xl border border-border/70 bg-surface-muted/50 p-3"
+              >
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${feature.tint}`}
+                >
+                  <feature.icon className="h-4 w-4 text-white" strokeWidth={2} />
+                </span>
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-1.5 w-full rounded-full bg-foreground/25" />
+                  <div className="h-1.5 w-2/3 rounded-full bg-foreground/15" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </motion.div>

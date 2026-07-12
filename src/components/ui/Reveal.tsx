@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { cn } from "@/lib/cn";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 type RevealProps = {
   children: React.ReactNode;
@@ -41,7 +42,7 @@ export function Reveal({
   delay = 0,
   duration = 0.7,
 }: RevealProps) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = usePrefersReducedMotion();
 
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;

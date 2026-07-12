@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Calendar, Check, CheckCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -43,62 +43,104 @@ const services = [
   },
 ];
 
-function ServiceVisual({ variant }: { variant: number }) {
-  if (variant === 0) {
-    return (
-      <div className="flex h-full flex-col justify-center gap-3 p-8 sm:p-10">
-        <div className="h-3 w-1/3 rounded-full bg-clay/40" />
-        <div className="h-4 w-3/4 rounded-md bg-foreground/85" />
-        <div className="h-2.5 w-full rounded-full bg-border" />
-        <div className="h-2.5 w-5/6 rounded-full bg-border" />
-        <div className="mt-2 grid grid-cols-3 gap-2.5">
-          <div className="aspect-[4/3] rounded-lg bg-surface" />
-          <div className="aspect-[4/3] rounded-lg bg-surface" />
-          <div className="aspect-[4/3] rounded-lg bg-surface" />
-        </div>
-      </div>
-    );
-  }
-
-  if (variant === 1) {
-    return (
-      <div className="flex h-full flex-col justify-center gap-4 p-8 sm:p-10">
-        <div className="flex items-center gap-3 rounded-xl bg-surface p-4 shadow-soft">
-          <div className="h-9 w-9 shrink-0 rounded-full bg-accent/90" />
-          <div className="flex-1 space-y-2">
-            <div className="h-2.5 w-2/3 rounded-full bg-border" />
-            <div className="h-2.5 w-1/3 rounded-full bg-border" />
-          </div>
-        </div>
-        <div className="ml-8 flex items-center gap-3 rounded-xl bg-surface p-4 shadow-soft">
-          <div className="h-9 w-9 shrink-0 rounded-full bg-clay/60" />
-          <div className="flex-1 space-y-2">
-            <div className="h-2.5 w-3/4 rounded-full bg-border" />
-            <div className="h-2.5 w-1/2 rounded-full bg-border" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+/** Eindeutig als Website-Vorschau erkennbar: Browser-Chrome + Nav + Hero + Galerie. */
+function WebsiteVisual() {
   return (
-    <div className="flex h-full flex-col justify-center gap-3 p-8 sm:p-10">
-      <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-medium text-accent-foreground">
-          LL
-        </span>
-        <div className="flex-1 space-y-2">
-          <div className="h-2.5 w-2/3 rounded-full bg-surface" />
-          <div className="h-2.5 w-1/3 rounded-full bg-surface" />
+    <div className="flex h-full flex-col justify-center p-8 sm:p-10">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-soft">
+        <div className="flex items-center gap-1.5 border-b border-border px-3.5 py-2.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-border" />
+          <span className="h-1.5 w-1.5 rounded-full bg-border" />
+          <span className="h-1.5 w-1.5 rounded-full bg-border" />
+          <div className="ml-2 h-3 flex-1 rounded-full bg-surface-muted" />
         </div>
-      </div>
-      <div className="mt-2 space-y-2.5 rounded-xl bg-surface p-4 shadow-soft">
-        <div className="h-2.5 w-full rounded-full bg-border" />
-        <div className="h-2.5 w-4/5 rounded-full bg-border" />
-        <div className="h-2.5 w-3/5 rounded-full bg-border" />
+        <div className="space-y-4 p-5">
+          <div className="flex items-center justify-between">
+            <div className="h-2 w-14 rounded-full bg-foreground/70" />
+            <div className="h-5 w-14 rounded-full bg-accent" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3.5 w-3/4 rounded-md bg-foreground/85" />
+            <div className="h-2 w-1/2 rounded-full bg-border" />
+          </div>
+          <div className="grid grid-cols-3 gap-2.5 pt-1">
+            <div className="aspect-[4/3] rounded-lg bg-clay/30" />
+            <div className="aspect-[4/3] rounded-lg bg-accent-soft" />
+            <div className="aspect-[4/3] rounded-lg bg-[#dbe3ea]" />
+          </div>
+        </div>
       </div>
     </div>
   );
+}
+
+/** Eindeutig als Terminbuchung erkennbar: Kalender, Datum, Zeitslots, Bestätigung. */
+function BookingVisual() {
+  return (
+    <div className="flex h-full flex-col justify-center p-8 sm:p-10">
+      <div className="w-full max-w-[280px] rounded-xl border border-border bg-surface p-5 shadow-soft">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-clay" strokeWidth={2} />
+          <div className="h-2 w-24 rounded-full bg-foreground/70" />
+        </div>
+        <div className="mt-4 grid grid-cols-7 gap-1.5">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <span
+              key={i}
+              className={cn("aspect-square rounded-md", i === 9 ? "bg-accent" : "bg-surface-muted")}
+            />
+          ))}
+        </div>
+        <div className="mt-4 flex gap-2">
+          <span className="h-7 flex-1 rounded-full border border-border" />
+          <span className="h-7 flex-1 rounded-full bg-accent" />
+          <span className="h-7 flex-1 rounded-full border border-border" />
+        </div>
+        <div className="mt-4 flex items-center gap-2 rounded-lg bg-accent-soft px-3 py-2.5">
+          <Check className="h-3.5 w-3.5 shrink-0 text-clay" strokeWidth={2.5} />
+          <div className="h-2 w-28 rounded-full bg-foreground/45" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Eindeutig als persönliche Kommunikation erkennbar: Chat-Verlauf mit Lesebestätigung. */
+function ConversationVisual() {
+  return (
+    <div className="flex h-full flex-col justify-center gap-2.5 p-8 sm:p-10">
+      <div className="flex items-end gap-2">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2a2a25] to-accent text-[0.6rem] font-medium text-accent-foreground">
+          LL
+        </span>
+        <div className="max-w-[75%] space-y-1.5 rounded-2xl rounded-bl-sm bg-surface px-4 py-3 shadow-soft">
+          <div className="h-2 w-28 rounded-full bg-foreground/55" />
+          <div className="h-2 w-16 rounded-full bg-foreground/35" />
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <div className="max-w-[65%] space-y-1.5 rounded-2xl rounded-br-sm bg-accent px-4 py-3">
+          <div className="h-2 w-24 rounded-full bg-white/70" />
+        </div>
+      </div>
+      <div className="flex items-end gap-2">
+        <span className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-br from-[#2a2a25] to-accent" />
+        <div className="max-w-[55%] rounded-2xl rounded-bl-sm bg-surface px-4 py-3 shadow-soft">
+          <div className="h-2 w-14 rounded-full bg-foreground/45" />
+        </div>
+      </div>
+      <div className="flex items-center justify-end gap-1.5 pr-1 pt-1">
+        <div className="h-1.5 w-10 rounded-full bg-border" />
+        <CheckCheck className="h-3.5 w-3.5 text-clay" strokeWidth={2.5} />
+      </div>
+    </div>
+  );
+}
+
+function ServiceVisual({ variant }: { variant: number }) {
+  if (variant === 0) return <WebsiteVisual />;
+  if (variant === 1) return <BookingVisual />;
+  return <ConversationVisual />;
 }
 
 export function Services() {
