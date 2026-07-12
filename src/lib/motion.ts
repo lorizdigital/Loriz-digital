@@ -8,3 +8,6 @@ export const springLayout = { type: "spring", stiffness: 210, damping: 28, mass:
 
 /** Sehr weiche, langsame Feder für Parallax-Glättung (Mausposition). */
 export const springParallax = { stiffness: 55, damping: 20, mass: 0.6 } as const;
+
+/** Straffe, direkte Feder für den Cursor-Begleiter – folgt eng, ohne spürbaren Nachlauf. */
+export const springCursor = { stiffness: 900, damping: 40, mass: 0.4 } as const;

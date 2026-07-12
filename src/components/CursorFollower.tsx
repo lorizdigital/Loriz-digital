@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { cn } from "@/lib/cn";
-import { springParallax } from "@/lib/motion";
+import { springCursor } from "@/lib/motion";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const FINE_POINTER_QUERY = "(pointer: fine)";
@@ -41,8 +41,8 @@ export function CursorFollower() {
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const springX = useSpring(x, springParallax);
-  const springY = useSpring(y, springParallax);
+  const springX = useSpring(x, springCursor);
+  const springY = useSpring(y, springCursor);
 
   useEffect(() => {
     if (!enabled) return;
@@ -72,16 +72,16 @@ export function CursorFollower() {
       className="pointer-events-none fixed left-0 top-0 z-[999] -translate-x-1/2 -translate-y-1/2 rounded-full"
       style={{ x: springX, y: springY }}
       animate={{
-        width: hovering ? 52 : 26,
-        height: hovering ? 52 : 26,
+        width: hovering ? 30 : 22,
+        height: hovering ? 30 : 22,
         opacity: visible ? 1 : 0,
       }}
-      transition={{ type: "spring", stiffness: 260, damping: 24, mass: 0.5 }}
+      transition={{ type: "spring", stiffness: 320, damping: 26, mass: 0.4 }}
     >
       <div
         className={cn(
-          "glass-subtle backdrop-blur-[var(--glass-blur-sm)] h-full w-full rounded-full border transition-colors duration-300",
-          hovering ? "border-clay/40 bg-accent-soft" : "border-foreground/15",
+          "h-full w-full rounded-full border-[1.5px] backdrop-blur-[3px] transition-colors duration-300",
+          hovering ? "border-clay/60 bg-clay/[0.08]" : "border-foreground/35 bg-foreground/[0.03]",
         )}
       />
     </motion.div>
