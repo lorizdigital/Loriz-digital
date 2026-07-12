@@ -1,17 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { siteConfig } from "@/lib/site";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Button } from "@/components/ui/Button";
 import { LorizMark } from "@/components/icons/LorizMark";
 import { springLayout } from "@/lib/motion";
 import { cn } from "@/lib/cn";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+
+type HoverRect = { left: number; width: number };
 
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
+  const [hoverRect, setHoverRect] = useState<HoverRect | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -19,6 +25,13 @@ export function Navigation() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const handleLinkHover = (el: HTMLAnchorElement) => {
+    const navBox = navRef.current?.getBoundingClientRect();
+    if (!navBox) return;
+    const linkBox = el.getBoundingClientRect();
+    setHoverRect({ left: linkBox.left - navBox.left, width: linkBox.width });
+  };
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4">
@@ -40,12 +53,34 @@ export function Navigation() {
           Loriz Digital
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav
+          ref={navRef}
+          className="relative hidden items-center gap-1 md:flex"
+          onMouseLeave={() => setHoverRect(null)}
+        >
+          {!shouldReduceMotion && (
+            <AnimatePresence>
+              {hoverRect && (
+                <motion.span
+                  aria-hidden="true"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, x: hoverRect.left, width: hoverRect.width }}
+                  exit={{ opacity: 0 }}
+                  transition={springLayout}
+                  className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] pointer-events-none absolute inset-y-0 left-0 z-0 h-full rounded-full"
+                />
+              )}
+            </AnimatePresence>
+          )}
           {siteConfig.navigation.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-full px-3.5 py-2 text-[0.95rem] text-foreground/80 transition-colors duration-300 hover:bg-foreground/[0.05] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              onMouseEnter={(e) => handleLinkHover(e.currentTarget)}
+              className={cn(
+                "relative z-10 rounded-full px-3.5 py-2 text-[0.95rem] text-foreground/80 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30",
+                shouldReduceMotion && "hover:bg-foreground/[0.05]",
+              )}
             >
               {item.label}
             </Link>
