@@ -1,4 +1,3 @@
-import { User } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -10,16 +9,20 @@ export function About() {
         <div className="grid items-center gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           <Reveal variant="left">
             <div
-              className="relative mx-auto flex aspect-[4/5] w-full max-w-sm items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-surface-muted"
-              role="img"
-              aria-label="Platzhalter für Porträtfoto von Lino Loriz"
+              aria-hidden="true"
+              className="shadow-glass-lg relative mx-auto flex aspect-[4/5] w-full max-w-sm items-center justify-center overflow-hidden rounded-2xl"
             >
-              <div className="flex flex-col items-center gap-3 text-center">
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-surface shadow-soft">
-                  <User className="h-7 w-7 text-muted-foreground" strokeWidth={1.5} />
-                </span>
-                <p className="text-sm font-medium text-muted-foreground">Porträtfoto folgt</p>
-              </div>
+              {/* Markentreue, immer dunkle Grundfläche – bewusst unabhängig vom
+                  Farbschema, damit sie wie ein gestaltetes Signature-Element
+                  wirkt und nicht wie eine leere Platzhalterfläche. */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#211f1a] via-[#2a2621] to-[#39301f]" />
+              <div className="absolute -right-10 -top-14 h-48 w-48 rounded-full bg-clay/30 blur-3xl" />
+              <div className="absolute -bottom-16 -left-12 h-56 w-56 rounded-full bg-[#bfcddb]/15 blur-3xl" />
+              <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+
+              <span className="relative text-[5.5rem] font-semibold tracking-tight text-[#f3f1ea] sm:text-[6.5rem]">
+                LL
+              </span>
             </div>
           </Reveal>
 
