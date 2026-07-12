@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+:root {
+  /* Farbsystem – überwiegend hell, mit dunkler Akzentfarbe */
+  --background: #faf9f5;
+  --surface: #ffffff;
+  --surface-muted: #f2f0ea;
+  --foreground: #1b1b18;
+  --muted-foreground: #6e6c65;
+  --border: #e6e2d9;
+  --accent: #1b1b18;
+  --accent-foreground: #faf9f5;
+  --accent-soft: #ece9e1;
+  --clay: #a3835f;
+
+  /* Radien */
+  --radius-sm: 0.625rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-2xl: 2.75rem;
+
+  /* Schatten */
+  --shadow-soft: 0 2px 10px -4px rgb(27 27 24 / 0.08), 0 1px 2px -1px rgb(27 27 24 / 0.04);
+  --shadow-elevated: 0 24px 48px -20px rgb(27 27 24 / 0.18), 0 8px 20px -8px rgb(27 27 24 / 0.08);
+
+  /* Liquid-Glass-System – zentral steuerbar */
+  --glass-blur-sm: 8px;
+  --glass-blur-md: 14px;
+  --glass-blur-lg: 22px;
+
+  --glass-bg-subtle: rgb(255 255 255 / 0.32);
+  --glass-bg-medium: rgb(255 255 255 / 0.5);
+  --glass-bg-floating: rgb(255 255 255 / 0.66);
+  --glass-bg-elevated: rgb(255 255 255 / 0.8);
+
+  --glass-border: rgb(27 27 24 / 0.07);
+  --glass-edge-light: inset 0 1px 0 0 rgb(255 255 255 / 0.55);
+
+  /* Jeweils: Lichtkante + kleiner Kontaktschatten + großer, diffuser Umgebungsschatten */
+  --shadow-glass-sm: var(--glass-edge-light), 0 1px 2px rgb(27 27 24 / 0.05),
+    0 10px 24px -16px rgb(27 27 24 / 0.14);
+  --shadow-glass-md: var(--glass-edge-light), 0 1px 3px rgb(27 27 24 / 0.06),
+    0 22px 44px -22px rgb(27 27 24 / 0.18);
+  --shadow-glass-lg: var(--glass-edge-light), 0 2px 4px rgb(27 27 24 / 0.06),
+    0 40px 70px -28px rgb(27 27 24 / 0.24), 0 14px 30px -14px rgb(27 27 24 / 0.12);
+
+  /* Bewegung – zentral steuerbar */
+  --ease-glass: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-soft: 220ms;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-clay: var(--clay);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-elevated: var(--shadow-elevated);
+  --shadow-glass-sm: var(--shadow-glass-sm);
+  --shadow-glass-md: var(--shadow-glass-md);
+  --shadow-glass-lg: var(--shadow-glass-lg);
+
+  --font-sans: var(--font-geist-sans);
+}
+
+@layer utilities {
+  .glass-subtle {
+    background: var(--glass-bg-subtle);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass-sm);
+  }
+
+  .glass-medium {
+    background: var(--glass-bg-medium);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass-sm);
+  }
+
+  .glass-floating {
+    background: var(--glass-bg-floating);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass-md);
+  }
+
+  .glass-elevated {
+    background: var(--glass-bg-elevated);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass-lg);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+}
+
+@layer utilities {
+  .section-padding {
+    padding-top: 5.5rem;
+    padding-bottom: 5.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .section-padding {
+      padding-top: 7rem;
+      padding-bottom: 7rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-top: 8.5rem;
+      padding-bottom: 8.5rem;
+    }
+  }
+
+  .balance {
+    text-wrap: balance;
+  }
+
+  .atmos-blob {
+    filter: blur(60px);
+    will-change: transform;
+  }
+
+  .atmos-blob-warm {
+    background: radial-gradient(circle at 50% 50%, rgb(163 131 95 / 0.32), transparent 70%);
+    animation: atmos-drift-a 46s ease-in-out infinite;
+  }
+
+  .atmos-blob-cool {
+    background: radial-gradient(circle at 50% 50%, rgb(191 205 219 / 0.34), transparent 70%);
+    animation: atmos-drift-b 58s ease-in-out infinite;
+  }
+}
+
+@keyframes atmos-drift-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(4%, 6%) scale(1.06);
+  }
+}
+
+@keyframes atmos-drift-b {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-5%, -4%) scale(1.05);
+  }
+}
+
+@media (max-width: 640px) {
+  .atmos-blob {
+    animation: none;
+    filter: blur(40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
