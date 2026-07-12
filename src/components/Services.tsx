@@ -120,7 +120,7 @@ function ConversationVisual() {
       </div>
       <div className="flex justify-end">
         <div className="max-w-[65%] space-y-1.5 rounded-2xl rounded-br-sm bg-accent px-4 py-3">
-          <div className="h-2 w-24 rounded-full bg-white/70" />
+          <div className="h-2 w-24 rounded-full bg-accent-foreground/70" />
         </div>
       </div>
       <div className="flex items-end gap-2">

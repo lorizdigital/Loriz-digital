@@ -70,7 +70,7 @@ export function MobileMenu() {
                           delay: 0.06 + index * 0.05,
                           ease: [0.16, 1, 0.3, 1],
                         }}
-                        className="w-full rounded-2xl px-3 py-3 text-2xl font-medium tracking-tight text-foreground transition-colors hover:bg-black/[0.04]"
+                        className="w-full rounded-2xl px-3 py-3 text-2xl font-medium tracking-tight text-foreground transition-colors hover:bg-foreground/[0.05]"
                       >
                         {item.label}
                       </motion.a>

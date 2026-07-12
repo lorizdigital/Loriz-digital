@@ -50,6 +50,52 @@
   --spring-soft: 220ms;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Farbsystem – warmes Dunkel, kein reines Schwarz; Akzent invertiert
+       (helle Fläche auf dunklem Grund), damit Primär-Buttons weiterhin
+       kontrastreich wirken. */
+    --background: #17160f;
+    --surface: #201e17;
+    --surface-muted: #27251c;
+    --foreground: #f3f1ea;
+    --muted-foreground: #a6a196;
+    --border: #37342a;
+    --accent: #f3f1ea;
+    --accent-foreground: #17160f;
+    --accent-soft: #2c2a20;
+    --clay: #c2a179;
+
+    /* Schatten – auf dunklem Grund trägt vor allem die Lichtkante, der
+       Streuschatten bleibt dezenter Kontakt zur noch dunkleren Umgebung. */
+    --shadow-soft: 0 2px 10px -4px rgb(0 0 0 / 0.45), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-elevated: 0 24px 48px -20px rgb(0 0 0 / 0.55), 0 8px 20px -8px rgb(0 0 0 / 0.3);
+
+    --glass-bg-subtle: rgb(255 255 255 / 0.06);
+    --glass-bg-medium: rgb(255 255 255 / 0.09);
+    --glass-bg-floating: rgb(255 255 255 / 0.12);
+    --glass-bg-elevated: rgb(255 255 255 / 0.16);
+
+    --glass-border: rgb(255 255 255 / 0.12);
+    --glass-edge-light: inset 0 1px 0 0 rgb(255 255 255 / 0.14);
+
+    --shadow-glass-sm: var(--glass-edge-light), 0 1px 2px rgb(0 0 0 / 0.3),
+      0 10px 24px -16px rgb(0 0 0 / 0.5);
+    --shadow-glass-md: var(--glass-edge-light), 0 1px 3px rgb(0 0 0 / 0.3),
+      0 22px 44px -22px rgb(0 0 0 / 0.55);
+    --shadow-glass-lg: var(--glass-edge-light), 0 2px 4px rgb(0 0 0 / 0.3),
+      0 40px 70px -28px rgb(0 0 0 / 0.6), 0 14px 30px -14px rgb(0 0 0 / 0.4);
+  }
+
+  .atmos-blob-warm {
+    background: radial-gradient(circle at 50% 50%, rgb(194 161 121 / 0.22), transparent 70%);
+  }
+
+  .atmos-blob-cool {
+    background: radial-gradient(circle at 50% 50%, rgb(120 138 168 / 0.22), transparent 70%);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
