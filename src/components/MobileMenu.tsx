@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/site";
+import { Button } from "@/components/ui/Button";
 import { springLayout } from "@/lib/motion";
 import { useIsMounted } from "@/hooks/useIsMounted";
 
@@ -76,9 +77,7 @@ export function MobileMenu() {
                       </motion.a>
                     ))}
                   </nav>
-                  <motion.a
-                    href="#kontakt"
-                    onClick={() => setOpen(false)}
+                  <motion.div
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
@@ -86,10 +85,12 @@ export function MobileMenu() {
                       delay: 0.06 + siteConfig.navigation.length * 0.05,
                       ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="mt-4 inline-flex items-center justify-center rounded-full bg-accent px-7 py-3.5 text-base font-medium text-accent-foreground shadow-glass-sm"
+                    className="mt-4"
                   >
-                    Projekt anfragen
-                  </motion.a>
+                    <Button href="#kontakt" variant="primary" onClick={() => setOpen(false)}>
+                      Projekt anfragen
+                    </Button>
+                  </motion.div>
 
                   {/* Rechtstexte: eigene Seiten, bewusst nicht Teil der
                       Hauptnavigation, daher separat und zurückhaltend. */}

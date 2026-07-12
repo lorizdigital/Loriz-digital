@@ -11,13 +11,28 @@ type ButtonProps = {
   href: string;
   children: React.ReactNode;
   variant?: "primary" | "secondary";
+  size?: "md" | "sm";
   className?: string;
   external?: boolean;
+  onClick?: () => void;
 };
 
-export function Button({ href, children, variant = "primary", className, external }: ButtonProps) {
+export function Button({
+  href,
+  children,
+  variant = "primary",
+  size = "md",
+  className,
+  external,
+  onClick,
+}: ButtonProps) {
   const base =
-    "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-[0.95rem] font-medium tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+    "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-medium tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
+  const sizes = {
+    md: "px-7 py-3.5 text-[0.95rem]",
+    sm: "px-6 py-2.5 text-[0.9rem]",
+  };
 
   const variants = {
     primary: "bg-accent text-accent-foreground shadow-glass-sm",
@@ -30,7 +45,8 @@ export function Button({ href, children, variant = "primary", className, externa
   return (
     <MotionLink
       href={href}
-      className={cn(base, variants[variant], className)}
+      onClick={onClick}
+      className={cn(base, sizes[size], variants[variant], className)}
       whileHover={{ y: -2, scale: 1.015 }}
       whileTap={{ y: 0, scale: 0.985 }}
       transition={springSoft}

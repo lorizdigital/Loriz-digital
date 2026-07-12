@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { siteConfig } from "@/lib/site";
 import { MobileMenu } from "@/components/MobileMenu";
+import { Button } from "@/components/ui/Button";
 import { springLayout } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
@@ -50,12 +51,9 @@ export function Navigation() {
         </nav>
 
         <div className="hidden md:block">
-          <Link
-            href="#kontakt"
-            className="inline-flex items-center justify-center rounded-full bg-accent px-6 py-2.5 text-[0.9rem] font-medium text-accent-foreground shadow-glass-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
+          <Button href="#kontakt" variant="primary" size="sm">
             Projekt anfragen
-          </Link>
+          </Button>
         </div>
 
         <MobileMenu />
