@@ -53,7 +53,7 @@ export function Process() {
             {steps.map((step, index) => (
               <Reveal key={step.title} delay={index * 0.06}>
                 <li className="relative flex gap-6 sm:gap-8">
-                  <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-sm font-medium text-foreground shadow-soft">
+                  <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-clay/25 bg-accent-soft text-sm font-medium text-clay shadow-soft">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div className="pt-1.5">
