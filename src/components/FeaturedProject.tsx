@@ -20,7 +20,7 @@ export function FeaturedProject() {
       <Container>
         <div className="max-w-2xl">
           <Reveal>
-            <Eyebrow>Ausgewähltes Projekt</Eyebrow>
+            <Eyebrow>Aktuelles Projekt</Eyebrow>
           </Reveal>
           <Reveal delay={0.08}>
             <h2 className="balance mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -66,7 +66,7 @@ export function FeaturedProject() {
                 className="mt-8 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
               >
                 Projekt ansehen
-                <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+                <ArrowUpRight aria-hidden="true" className="h-4 w-4" strokeWidth={2} />
               </a>
             </div>
           </div>

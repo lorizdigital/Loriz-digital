@@ -30,7 +30,7 @@ export function ProblemSolution() {
       <Container>
         <div className="max-w-2xl">
           <Reveal>
-            <Eyebrow>Warum digitaler Auftritt zählt</Eyebrow>
+            <Eyebrow>Der erste Eindruck</Eyebrow>
           </Reveal>
           <Reveal delay={0.08}>
             <h2 className="balance mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -53,7 +53,7 @@ export function ProblemSolution() {
           {benefits.map((benefit, index) => (
             <Reveal key={benefit.title} variant="up" delay={index * 0.08}>
               <div className="h-full rounded-2xl border border-border bg-surface p-8 shadow-soft sm:p-9">
-                <benefit.icon className="h-6 w-6 text-clay" strokeWidth={1.5} />
+                <benefit.icon aria-hidden="true" className="h-6 w-6 text-clay" strokeWidth={1.5} />
                 <h3 className="mt-6 text-lg font-medium tracking-tight text-foreground">
                   {benefit.title}
                 </h3>

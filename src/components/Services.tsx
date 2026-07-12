@@ -8,7 +8,7 @@ const services = [
   {
     index: "01",
     title: "Moderne Webseiten",
-    lead: "Individuell gestaltet, schnell, mobil optimiert und auf Ihr Unternehmen zugeschnitten.",
+    lead: "Schnell, mobil optimiert und individuell auf Ihr Unternehmen zugeschnitten.",
     points: [
       "Unternehmenswebseiten",
       "Landingpages",
@@ -80,7 +80,7 @@ function BookingVisual() {
     <div className="flex h-full flex-col justify-center p-8 sm:p-10">
       <div className="w-full max-w-[280px] rounded-xl border border-border bg-surface p-5 shadow-soft">
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-clay" strokeWidth={2} />
+          <Calendar aria-hidden="true" className="h-4 w-4 text-clay" strokeWidth={2} />
           <div className="h-2 w-24 rounded-full bg-foreground/70" />
         </div>
         <div className="mt-4 grid grid-cols-7 gap-1.5">
@@ -97,7 +97,7 @@ function BookingVisual() {
           <span className="h-7 flex-1 rounded-full border border-border" />
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-lg bg-accent-soft px-3 py-2.5">
-          <Check className="h-3.5 w-3.5 shrink-0 text-clay" strokeWidth={2.5} />
+          <Check aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-clay" strokeWidth={2.5} />
           <div className="h-2 w-28 rounded-full bg-foreground/45" />
         </div>
       </div>
@@ -131,7 +131,7 @@ function ConversationVisual() {
       </div>
       <div className="flex items-center justify-end gap-1.5 pr-1 pt-1">
         <div className="h-1.5 w-10 rounded-full bg-border" />
-        <CheckCheck className="h-3.5 w-3.5 text-clay" strokeWidth={2.5} />
+        <CheckCheck aria-hidden="true" className="h-3.5 w-3.5 text-clay" strokeWidth={2.5} />
       </div>
     </div>
   );
@@ -152,7 +152,7 @@ export function Services() {
             <Eyebrow>Leistungen</Eyebrow>
           </Reveal>
           <Reveal delay={0.08}>
-            <h2 className="balance mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="balance mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
               Drei Bereiche, ein Ansprechpartner.
             </h2>
           </Reveal>
@@ -179,7 +179,7 @@ export function Services() {
                     <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                       {service.points.map((point) => (
                         <li key={point} className="flex items-start gap-2.5 text-sm text-foreground/85">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-clay" strokeWidth={2} />
+                          <Check aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-clay" strokeWidth={2} />
                           {point}
                         </li>
                       ))}

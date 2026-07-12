@@ -39,7 +39,7 @@ export function Process() {
           </Reveal>
           <Reveal delay={0.08}>
             <h2 className="balance mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Von der ersten Idee bis zur fertigen Lösung.
+              So arbeiten wir zusammen.
             </h2>
           </Reveal>
         </div>
