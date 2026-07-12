@@ -34,7 +34,7 @@ export function ClosingCta() {
               href={`mailto:${siteConfig.email}`}
               className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-              <Mail className="h-4 w-4" strokeWidth={1.75} />
+              <Mail aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
               Oder schreiben Sie direkt eine E-Mail an {siteConfig.email}
             </a>
           </div>

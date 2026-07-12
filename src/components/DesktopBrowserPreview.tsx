@@ -67,7 +67,7 @@ export function DesktopBrowserPreview({
 
   return (
     <div
-      className={cn("glass-elevated backdrop-blur-[var(--glass-blur-lg)] overflow-hidden rounded-[1.5rem]", className)}
+      className={cn("glass-elevated backdrop-blur-[var(--glass-blur-lg)] overflow-hidden rounded-lg", className)}
       onPointerEnter={() => controls.stop()}
       onPointerLeave={() => !prefersReducedMotion && startPan()}
     >

@@ -17,7 +17,7 @@ export function TrustSignals({ className }: { className?: string }) {
     >
       {signals.map((signal) => (
         <li key={signal.label} className="flex items-center gap-2 text-sm text-muted-foreground">
-          <signal.icon className="h-4 w-4 shrink-0 text-clay" strokeWidth={1.75} />
+          <signal.icon aria-hidden="true" className="h-4 w-4 shrink-0 text-clay" strokeWidth={1.75} />
           {signal.label}
         </li>
       ))}

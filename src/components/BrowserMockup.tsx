@@ -49,7 +49,7 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
       {/* Peekende zweite Glasfläche – erzeugt Tiefe ohne eigenen Inhalt */}
       <div
         aria-hidden="true"
-        className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] absolute -right-3 -top-3 h-full w-full rounded-[1.75rem]"
+        className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] absolute -right-3 -top-3 h-full w-full rounded-xl"
       />
 
       <motion.div
@@ -60,7 +60,7 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
           rotateY: tiltY,
           transformPerspective: 1400,
         }}
-        className="glass-elevated backdrop-blur-[var(--glass-blur-lg)] relative overflow-hidden rounded-[1.75rem]"
+        className="glass-elevated backdrop-blur-[var(--glass-blur-lg)] relative overflow-hidden rounded-xl"
       >
         {/* Browser-Leiste */}
         <div className="flex items-center gap-3 border-b border-black/[0.06] bg-white/40 px-5 py-4">
@@ -111,7 +111,7 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
                 <span
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${feature.tint}`}
                 >
-                  <feature.icon className="h-4 w-4 text-white" strokeWidth={2} />
+                  <feature.icon aria-hidden="true" className="h-4 w-4 text-white" strokeWidth={2} />
                 </span>
                 <div className="flex-1 space-y-1.5">
                   <div className="h-1.5 w-full rounded-full bg-foreground/25" />

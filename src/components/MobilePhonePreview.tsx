@@ -62,7 +62,7 @@ export function MobilePhonePreview({
     // für Notch und Screen lebt eine Ebene tiefer, damit sich beides nie
     // widerspricht.
     <div
-      className={cn("glass-elevated backdrop-blur-[var(--glass-blur-sm)] rounded-[1.75rem] p-2", className)}
+      className={cn("glass-elevated backdrop-blur-[var(--glass-blur-sm)] rounded-xl p-2", className)}
       onPointerEnter={() => controls.stop()}
       onPointerLeave={() => !prefersReducedMotion && startPan()}
     >
@@ -71,7 +71,7 @@ export function MobilePhonePreview({
         <div className="pointer-events-none absolute left-1/2 top-4 z-10 h-1.5 w-8 -translate-x-1/2 rounded-full bg-black/15" />
 
         <div
-          className="relative w-full overflow-hidden rounded-[1.35rem] bg-surface-muted"
+          className="relative w-full overflow-hidden rounded-lg bg-surface-muted"
           style={{ aspectRatio: `${CAPTURE_WIDTH} / ${SCREEN_HEIGHT}` }}
         >
           <motion.div animate={controls} className="absolute inset-x-0 top-0">

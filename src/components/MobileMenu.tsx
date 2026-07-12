@@ -30,7 +30,11 @@ export function MobileMenu() {
         aria-label={open ? "Menü schließen" : "Menü öffnen"}
         className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] relative z-50 flex h-10 w-10 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
       >
-        {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {open ? (
+          <X aria-hidden="true" className="h-5 w-5" />
+        ) : (
+          <Menu aria-hidden="true" className="h-5 w-5" />
+        )}
       </button>
 
       {/* Per Portal direkt in <body> gerendert: Die Navigation nutzt Framer
@@ -56,7 +60,7 @@ export function MobileMenu() {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.97, y: -6 }}
                   transition={springLayout}
-                  className="glass-elevated backdrop-blur-[var(--glass-blur-lg)] fixed inset-x-4 bottom-6 top-[5.5rem] z-40 flex flex-col rounded-[1.75rem] p-6"
+                  className="glass-elevated backdrop-blur-[var(--glass-blur-lg)] fixed inset-x-4 bottom-6 top-[5.5rem] z-40 flex flex-col rounded-xl p-6"
                 >
                   <nav className="flex flex-1 flex-col items-start justify-center gap-1">
                     {siteConfig.navigation.map((item, index) => (
