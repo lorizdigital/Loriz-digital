@@ -87,7 +87,7 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
             </div>
           </div>
 
-          {/* Hero-innerhalb-des-Mockups: Text + farbige Bildfläche */}
+          {/* Hero-innerhalb-des-Mockups */}
           <div className="grid grid-cols-5 gap-4">
             <div className="col-span-3 flex flex-col justify-center space-y-3">
               <div className="h-2 w-16 rounded-full bg-clay/60" />
@@ -98,11 +98,6 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
                 <div className="h-8 w-20 rounded-full bg-accent" />
                 <div className="h-8 w-8 rounded-full border border-border" />
               </div>
-            </div>
-            <div className="relative col-span-2 aspect-[4/5] overflow-hidden rounded-2xl bg-gradient-to-br from-clay/35 via-accent-soft to-[#e4e9ee]">
-              <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-accent/15 blur-xl" />
-              <div className="absolute -top-4 right-2 h-16 w-16 rounded-full bg-white/40 blur-lg" />
-              <div className="absolute bottom-4 left-4 h-10 w-10 rounded-xl bg-white/50 shadow-sm" />
             </div>
           </div>
 
