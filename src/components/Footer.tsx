@@ -8,12 +8,12 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-surface-muted/60">
-      <Container className="py-14 sm:py-16">
+      <Container className="pb-14 pt-10 sm:pb-16 sm:pt-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2">
-              <LorizMark className="h-5 w-5 shrink-0 text-foreground" />
-              <span className="text-[1.05rem] font-semibold tracking-tight text-foreground">
+            <div className="flex items-center gap-2.5">
+              <LorizMark className="h-6 w-6 shrink-0 text-foreground" />
+              <span className="text-xl font-semibold tracking-tight text-foreground">
                 {siteConfig.name}
               </span>
             </div>
