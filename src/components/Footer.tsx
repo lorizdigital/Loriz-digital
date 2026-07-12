@@ -53,7 +53,7 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               <li>
                 <Link
-                  href="#"
+                  href="/impressum"
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Impressum
@@ -61,7 +61,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/datenschutz"
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Datenschutz

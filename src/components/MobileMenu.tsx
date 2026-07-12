@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/site";
 import { springLayout } from "@/lib/motion";
@@ -89,6 +90,34 @@ export function MobileMenu() {
                   >
                     Projekt anfragen
                   </motion.a>
+
+                  {/* Rechtstexte: eigene Seiten, bewusst nicht Teil der
+                      Hauptnavigation, daher separat und zurückhaltend. */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.4,
+                      delay: 0.06 + (siteConfig.navigation.length + 1) * 0.05,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="mt-6 flex items-center gap-4"
+                  >
+                    <Link
+                      href="/impressum"
+                      onClick={() => setOpen(false)}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Impressum
+                    </Link>
+                    <Link
+                      href="/datenschutz"
+                      onClick={() => setOpen(false)}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Datenschutz
+                    </Link>
+                  </motion.div>
                 </motion.div>
               </>
             )}
