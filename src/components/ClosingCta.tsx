@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
+import { TrustSignals } from "@/components/TrustSignals";
 import { siteConfig } from "@/lib/site";
 
 export function ClosingCta() {
@@ -21,7 +22,9 @@ export function ClosingCta() {
               von Ihrer Idee.
             </p>
 
-            <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <TrustSignals className="mt-7" />
+
+            <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button href={`mailto:${siteConfig.email}`} variant="primary">
                 Unverbindlich anfragen
               </Button>
