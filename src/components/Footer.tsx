@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
+import { LorizMark } from "@/components/icons/LorizMark";
 import { siteConfig } from "@/lib/site";
 
 export function Footer() {
@@ -10,9 +11,12 @@ export function Footer() {
       <Container className="py-14 sm:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <span className="text-[1.05rem] font-semibold tracking-tight text-foreground">
-              {siteConfig.name}
-            </span>
+            <div className="flex items-center gap-2">
+              <LorizMark className="h-5 w-5 shrink-0 text-foreground" />
+              <span className="text-[1.05rem] font-semibold tracking-tight text-foreground">
+                {siteConfig.name}
+              </span>
+            </div>
             <p className="mt-3 max-w-[200px] text-sm leading-relaxed text-muted-foreground">
               {siteConfig.slogan}
             </p>

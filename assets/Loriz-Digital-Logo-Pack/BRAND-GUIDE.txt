@@ -1,0 +1,21 @@
+LORIZ DIGITAL – BRAND GUIDE
+
+FARBSCHEMA
+Primär Schwarz:   #0F1114
+Sekundär Slate:   #2B3340
+Akzent Taupe:     #D7D2CC
+Fläche Off-White: #F3F3F2
+Weiß:             #FFFFFF
+Sekundärtext:     #6B6F76
+
+TYPOGRAFIE
+Logo / Headlines: Inter Display, Gewicht 300–400
+Fließtext / UI:   Inter, Gewicht 400
+Buttons / Labels: Inter, Gewicht 500–600
+
+Empfohlener CSS-Font-Stack:
+font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+Hinweis:
+Die SVG-Dateien sind echte Vektorgrafiken und bleiben bei jeder Größe scharf.
+Für Websites bevorzugt SVG verwenden. PNG nur für Plattformen nutzen, die SVG nicht unterstützen.

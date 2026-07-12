@@ -40,6 +40,13 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: "/icons/loriz-app-icon-light.svg", media: "(prefers-color-scheme: light)" },
+      { url: "/icons/loriz-app-icon-dark.svg", media: "(prefers-color-scheme: dark)" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

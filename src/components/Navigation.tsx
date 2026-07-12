@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { siteConfig } from "@/lib/site";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Button } from "@/components/ui/Button";
+import { LorizMark } from "@/components/icons/LorizMark";
 import { springLayout } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
@@ -33,8 +34,9 @@ export function Navigation() {
       >
         <Link
           href="#start"
-          className="rounded-full px-2 py-1 text-[1.05rem] font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+          className="flex items-center gap-2 rounded-full px-2 py-1 text-[1.05rem] font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
         >
+          <LorizMark className="h-5 w-5 shrink-0" />
           Loriz Digital
         </Link>
 
