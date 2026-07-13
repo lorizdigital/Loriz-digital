@@ -87,8 +87,8 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
             </div>
           </div>
 
-          {/* Hero-innerhalb-des-Mockups */}
-          <div className="grid grid-cols-5 gap-4">
+          {/* Hero-innerhalb-des-Mockups: Text links, schwebende Tag-Akzente rechts */}
+          <div className="grid grid-cols-5 items-center gap-4">
             <div className="col-span-3 flex flex-col justify-center space-y-3">
               <div className="h-2 w-16 rounded-full bg-clay/60" />
               <div className="h-4 w-full rounded-md bg-foreground/90" />
@@ -98,6 +98,11 @@ export function BrowserMockup({ mouseX, mouseY }: BrowserMockupProps) {
                 <div className="h-8 w-20 rounded-full bg-accent" />
                 <div className="h-8 w-8 rounded-full border border-border" />
               </div>
+            </div>
+            <div className="col-span-2 flex flex-col items-end gap-2.5">
+              <div className="h-7 w-24 rounded-full bg-accent-soft" />
+              <div className="h-7 w-20 rounded-full border border-border" />
+              <div className="h-7 w-16 rounded-full bg-clay/20" />
             </div>
           </div>
 
