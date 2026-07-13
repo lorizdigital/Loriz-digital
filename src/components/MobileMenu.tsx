@@ -60,7 +60,7 @@ export function MobileMenu() {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.97, y: -6 }}
                   transition={springLayout}
-                  className="glass-elevated backdrop-blur-[var(--glass-blur-lg)] fixed inset-x-4 bottom-6 top-[5.5rem] z-40 flex flex-col rounded-xl p-6"
+                  className="glass-elevated backdrop-blur-[var(--glass-blur-lg)] fixed inset-x-4 bottom-6 top-[5.5rem] z-[70] flex flex-col rounded-xl p-6"
                 >
                   <nav className="flex flex-1 flex-col items-start justify-center gap-1">
                     {siteConfig.navigation.map((item, index) => (

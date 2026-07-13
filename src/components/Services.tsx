@@ -2,6 +2,7 @@ import { Calendar, Check, CheckCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ModernWebsiteDemo } from "@/components/ModernWebsiteDemo";
 import { cn } from "@/lib/cn";
 
 const services = [
@@ -43,35 +44,9 @@ const services = [
   },
 ];
 
-/** Eindeutig als Website-Vorschau erkennbar: Browser-Chrome + Nav + Hero + Galerie. */
+/** Animierte Mini-Landingpage-Demo statt statischem Browser-Mockup. */
 function WebsiteVisual() {
-  return (
-    <div className="flex h-full flex-col justify-center p-8 sm:p-10">
-      <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-soft">
-        <div className="flex items-center gap-1.5 border-b border-border px-3.5 py-2.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-border" />
-          <span className="h-1.5 w-1.5 rounded-full bg-border" />
-          <span className="h-1.5 w-1.5 rounded-full bg-border" />
-          <div className="ml-2 h-3 flex-1 rounded-full bg-surface-muted" />
-        </div>
-        <div className="space-y-4 p-5">
-          <div className="flex items-center justify-between">
-            <div className="h-2 w-14 rounded-full bg-foreground/70" />
-            <div className="h-5 w-14 rounded-full bg-accent" />
-          </div>
-          <div className="space-y-2">
-            <div className="h-3.5 w-3/4 rounded-md bg-foreground/85" />
-            <div className="h-2 w-1/2 rounded-full bg-border" />
-          </div>
-          <div className="grid grid-cols-3 gap-2.5 pt-1">
-            <div className="aspect-[4/3] rounded-lg bg-clay/30" />
-            <div className="aspect-[4/3] rounded-lg bg-accent-soft" />
-            <div className="aspect-[4/3] rounded-lg bg-[#dbe3ea]" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <ModernWebsiteDemo />;
 }
 
 /** Eindeutig als Terminbuchung erkennbar: Kalender, Datum, Zeitslots, Bestätigung. */

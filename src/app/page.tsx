@@ -11,7 +11,7 @@ import { Footer } from "@/components/Footer";
 export default function Home() {
   return (
     <>
-      <Navigation />
+      <Navigation heroLogoDockEnabled />
       <main className="flex-1">
         <Hero />
         <ProblemSolution />

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useTransform } from "framer-motion";
 import { siteConfig } from "@/lib/site";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Button } from "@/components/ui/Button";
@@ -10,14 +10,24 @@ import { LorizMark } from "@/components/icons/LorizMark";
 import { springLayout } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { heroLogoDockProgress, NAV_LOGO_DOM_ID } from "@/lib/heroLogoDock";
 
 type HoverRect = { left: number; width: number };
 
-export function Navigation() {
+type NavigationProps = {
+  heroLogoDockEnabled?: boolean;
+};
+
+export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
   const [scrolled, setScrolled] = useState(false);
   const [hoverRect, setHoverRect] = useState<HoverRect | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = usePrefersReducedMotion();
+  // Die fliegende Marke erreicht bei 0.9 bereits exakt diese Zielbox. Das
+  // echte Logo wird danach unter der noch opaken Portal-Marke aktiviert; erst
+  // anschließend blendet das Portal aus. So ist nie eine versetzte Dublette
+  // sichtbar und die Gesamtopazität bleibt konstant.
+  const dockedLogoOpacity = useTransform(heroLogoDockProgress, [0.9, 0.92], [0, 1]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -49,7 +59,14 @@ export function Navigation() {
           href="#start"
           className="flex items-center gap-2 rounded-full px-2 py-1 text-[1.05rem] font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
         >
-          <LorizMark className="h-5 w-5 shrink-0" />
+          <motion.span
+            id={heroLogoDockEnabled ? NAV_LOGO_DOM_ID : undefined}
+            aria-hidden="true"
+            className="flex h-5 w-5 shrink-0 items-center justify-center"
+            style={heroLogoDockEnabled ? { opacity: dockedLogoOpacity } : { opacity: 1 }}
+          >
+            <LorizMark className="h-full w-full" />
+          </motion.span>
           Loriz Digital
         </Link>
 
