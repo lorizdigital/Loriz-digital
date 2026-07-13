@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CursorFollower } from "@/components/CursorFollower";
+import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -9,10 +10,33 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://www.lorizdigital.de";
+const siteUrl = "https://loriz.digital";
+
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: siteConfig.name,
+  image: `${siteUrl}/opengraph-image`,
+  url: siteUrl,
+  telephone: siteConfig.phone,
+  email: siteConfig.email,
+  founder: { "@type": "Person", name: siteConfig.founder },
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Wiesenweg 23",
+    postalCode: "34379",
+    addressLocality: "Calden",
+    addressCountry: "DE",
+  },
+  description:
+    "Moderne Webseiten und digitale Lösungen für kleine Unternehmen, Handwerksbetriebe und Selbstständige.",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+  },
   title: {
     default: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
     template: "%s | Loriz Digital",
@@ -58,6 +82,10 @@ export default function RootLayout({
   return (
     <html lang="de" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+        />
         {children}
         <ScrollToTop />
         <CursorFollower />
