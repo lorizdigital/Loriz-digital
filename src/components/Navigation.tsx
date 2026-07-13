@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Button } from "@/components/ui/Button";
 import { LorizMark } from "@/components/icons/LorizMark";
-import { springLayout } from "@/lib/motion";
+import { easeGlass, springLayout } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { heroLogoDockProgress, NAV_LOGO_DOM_ID } from "@/lib/heroLogoDock";
@@ -46,15 +46,21 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4">
       <motion.div
-        layout
-        transition={springLayout}
         className={cn(
-          "flex w-full items-center justify-between backdrop-blur-[2px]",
+          "relative isolate flex w-full items-center justify-between backdrop-blur-[2px] transition-[max-width,margin-top,padding,border-radius] duration-700 ease-[var(--ease-glass)]",
           scrolled
-            ? "glass-floating backdrop-blur-[var(--glass-blur-lg)] mt-3 max-w-[calc(1200px-2rem)] rounded-full px-5 py-3 sm:px-6"
+            ? "mt-3 max-w-[calc(1200px-2rem)] rounded-full px-5 py-3 sm:px-6"
             : "max-w-[1200px] px-6 py-6 sm:px-8 lg:px-10",
         )}
       >
+        <motion.div
+          aria-hidden="true"
+          initial={false}
+          animate={{ opacity: scrolled ? 1 : 0 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.7, ease: easeGlass }}
+          className="glass-floating backdrop-blur-[var(--glass-blur-lg)] pointer-events-none absolute inset-0 -z-10 rounded-[inherit]"
+        />
+
         <Link
           href="#start"
           className="flex items-center gap-2 rounded-full px-2 py-1 text-[1.05rem] font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
