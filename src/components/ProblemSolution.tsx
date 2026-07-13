@@ -2,6 +2,7 @@ import { Sparkles, Smartphone, Clock } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { InteractiveCard } from "@/components/ui/InteractiveCard";
 
 const benefits = [
   {
@@ -52,7 +53,7 @@ export function ProblemSolution() {
         <div className="mt-16 grid gap-6 sm:grid-cols-3">
           {benefits.map((benefit, index) => (
             <Reveal key={benefit.title} variant="up" delay={index * 0.08}>
-              <div className="h-full rounded-2xl border border-border bg-surface p-8 shadow-soft transition-[transform,border-color,box-shadow] duration-500 ease-[var(--ease-glass)] hover:-translate-y-1 hover:border-clay/25 hover:shadow-glass-md sm:p-9">
+              <InteractiveCard className="h-full rounded-2xl border border-border bg-surface p-8 shadow-soft sm:p-9">
                 <benefit.icon aria-hidden="true" className="h-6 w-6 text-clay" strokeWidth={1.5} />
                 <h3 className="mt-6 text-lg font-medium tracking-tight text-foreground">
                   {benefit.title}
@@ -60,7 +61,7 @@ export function ProblemSolution() {
                 <p className="mt-3 text-[0.95rem] leading-relaxed text-muted-foreground">
                   {benefit.description}
                 </p>
-              </div>
+              </InteractiveCard>
             </Reveal>
           ))}
         </div>

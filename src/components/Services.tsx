@@ -2,6 +2,7 @@ import { Calendar, Check, CheckCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { ModernWebsiteDemo } from "@/components/ModernWebsiteDemo";
 import { cn } from "@/lib/cn";
 
@@ -136,7 +137,7 @@ export function Services() {
         <div className="mt-16 space-y-6">
           {services.map((service, i) => (
             <Reveal key={service.index} variant={i % 2 === 0 ? "left" : "right"} delay={0.05}>
-              <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft">
+              <InteractiveCard className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft">
                 <div
                   className={cn(
                     "grid items-stretch lg:grid-cols-2",
@@ -169,7 +170,7 @@ export function Services() {
                     <ServiceVisual variant={i} />
                   </div>
                 </div>
-              </div>
+              </InteractiveCard>
             </Reveal>
           ))}
         </div>
