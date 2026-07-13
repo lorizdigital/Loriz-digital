@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -7,6 +7,8 @@ import { TrustSignals } from "@/components/TrustSignals";
 import { siteConfig } from "@/lib/site";
 
 export function ClosingCta() {
+  const phoneHref = `tel:${siteConfig.phone.replace(/\s+/g, "")}`;
+
   return (
     <section id="kontakt" className="section-padding">
       <Container>
@@ -28,15 +30,27 @@ export function ClosingCta() {
               <Button href={`mailto:${siteConfig.email}`} variant="primary">
                 Unverbindlich anfragen
               </Button>
+              <Button href={phoneHref} variant="secondary">
+                Anrufen
+              </Button>
             </div>
 
-            <a
-              href={`mailto:${siteConfig.email}`}
-              className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Mail aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
-              Oder schreiben Sie direkt eine E-Mail an {siteConfig.email}
-            </a>
+            <div className="mt-6 flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-6">
+              <a
+                href={`mailto:${siteConfig.email}`}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Mail aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+                {siteConfig.email}
+              </a>
+              <a
+                href={phoneHref}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Phone aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+                {siteConfig.phone}
+              </a>
+            </div>
           </div>
         </Reveal>
       </Container>
