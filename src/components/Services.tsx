@@ -106,10 +106,14 @@ export function Services() {
         <div className="mt-16 space-y-6">
           {services.map((service, i) => (
             <Reveal key={service.index} variant={i % 2 === 0 ? "left" : "right"} delay={0.05}>
-              <InteractiveCard className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft">
+              <InteractiveCard
+                motionMode={i === 2 ? "highlight" : "tilt"}
+                className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft"
+              >
                 <div
                   className={cn(
                     "grid items-stretch lg:grid-cols-2",
+                    i === 2 && "lg:grid-cols-[minmax(16rem,0.72fr)_minmax(0,1.28fr)]",
                     i % 2 === 1 && "lg:[direction:rtl]",
                   )}
                 >

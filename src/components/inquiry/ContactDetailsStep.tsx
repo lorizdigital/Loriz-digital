@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 export type InquiryContactDraft = {
@@ -21,7 +22,7 @@ type ContactDetailsStepProps = {
 };
 
 const fieldClass =
-  "mt-2 min-h-12 w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/55 focus:border-clay/45 focus:ring-2 focus:ring-accent/20";
+  "mt-2.5 min-h-12 w-full rounded-xl border border-border bg-surface-muted/30 px-4 py-3 text-base text-foreground outline-none transition-[background-color,border-color,box-shadow] duration-300 placeholder:text-muted-foreground/55 hover:border-clay/25 focus:border-clay/45 focus:bg-surface focus:ring-2 focus:ring-clay/15";
 
 export function ContactDetailsStep({
   value,
@@ -40,20 +41,22 @@ export function ContactDetailsStep({
 
   return (
     <div>
-      <h3 className="text-lg font-medium leading-snug tracking-tight text-foreground sm:text-xl">
+      <h3 className="max-w-2xl text-xl font-medium leading-[1.3] tracking-[-0.02em] text-foreground sm:text-2xl">
         Wie darf ich Sie erreichen?
       </h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
         Ihre Kontaktdaten werden ausschließlich zur Bearbeitung dieser Anfrage verwendet.
       </p>
 
-      <div className="mt-6 grid gap-5 sm:grid-cols-2">
+      <div className="mt-7 grid gap-x-5 gap-y-6 sm:grid-cols-2">
         <FormField label="Name" name="name" required error={errors.name}>
           <input
             id="inquiry-name"
             name="name"
             autoComplete="name"
             value={value.name}
+            required
+            aria-required="true"
             maxLength={100}
             onChange={(event) => update("name", event.target.value)}
             className={fieldClass}
@@ -84,6 +87,8 @@ export function ContactDetailsStep({
             inputMode="email"
             autoComplete="email"
             value={value.email}
+            required
+            aria-required="true"
             maxLength={254}
             onChange={(event) => update("email", event.target.value)}
             className={fieldClass}
@@ -109,9 +114,9 @@ export function ContactDetailsStep({
         </FormField>
       </div>
 
-      <fieldset className="mt-6" aria-describedby={errors.preferredContact ? "preferred-contact-error" : undefined}>
+      <fieldset className="mt-8" aria-describedby={errors.preferredContact ? "preferred-contact-error" : undefined}>
         <legend className="text-sm font-medium text-foreground">Bevorzugter Kontaktweg</legend>
-        <div className="mt-3 flex flex-wrap gap-2.5">
+        <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
           {[
             ["email", "E-Mail"],
             ["phone", "Telefon"],
@@ -127,13 +132,24 @@ export function ContactDetailsStep({
                   update("preferredContact", optionValue as InquiryContactDraft["preferredContact"])
                 }
                 className={cn(
-                  "min-h-11 rounded-full border px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35",
+                  "flex min-h-12 items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[var(--ease-glass)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
                   selected
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border bg-surface text-foreground hover:border-clay/30",
+                    ? "border-clay/45 bg-accent-soft text-foreground shadow-soft"
+                    : "border-border bg-surface text-foreground hover:-translate-y-0.5 hover:border-clay/30 hover:shadow-soft",
                 )}
               >
-                {label}
+                <span>{label}</span>
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+                    selected
+                      ? "border-accent bg-accent text-accent-foreground"
+                      : "border-border bg-surface-muted text-transparent",
+                  )}
+                >
+                  <Check className="h-3 w-3" strokeWidth={2.5} />
+                </span>
               </button>
             );
           })}
@@ -145,13 +161,15 @@ export function ContactDetailsStep({
         )}
       </fieldset>
 
-      <div className="mt-6 rounded-xl border border-border bg-surface-muted/60 p-4">
-        <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-foreground">
+      <div className="mt-8 rounded-[1.1rem] border border-border bg-surface-muted/45 p-4 sm:p-5">
+        <label className="flex cursor-pointer items-start gap-3.5 text-sm leading-relaxed text-foreground">
           <input
             type="checkbox"
             checked={privacyAccepted}
+            required
+            aria-required="true"
             onChange={(event) => onPrivacyChange(event.target.checked)}
-            className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)]"
+            className="mt-0.5 h-5 w-5 shrink-0 rounded border-border accent-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted"
             aria-invalid={Boolean(errors.privacyAccepted)}
             aria-describedby={errors.privacyAccepted ? "privacy-error" : undefined}
           />
@@ -178,7 +196,7 @@ export function ContactDetailsStep({
       <button
         type="button"
         onClick={onContinue}
-        className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 py-2.5 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
       >
         Angaben prüfen
       </button>

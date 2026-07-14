@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, LoaderCircle, RotateCcw } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowRight, RotateCcw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChoiceQuestion } from "./ChoiceQuestion";
 import {
   ContactDetailsStep,
@@ -31,6 +31,7 @@ import type {
   QuestionId,
 } from "@/lib/inquiry/types";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { easeGlass } from "@/lib/motion";
 
 type Stage = "project-type" | "questions" | "contact" | "summary" | "success";
 type EditSection = "project" | "common" | "contact" | null;
@@ -128,8 +129,10 @@ export function PersonalInquiryChat() {
   }, [submissionError]);
 
   const visibleQuestionIds = useMemo(() => getVisibleQuestionIds(draft), [draft]);
-  const recentCompletedIds = completedQuestionIds.slice(-4);
-  const hiddenAnswerCount = Math.max(0, completedQuestionIds.length - recentCompletedIds.length);
+  const visibleQuestionSet = useMemo(() => new Set(visibleQuestionIds), [visibleQuestionIds]);
+  const visibleCompletedIds = completedQuestionIds.filter((id) => visibleQuestionSet.has(id));
+  const recentCompletedIds = visibleCompletedIds.slice(-4);
+  const hiddenAnswerCount = Math.max(0, visibleCompletedIds.length - recentCompletedIds.length);
 
   function delay(action: () => void) {
     window.setTimeout(action, prefersReducedMotion ? 0 : 320);
@@ -487,16 +490,25 @@ export function PersonalInquiryChat() {
     void fetchStartToken();
   }
 
-  const progress = stage === "success"
-    ? 100
-    : Math.min(
-        96,
-        Math.round(
-          ((completedQuestionIds.length + (draft.projectType ? 1 : 0) + (stage === "summary" ? 1 : 0)) /
-            Math.max(1, visibleQuestionIds.length + 3)) *
-            100,
-        ),
-      );
+  const totalSteps = visibleQuestionIds.length + 3;
+  const completedSteps =
+    (draft.projectType ? 1 : 0) +
+    visibleCompletedIds.length +
+    (stage === "summary" || stage === "success" ? 1 : 0) +
+    (stage === "success" ? 1 : 0);
+  const currentStep = Math.min(totalSteps, completedSteps + (stage === "success" ? 0 : 1));
+  const phaseIndex = stage === "project-type" ? 0 : stage === "questions" ? 1 : stage === "contact" ? 2 : 3;
+  const phaseLabel =
+    stage === "project-type"
+      ? "Orientierung"
+      : stage === "questions"
+        ? "Ihr Vorhaben"
+        : stage === "contact"
+          ? "Kontakt"
+            : stage === "summary"
+              ? "Prüfen"
+              : "Übermittelt";
+  const stepLabel = stage === "project-type" ? "Kurzer Einstieg" : `Schritt ${currentStep} von ${totalSteps}`;
 
   const currentQuestion = currentQuestionId ? QUESTION_CATALOG[currentQuestionId] : null;
   const currentAnswer = currentQuestionId ? draft.answers[currentQuestionId] : undefined;
@@ -507,42 +519,51 @@ export function PersonalInquiryChat() {
       : [];
 
   return (
-    <div className="bg-surface-muted/70 p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-border bg-surface shadow-glass-md">
-        <div className="border-b border-border px-5 py-4 sm:px-6">
-          <div className="flex items-center justify-between gap-4">
+    <div className="bg-surface-muted/70 p-2 sm:p-5 lg:p-6">
+      <div className="mx-auto max-w-3xl overflow-hidden rounded-[1.75rem] border border-border bg-surface shadow-glass-md">
+        <div className="border-b border-border/80 px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex flex-wrap items-start justify-between gap-x-5 gap-y-3">
             <div>
-              <p className="text-sm font-medium text-foreground">Persönliche Projektanfrage</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">Geführt, unverbindlich und direkt bei Loriz Digital</p>
+              <p className="text-sm font-medium tracking-tight text-foreground">Persönliche Projektanfrage</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Geführt, unverbindlich und direkt bei Loriz Digital</p>
             </div>
-            <span className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="h-2 w-2 rounded-full bg-[#7aa184]" aria-hidden="true" />
-              Anfrage
-            </span>
-          </div>
-          <div className="mt-4 h-1 overflow-hidden rounded-full bg-surface-muted" aria-hidden="true">
-            <div
-              className="h-full rounded-full bg-clay transition-[width] duration-500 ease-[var(--ease-glass)]"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="flex items-center gap-3" aria-label={`Fortschritt: ${phaseLabel}, ${stepLabel}`}>
+              <span className="text-right text-[0.68rem] leading-tight text-muted-foreground">
+                <span className="block font-medium text-foreground/80">{phaseLabel}</span>
+                <span className="tabular-nums">{stepLabel}</span>
+              </span>
+              <span className="flex items-center gap-1.5" aria-hidden="true">
+                {[0, 1, 2, 3].map((phase) => (
+                  <motion.span
+                    key={phase}
+                    animate={{
+                      width: phase === phaseIndex ? 16 : 5,
+                      opacity: phase <= phaseIndex ? 1 : 0.28,
+                    }}
+                    transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: easeGlass }}
+                    className={phase <= phaseIndex ? "h-[5px] rounded-full bg-clay" : "h-[5px] rounded-full bg-muted-foreground"}
+                  />
+                ))}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="px-5 py-6 sm:px-6 sm:py-8">
-          <div aria-label="Bisheriger Gesprächsverlauf" className="space-y-3">
-            <AssistantMessage>Wobei darf ich Sie unterstützen?</AssistantMessage>
-            {draft.projectType && <UserMessage>{getProjectTypeLabel(draft.projectType)}</UserMessage>}
+        <div className="px-4 py-6 sm:px-6 sm:py-9">
+          <div aria-label="Bisheriger Gesprächsverlauf" className="space-y-4">
+            <AssistantMessage reducedMotion={prefersReducedMotion}>Wobei darf ich Sie unterstützen?</AssistantMessage>
+            {draft.projectType && <UserMessage reducedMotion={prefersReducedMotion}>{getProjectTypeLabel(draft.projectType)}</UserMessage>}
             {hiddenAnswerCount > 0 && (
               <p className="py-1 text-center text-xs text-muted-foreground">
                 {hiddenAnswerCount} frühere Antworten erscheinen später vollständig in der Zusammenfassung.
               </p>
             )}
             {recentCompletedIds.map((id) => (
-              <div key={id} className="space-y-2">
-                <AssistantMessage>{QUESTION_CATALOG[id].prompt}</AssistantMessage>
-                <UserMessage>{formatAnswer(id).join(", ") || "Übersprungen"}</UserMessage>
+              <div key={id} className="space-y-3">
+                <AssistantMessage reducedMotion={prefersReducedMotion}>{QUESTION_CATALOG[id].prompt}</AssistantMessage>
+                <UserMessage reducedMotion={prefersReducedMotion}>{formatAnswer(id).join(", ") || "Übersprungen"}</UserMessage>
                 {draft.projectType === "not_sure" && id === "unsure_challenges" && (
-                  <AssistantMessage>
+                  <AssistantMessage reducedMotion={prefersReducedMotion}>
                     Auf Basis Ihrer Auswahl können wir gemeinsam klären, welche Lösung sinnvoll ist.
                   </AssistantMessage>
                 )}
@@ -557,8 +578,8 @@ export function PersonalInquiryChat() {
             key={`${stage}-${currentQuestionId ?? "panel"}`}
             initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-7 border-t border-border pt-7 outline-none"
+            transition={{ duration: prefersReducedMotion ? 0 : 0.38, ease: easeGlass }}
+            className="mt-8 border-t border-border/80 pt-8 outline-none sm:mt-10 sm:pt-9"
           >
             {stage === "project-type" && (
               <ChoiceQuestion
@@ -568,6 +589,8 @@ export function PersonalInquiryChat() {
                 options={PROJECT_TYPE_OPTIONS}
                 selectedValues={draft.projectType ? [draft.projectType] : []}
                 onSelect={(value) => chooseProjectType(value as ProjectType)}
+                reducedMotion={prefersReducedMotion}
+                hidePromptVisually
               />
             )}
 
@@ -586,6 +609,7 @@ export function PersonalInquiryChat() {
                   onSelect={selectChoice}
                   onOtherChange={currentQuestion.allowOther ? updateOther : undefined}
                   onContinue={currentQuestion.type === "multiple" ? continueMultiple : undefined}
+                  reducedMotion={prefersReducedMotion}
                 />
               ) : (
                 <InputQuestion
@@ -622,7 +646,7 @@ export function PersonalInquiryChat() {
             {stage === "summary" && (
               <div>
                 <InquirySummary sections={summarySections} onEdit={editSummarySection} />
-                <div className="mt-6">
+                <div className="mt-7">
                   <div className="pointer-events-none absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
                     <label htmlFor="inquiry-website-confirm">Webseite bestätigen</label>
                     <input
@@ -635,12 +659,29 @@ export function PersonalInquiryChat() {
                     />
                   </div>
                   <TurnstileWidget ref={turnstileRef} onReadyChange={setTurnstileReady} />
+                  <AnimatePresence initial={false}>
+                    {isSubmitting && (
+                      <motion.div
+                        initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={prefersReducedMotion ? undefined : { opacity: 0, y: -4 }}
+                        transition={{ duration: prefersReducedMotion ? 0 : 0.35, ease: easeGlass }}
+                        className="mb-5 flex items-center gap-4 rounded-[1.1rem] border border-clay/20 bg-accent-soft/70 p-4 sm:p-5"
+                      >
+                        <SendingGlyph reducedMotion={prefersReducedMotion} />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">Ihre Anfrage wird sicher übermittelt.</p>
+                          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Bitte lassen Sie dieses Fenster einen kurzen Moment geöffnet.</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                   {submissionError && (
                     <div
                       ref={submissionErrorRef}
                       tabIndex={-1}
                       role="alert"
-                      className="mb-4 rounded-xl border border-red-700/25 bg-red-50 p-4 text-sm leading-relaxed text-red-800 outline-none dark:border-red-300/25 dark:bg-red-950/25 dark:text-red-200"
+                      className="mb-5 rounded-[1.1rem] border border-red-700/25 bg-red-50 p-4 text-sm leading-relaxed text-red-800 outline-none dark:border-red-300/25 dark:bg-red-950/25 dark:text-red-200"
                     >
                       {submissionError} Ihre bisherigen Eingaben bleiben vollständig erhalten.
                     </div>
@@ -649,11 +690,10 @@ export function PersonalInquiryChat() {
                     type="button"
                     disabled={isSubmitting || !turnstileReady}
                     onClick={() => void submitInquiry()}
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-accent px-7 py-3 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow,opacity] duration-300 hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-center text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow,opacity] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 sm:w-auto sm:px-7"
                   >
-                    {isSubmitting && <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin" />}
                     {isSubmitting
-                      ? "Anfrage wird gesendet"
+                      ? "Anfrage wird übermittelt"
                       : turnstileReady
                         ? "Projektanfrage senden"
                         : "Sicherheitsprüfung wird geladen"}
@@ -663,20 +703,19 @@ export function PersonalInquiryChat() {
             )}
 
             {stage === "success" && (
-              <div className="py-4">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-soft text-clay">
-                  <Check aria-hidden="true" className="h-5 w-5" strokeWidth={2.2} />
-                </span>
-                <h3 className="mt-5 text-xl font-medium tracking-tight text-foreground">
+              <div className="py-4 sm:py-6">
+                <SuccessGlyph reducedMotion={prefersReducedMotion} />
+                <p className="mt-6 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Anfrage übermittelt</p>
+                <h3 className="mt-3 max-w-xl text-2xl font-medium tracking-[-0.025em] text-foreground sm:text-3xl">
                   Vielen Dank für Ihre Anfrage.
                 </h3>
-                <p className="mt-3 max-w-xl leading-relaxed text-muted-foreground">
+                <p className="mt-3 max-w-xl text-[0.96rem] leading-relaxed text-muted-foreground">
                   Ich sehe mir Ihre Angaben persönlich an und melde mich zeitnah bei Ihnen.
                 </p>
                 <button
                   type="button"
                   onClick={resetInquiry}
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-clay/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35"
+                  className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-foreground transition-[background-color,border-color,box-shadow] duration-300 hover:border-clay/30 hover:bg-surface-muted/40 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 sm:w-auto"
                 >
                   <RotateCcw aria-hidden="true" className="h-4 w-4" />
                   Neue Anfrage beginnen
@@ -690,27 +729,86 @@ export function PersonalInquiryChat() {
   );
 }
 
-function AssistantMessage({ children }: { children: React.ReactNode }) {
+function AssistantMessage({
+  children,
+  reducedMotion,
+}: {
+  children: React.ReactNode;
+  reducedMotion: boolean;
+}) {
   return (
-    <div className="flex items-end gap-2.5">
-      <span aria-hidden="true" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2a2a25] to-accent text-[0.58rem] font-medium text-accent-foreground">
-        LL
+    <motion.div
+      initial={reducedMotion ? false : { opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.34, ease: easeGlass }}
+      className="flex items-start gap-2.5"
+    >
+      <span aria-hidden="true" className="relative mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface shadow-soft">
+        <span className="absolute h-3 w-[3px] -translate-x-[2px] -rotate-[28deg] rounded-full bg-foreground/85" />
+        <span className="absolute h-3 w-[3px] translate-x-[2px] rotate-[28deg] rounded-full bg-clay" />
       </span>
-      <p className="max-w-[85%] break-words rounded-2xl rounded-bl-sm bg-surface-muted px-4 py-2.5 text-sm leading-relaxed text-foreground shadow-soft [overflow-wrap:anywhere]">
+      <p className="max-w-[calc(100%_-_2.4rem)] break-words rounded-[1.1rem] border border-border/70 bg-surface-muted/65 px-4 py-3 text-sm leading-relaxed text-foreground shadow-soft [overflow-wrap:anywhere] sm:max-w-[85%]">
         <span className="sr-only">Loriz Digital: </span>
         {children}
       </p>
-    </div>
+    </motion.div>
   );
 }
 
-function UserMessage({ children }: { children: React.ReactNode }) {
+function UserMessage({ children, reducedMotion }: { children: React.ReactNode; reducedMotion: boolean }) {
   return (
-    <div className="flex justify-end">
-      <p className="max-w-[85%] break-words rounded-2xl rounded-br-sm bg-accent px-4 py-2.5 text-sm leading-relaxed text-accent-foreground [overflow-wrap:anywhere]">
+    <motion.div
+      initial={reducedMotion ? false : { opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.34, ease: easeGlass }}
+      className="flex justify-end"
+    >
+      <p className="max-w-[92%] break-words rounded-[1.1rem] border border-clay/20 bg-accent-soft px-4 py-3 text-sm font-medium leading-relaxed text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.28)] [overflow-wrap:anywhere] sm:max-w-[82%]">
         {children}
       </p>
-    </div>
+    </motion.div>
+  );
+}
+
+function SendingGlyph({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <span aria-hidden="true" className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-clay/20 bg-surface">
+      <motion.span
+        animate={reducedMotion ? undefined : { x: [-2, 1, -2], opacity: [0.55, 1, 0.55] }}
+        transition={{ duration: 1.5, ease: "easeInOut", repeat: Infinity }}
+        className="absolute h-4 w-[3px] -translate-x-[2px] -rotate-[28deg] rounded-full bg-foreground/80"
+      />
+      <motion.span
+        animate={reducedMotion ? undefined : { x: [2, -1, 2], opacity: [0.55, 1, 0.55] }}
+        transition={{ duration: 1.5, ease: "easeInOut", repeat: Infinity }}
+        className="absolute h-4 w-[3px] translate-x-[2px] rotate-[28deg] rounded-full bg-clay"
+      />
+    </span>
+  );
+}
+
+function SuccessGlyph({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <motion.div
+      aria-hidden="true"
+      initial={reducedMotion ? false : { opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: reducedMotion ? 0 : 0.55, ease: easeGlass }}
+      className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-clay/20 bg-accent-soft shadow-soft"
+    >
+      <motion.span
+        initial={reducedMotion ? false : { x: -7, opacity: 0 }}
+        animate={{ x: -2.5, opacity: 1 }}
+        transition={{ duration: reducedMotion ? 0 : 0.55, delay: reducedMotion ? 0 : 0.08, ease: easeGlass }}
+        className="absolute h-6 w-1 -rotate-[28deg] rounded-full bg-foreground/85"
+      />
+      <motion.span
+        initial={reducedMotion ? false : { x: 7, opacity: 0 }}
+        animate={{ x: 2.5, opacity: 1 }}
+        transition={{ duration: reducedMotion ? 0 : 0.55, delay: reducedMotion ? 0 : 0.12, ease: easeGlass }}
+        className="absolute h-6 w-1 rotate-[28deg] rounded-full bg-clay"
+      />
+    </motion.div>
   );
 }
 
@@ -740,10 +838,10 @@ function InputQuestion({
   const errorId = `${id}-error`;
   return (
     <div>
-      <label htmlFor={id} className="text-lg font-medium leading-snug tracking-tight text-foreground sm:text-xl">
+      <label htmlFor={id} className="max-w-2xl text-xl font-medium leading-[1.3] tracking-[-0.02em] text-foreground sm:text-2xl">
         {prompt}
       </label>
-      {optional && <p className="mt-2 text-sm text-muted-foreground">Diese Angabe ist freiwillig.</p>}
+      {optional && <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">Diese Angabe ist freiwillig.</p>}
       {maxLength > 300 ? (
         <textarea
           id={id}
@@ -754,7 +852,7 @@ function InputQuestion({
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
-          className="mt-4 w-full resize-y rounded-xl border border-border bg-surface px-4 py-3 text-base leading-relaxed text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/55 focus:border-clay/45 focus:ring-2 focus:ring-accent/20"
+          className="mt-5 w-full resize-y rounded-[1.1rem] border border-border bg-surface-muted/30 px-4 py-3.5 text-base leading-relaxed text-foreground outline-none transition-[background-color,border-color,box-shadow] duration-300 placeholder:text-muted-foreground/55 hover:border-clay/25 focus:border-clay/45 focus:bg-surface focus:ring-2 focus:ring-clay/15"
         />
       ) : (
         <input
@@ -767,20 +865,21 @@ function InputQuestion({
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
-          className="mt-4 min-h-12 w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-muted-foreground/55 focus:border-clay/45 focus:ring-2 focus:ring-accent/20"
+          className="mt-5 min-h-12 w-full rounded-[1.1rem] border border-border bg-surface-muted/30 px-4 py-3 text-base text-foreground outline-none transition-[background-color,border-color,box-shadow] duration-300 placeholder:text-muted-foreground/55 hover:border-clay/25 focus:border-clay/45 focus:bg-surface focus:ring-2 focus:ring-clay/15"
         />
       )}
-      <div className="mt-1.5 flex items-center justify-between gap-4 text-xs text-muted-foreground">
+      <div className="mt-2 flex items-center justify-between gap-4 text-xs text-muted-foreground">
         <span>{optional && !value ? "Kann übersprungen werden" : ""}</span>
-        <span>{value.length}/{maxLength}</span>
+        <span className="tabular-nums">{value.length}/{maxLength}</span>
       </div>
       {error && <p id={errorId} role="alert" className="mt-2 text-sm text-red-700 dark:text-red-300">{error}</p>}
       <button
         type="button"
         onClick={onContinue}
-        className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 py-2.5 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface sm:w-auto"
       >
         {optional && !value ? "Überspringen" : "Weiter"}
+        <ArrowRight aria-hidden="true" className="h-4 w-4" strokeWidth={1.8} />
       </button>
     </div>
   );
