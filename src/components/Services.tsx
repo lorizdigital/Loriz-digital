@@ -1,9 +1,10 @@
-import { Calendar, Check, CheckCheck } from "lucide-react";
+import { Calendar, Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { ModernWebsiteDemo } from "@/components/ModernWebsiteDemo";
+import { PersonalInquiryChat } from "@/components/inquiry/PersonalInquiryChat";
 import { cn } from "@/lib/cn";
 
 const services = [
@@ -81,42 +82,10 @@ function BookingVisual() {
   );
 }
 
-/** Eindeutig als persönliche Kommunikation erkennbar: Chat-Verlauf mit Lesebestätigung. */
-function ConversationVisual() {
-  return (
-    <div className="flex h-full flex-col justify-center gap-2.5 p-8 sm:p-10">
-      <div className="flex items-end gap-2">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2a2a25] to-accent text-[0.6rem] font-medium text-accent-foreground">
-          LL
-        </span>
-        <div className="max-w-[75%] space-y-1.5 rounded-2xl rounded-bl-sm bg-surface px-4 py-3 shadow-soft">
-          <div className="h-2 w-28 rounded-full bg-foreground/55" />
-          <div className="h-2 w-16 rounded-full bg-foreground/35" />
-        </div>
-      </div>
-      <div className="flex justify-end">
-        <div className="max-w-[65%] space-y-1.5 rounded-2xl rounded-br-sm bg-accent px-4 py-3">
-          <div className="h-2 w-24 rounded-full bg-accent-foreground/70" />
-        </div>
-      </div>
-      <div className="flex items-end gap-2">
-        <span className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-br from-[#2a2a25] to-accent" />
-        <div className="max-w-[55%] rounded-2xl rounded-bl-sm bg-surface px-4 py-3 shadow-soft">
-          <div className="h-2 w-14 rounded-full bg-foreground/45" />
-        </div>
-      </div>
-      <div className="flex items-center justify-end gap-1.5 pr-1 pt-1">
-        <div className="h-1.5 w-10 rounded-full bg-border" />
-        <CheckCheck aria-hidden="true" className="h-3.5 w-3.5 text-clay" strokeWidth={2.5} />
-      </div>
-    </div>
-  );
-}
-
 function ServiceVisual({ variant }: { variant: number }) {
   if (variant === 0) return <WebsiteVisual />;
   if (variant === 1) return <BookingVisual />;
-  return <ConversationVisual />;
+  return <PersonalInquiryChat />;
 }
 
 export function Services() {
