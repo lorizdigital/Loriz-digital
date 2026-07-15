@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { HeroLogoReveal } from "@/components/HeroLogoReveal";
@@ -24,17 +24,8 @@ function textStepAtLeast(current: TextStep, target: TextStep) {
 export function Hero() {
   const shouldReduceMotion = usePrefersReducedMotion();
   const { x, y } = usePointerParallax();
-  const textRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress: textScrollProgress } = useScroll({
-    target: textRef,
-    offset: ["start end", "end start"],
-  });
-
-  const textScrollY = useTransform(textScrollProgress, [0, 1], shouldReduceMotion ? [0, 0] : [8, -8]);
   const textMouseX = useTransform(x, [-1, 1], shouldReduceMotion ? [0, 0] : [-4, 4]);
   const textMouseY = useTransform(y, [-1, 1], shouldReduceMotion ? [0, 0] : [-3, 3]);
-  const textY = useTransform([textScrollY, textMouseY], (values: number[]) => values[0] + values[1]);
 
   // Gemeinsame Orchestrierung: Text-Stufen laufen linear durch, und genau der
   // Moment, in dem die CTA-Reihe erscheint, ist zugleich das explizite
@@ -100,7 +91,7 @@ export function Hero() {
       <AtmosphericBackground />
 
       <Container className="grid items-center gap-12 md:grid-cols-[1.2fr_0.8fr] md:gap-8 lg:grid-cols-2 lg:gap-14 xl:grid-cols-[0.86fr_1.14fr]">
-        <motion.div ref={textRef} style={{ x: textMouseX, y: textY }}>
+        <motion.div style={{ x: textMouseX, y: textMouseY }}>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={textStepAtLeast(textStep, "claim") ? { opacity: 1, y: 0 } : undefined}
@@ -110,10 +101,10 @@ export function Hero() {
             {siteConfig.slogan}
           </motion.h1>
 
-          {/* Mobil: Logo direkt unter der Headline. Ab Tablet steht es platzsparend
-              in der zweiten Grid-Spalte; die Scroll-Ueberfuehrung bleibt rein mobil. */}
+          {/* Mobil fliegt genau eine Logo-Instanz aus diesem Platzhalter zur
+              Navigation und bleibt dort angedockt. */}
           <div className="my-5 sm:my-6 md:hidden">
-            <HeroLogoMobileDock ready={logoReady}>
+            <HeroLogoMobileDock>
               <HeroLogoReveal
                 start={logoStart}
                 mouseX={x}

@@ -71,12 +71,7 @@ export function ChoiceQuestion({
               type="button"
               aria-pressed={selected}
               onClick={() => onSelect(option.value)}
-              initial={reducedMotion ? false : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reducedMotion ? 0 : 0.22,
-                ease: easeGlass,
-              }}
+              initial={false}
               whileHover={reducedMotion ? undefined : { y: -2 }}
               whileTap={reducedMotion ? undefined : { scale: 0.992 }}
               className={cn(

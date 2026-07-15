@@ -8,28 +8,28 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { motion, useMotionValue } from "framer-motion";
-import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useIsMounted } from "@/hooks/useIsMounted";
-import { heroLogoDockProgress, NAV_LOGO_DOM_ID } from "@/lib/heroLogoDock";
-
-/**
- * Distanz (px), über die sich die mobile Scroll-Überführung erstreckt. Bewusst
- * ein fester Wert statt an die Hero-Höhe gekoppelt – hält den Übergang auf
- * allen realistischen Mobil-Bildschirmen kurz und kontrolliert, ohne eine
- * zusätzliche Höhen-Messung als weitere Fehlerquelle einzuführen.
- */
-const DOCK_DISTANCE = 300;
-
-type Rect = { top: number; left: number; width: number; height: number };
-type TargetGeometry = { centerX: number; centerY: number; height: number };
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { MOBILE_LOGO_TARGET_ID } from "@/lib/mobileLogoDock";
 
 const MOBILE_QUERY = "(max-width: 767px)";
+const DOCK_DISTANCE = 300;
+
+type DockGeometry = {
+  sourceDocumentLeft: number;
+  sourceDocumentTop: number;
+  sourceWidth: number;
+  sourceHeight: number;
+  sourceMarkHeight: number;
+  targetCenterX: number;
+  targetCenterY: number;
+  targetHeight: number;
+};
 
 function subscribeMobile(callback: () => void) {
-  const mql = window.matchMedia(MOBILE_QUERY);
-  mql.addEventListener("change", callback);
-  return () => mql.removeEventListener("change", callback);
+  const query = window.matchMedia(MOBILE_QUERY);
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
 }
 
 function getMobileSnapshot() {
@@ -40,229 +40,219 @@ function getMobileServerSnapshot() {
   return false;
 }
 
-function useIsMobile() {
-  return useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServerSnapshot);
+function smoothstep(value: number) {
+  return value * value * (3 - 2 * value);
 }
-
-type HeroLogoMobileDockProps = {
-  children: ReactNode;
-  ready: boolean;
-};
 
 /**
- * Nur auf Mobil (< md) und ohne prefers-reduced-motion aktiv: überführt das
- * fertige Hero-Logo direkt scrollgebunden zur tatsächlichen Position des
- * Navigations-Logos. Auf Tablet/Desktop (>= md) oder bei reduzierter Bewegung
- * wird schlicht das Kind unverändert gerendert – ohne jeden Scroll-Listener.
+ * Eine einzige mobile Logo-Instanz. Bis zum Beginn der Ueberfuehrung liegt
+ * sie absolut an ihrer natuerlichen Dokumentposition und scrollt damit ohne
+ * JavaScript-Lag. Nur waehrend der kurzen Reise wird ein GPU-Transform
+ * aktualisiert; am Ziel wechselt dieselbe Instanz auf fixed und bleibt dort.
  */
-export function HeroLogoMobileDock({ children, ready }: HeroLogoMobileDockProps) {
-  const isMobile = useIsMobile();
+export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
+  const mounted = useIsMounted();
+  const isMobile = useSyncExternalStore(
+    subscribeMobile,
+    getMobileSnapshot,
+    getMobileServerSnapshot,
+  );
   const prefersReducedMotion = usePrefersReducedMotion();
-  const active = isMobile && !prefersReducedMotion;
-
-  useLayoutEffect(() => {
-    if (!active) heroLogoDockProgress.set(1);
-  }, [active]);
-
-  if (!active) {
-    return <>{children}</>;
-  }
-
-  return <HeroLogoDockActive ready={ready}>{children}</HeroLogoDockActive>;
-}
-
-function HeroLogoDockActive({ children, ready }: HeroLogoMobileDockProps) {
   const placeholderRef = useRef<HTMLDivElement>(null);
   const sourceMarkRef = useRef<HTMLDivElement>(null);
-  const [initialRect, setInitialRect] = useState<Rect | null>(null);
-  const [initialMarkHeight, setInitialMarkHeight] = useState(0);
-  const [targetGeometry, setTargetGeometry] = useState<TargetGeometry | null>(null);
-  const mounted = useIsMounted();
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const scale = useMotionValue(1);
-  const heroOpacity = useMotionValue(1);
+  const flyingLogoRef = useRef<HTMLDivElement>(null);
+  const [geometry, setGeometry] = useState<DockGeometry | null>(null);
+  const active = mounted && isMobile && !prefersReducedMotion;
 
-  // Startgeometrie: eigene, im Fluss stehende Platzhalter-Box. In eine
-  // scroll-invariante ("Dokument"-)Referenz umgerechnet, damit die spätere
-  // Transform-Berechnung unabhängig vom Scroll-Stand zum Messzeitpunkt ist.
   useLayoutEffect(() => {
+    if (!active) return;
+
+    let width = window.innerWidth;
+    let cancelled = false;
+
     function measure() {
-      const el = placeholderRef.current;
-      const mark = sourceMarkRef.current;
-      if (!el || !mark) return;
-      const rect = el.getBoundingClientRect();
-      const markRect = mark.getBoundingClientRect();
-      setInitialRect({
-        top: rect.top + window.scrollY,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-        height: rect.height,
-      });
-      setInitialMarkHeight(markRect.height);
-    }
+      if (cancelled) return;
+      const placeholder = placeholderRef.current;
+      const sourceMark = sourceMarkRef.current;
+      const target = document.getElementById(MOBILE_LOGO_TARGET_ID);
+      if (!placeholder || !sourceMark || !target) return;
 
-    measure();
+      const sourceRect = placeholder.getBoundingClientRect();
+      const sourceMarkRect = sourceMark.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      if (!sourceRect.width || !sourceMarkRect.height || !targetRect.height) return;
 
-    const el = placeholderRef.current;
-    const resizeObserver = new ResizeObserver(measure);
-    if (el) resizeObserver.observe(el);
-
-    // Mobile Browserleisten veraendern beim Scrollen nur die Viewport-Hoehe
-    // und feuern dabei resize. Die Startgeometrie ist davon unabhaengig; eine
-    // erneute React-State-Aktualisierung wuerde hier nur Frames kosten.
-    let viewportWidth = window.innerWidth;
-    function onResize() {
-      if (window.innerWidth === viewportWidth) return;
-      viewportWidth = window.innerWidth;
-      measure();
-    }
-
-    window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", measure);
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("orientationchange", measure);
-    };
-  }, []);
-
-  // Zielgeometrie: das echte Navigationslogo. Die mobile Navigation behaelt
-  // waehrend des Scrollens bewusst dieselbe Geometrie. Deshalb genuegt eine
-  // Messung bei Mount bzw. echter Breiten-/Orientierungsaenderung; synchrone
-  // Layout-Reads in jedem Scroll-Frame sind nicht mehr erforderlich.
-  useLayoutEffect(() => {
-    function measure() {
-      const el = document.getElementById(NAV_LOGO_DOM_ID);
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      setTargetGeometry({
-        centerX: rect.left + rect.width / 2,
-        centerY: rect.top + rect.height / 2,
-        height: rect.height,
+      setGeometry({
+        sourceDocumentLeft: sourceRect.left + window.scrollX,
+        sourceDocumentTop: sourceRect.top + window.scrollY,
+        sourceWidth: sourceRect.width,
+        sourceHeight: sourceRect.height,
+        sourceMarkHeight: sourceMarkRect.height,
+        targetCenterX: targetRect.left + targetRect.width / 2,
+        targetCenterY: targetRect.top + targetRect.height / 2,
+        targetHeight: targetRect.height,
       });
     }
 
-    measure();
-
-    let viewportWidth = window.innerWidth;
     function onResize() {
-      if (window.innerWidth === viewportWidth) return;
-      viewportWidth = window.innerWidth;
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
       measure();
     }
 
+    measure();
+    const placeholder = placeholderRef.current;
+    const target = document.getElementById(MOBILE_LOGO_TARGET_ID);
+    const resizeObserver = new ResizeObserver(measure);
+    if (placeholder) resizeObserver.observe(placeholder);
+    if (target) resizeObserver.observe(target);
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", measure);
-
-    const el = document.getElementById(NAV_LOGO_DOM_ID);
-    const resizeObserver = new ResizeObserver(measure);
-    if (el) resizeObserver.observe(el);
+    window.addEventListener("pageshow", measure);
+    void document.fonts?.ready.then(measure);
 
     return () => {
+      cancelled = true;
+      resizeObserver.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", measure);
-      resizeObserver.disconnect();
+      window.removeEventListener("pageshow", measure);
     };
-  }, []);
+  }, [active]);
 
-  // Alle visuellen Werte werden in demselben Scroll-Callback aus exakt
-  // demselben window.scrollY berechnet. Dadurch koennen Position, Skalierung
-  // und Crossfade bei grossen Scrollspruengen nicht in verschiedenen Frames
-  // auf alten Zwischenwerten stehen bleiben. Der Callback enthaelt nur
-  // Arithmetik und MotionValue-Writes, keine Layout-Reads oder React-Updates.
   useLayoutEffect(() => {
-    if (!initialRect || !targetGeometry) return;
+    const element = flyingLogoRef.current;
+    if (!active || !element || !geometry) return;
+    const flyingElement = element;
+    const dockGeometry = geometry;
 
-    const currentTargetGeometry = targetGeometry;
-    const initialCenterX = initialRect.left + initialRect.width / 2;
-    const initialCenterY = initialRect.top + initialRect.height / 2;
-    const targetScale =
-      initialMarkHeight > 0 && currentTargetGeometry.height > 0
-        ? currentTargetGeometry.height / initialMarkHeight
-        : 1;
+    let animationFrame: number | null = null;
+    let mode: "absolute" | "fixed" = "absolute";
+    let lastEndpoint: 0 | 1 | null = null;
 
-    function updateFromScroll() {
-      const scrollPosition = window.scrollY;
-      const normalized = Math.min(1, Math.max(0, scrollPosition) / DOCK_DISTANCE);
-      const smoothProgress = normalized * normalized * (3 - 2 * normalized);
-      const dockProgress = ready ? smoothProgress : 0;
-      const travelProgress = Math.min(1, Math.max(0, dockProgress / 0.9));
+    function renderAtCurrentScroll() {
+      animationFrame = null;
+      const scrollY = window.scrollY;
+      const normalized = Math.min(1, Math.max(0, scrollY / DOCK_DISTANCE));
+      const progress = smoothstep(normalized);
+      const verticalPhase = Math.min(1, Math.max(0, (normalized - 0.45) / 0.55));
+      const verticalProgress = smoothstep(verticalPhase);
+      const targetScale = dockGeometry.targetHeight / dockGeometry.sourceMarkHeight;
+      const nextMode =
+        mode === "fixed"
+          ? verticalProgress >= 0.78
+            ? "fixed"
+            : "absolute"
+          : verticalProgress >= 0.85
+            ? "fixed"
+            : "absolute";
 
-      x.set((currentTargetGeometry.centerX - initialCenterX) * travelProgress);
-      // Negative Scrollwerte werden bewusst beibehalten: Das Portal folgt so
-      // auch dem elastischen Mobile-Overscroll gemeinsam mit dem Hero-Inhalt.
-      y.set(
-        (currentTargetGeometry.centerY - initialCenterY) * travelProgress -
-          scrollPosition * (1 - travelProgress),
-      );
-      scale.set(1 + (targetScale - 1) * travelProgress);
+      if (nextMode === "fixed" && normalized === 1 && lastEndpoint === 1) {
+        return;
+      }
+      if (nextMode === "absolute" && normalized === 0 && lastEndpoint === 0) {
+        return;
+      }
 
-      const opacity = Math.min(1, Math.max(0, (1 - dockProgress) / 0.06));
-      heroOpacity.set(opacity);
-      heroLogoDockProgress.set(dockProgress);
+      if (nextMode !== mode) {
+        mode = nextMode;
+        flyingElement.style.position = mode;
+        if (mode === "fixed") {
+          flyingElement.style.left = "0px";
+          flyingElement.style.top = "0px";
+        } else {
+          flyingElement.style.left = `${dockGeometry.sourceDocumentLeft}px`;
+          flyingElement.style.top = `${dockGeometry.sourceDocumentTop}px`;
+        }
+      }
+
+      const sourceCenterX =
+        dockGeometry.sourceDocumentLeft + dockGeometry.sourceWidth / 2;
+      const sourceCenterY =
+        dockGeometry.sourceDocumentTop + dockGeometry.sourceHeight / 2;
+      const sourceViewportY = sourceCenterY - scrollY;
+      const desiredCenterX =
+        sourceCenterX + (dockGeometry.targetCenterX - sourceCenterX) * progress;
+      const desiredViewportY =
+        sourceViewportY +
+        (dockGeometry.targetCenterY - sourceViewportY) * verticalProgress;
+      // Die vertikale Reise beginnt bewusst spaeter als Skalierung und
+      // Seitwaertsbewegung. So bleibt die Marke zuerst im freien Hero-Bereich
+      // und steigt erst als bereits kleine Form in den Header auf, statt mit
+      // der grossen Headline optisch zu verschmelzen.
+      const scale = 1 + (targetScale - 1) * progress;
+
+      if (mode === "fixed") {
+        flyingElement.style.transform = `translate3d(${desiredCenterX - dockGeometry.sourceWidth / 2}px, ${desiredViewportY - dockGeometry.sourceHeight / 2}px, 0) scale(${scale})`;
+      } else {
+        const translateX = desiredCenterX - sourceCenterX;
+        const desiredDocumentY = scrollY + desiredViewportY;
+        const translateY = desiredDocumentY - sourceCenterY;
+        flyingElement.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+      }
+
+      lastEndpoint = normalized === 0 ? 0 : normalized === 1 ? 1 : null;
     }
 
-    updateFromScroll();
-    window.addEventListener("scroll", updateFromScroll, { passive: true });
-    return () => window.removeEventListener("scroll", updateFromScroll);
-  }, [
-    heroOpacity,
-    initialMarkHeight,
-    initialRect,
-    ready,
-    scale,
-    targetGeometry,
-    x,
-    y,
-  ]);
+    function scheduleRender() {
+      if (animationFrame !== null) return;
+      animationFrame = window.requestAnimationFrame(renderAtCurrentScroll);
+    }
 
-  useLayoutEffect(() => {
-    // Beim (Wieder-)Aktivieren des mobilen Docks darf kein alter globaler
-    // Fortschrittswert aus einem vorherigen Breakpoint-Zustand aufblitzen.
-    heroLogoDockProgress.set(0);
-    return () => heroLogoDockProgress.set(1);
-  }, []);
+    renderAtCurrentScroll();
+    window.addEventListener("scroll", scheduleRender, { passive: true });
+    window.addEventListener("pageshow", scheduleRender);
+
+    return () => {
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("scroll", scheduleRender);
+      window.removeEventListener("pageshow", scheduleRender);
+    };
+  }, [active, geometry]);
 
   return (
     <>
       <div
         ref={placeholderRef}
         aria-hidden="true"
-        className="pointer-events-none flex w-full items-center justify-center py-1 sm:py-4 lg:py-0"
+        className={
+          mounted && !active
+            ? "pointer-events-none w-full"
+            : "pointer-events-none flex w-full items-center justify-center py-1 sm:py-4"
+        }
       >
-        <div
-          ref={sourceMarkRef}
-          className="h-20 sm:h-28"
-          style={{ aspectRatio: "140.4 / 162.6" }}
-        />
+        {mounted && !active ? (
+          children
+        ) : (
+          <div
+            ref={sourceMarkRef}
+            className="h-20 sm:h-28"
+            style={{ aspectRatio: "140.4 / 162.6" }}
+          />
+        )}
       </div>
 
-      {mounted &&
-        initialRect &&
+      {active &&
+        geometry &&
         createPortal(
-          <motion.div
+          <div
+            ref={flyingLogoRef}
             aria-hidden="true"
             style={{
-              position: "fixed",
-              top: initialRect.top,
-              left: initialRect.left,
-              width: initialRect.width,
-              height: initialRect.height,
-              x,
-              y,
-              scale,
-              opacity: heroOpacity,
-              willChange: "transform, opacity",
+              position: "absolute",
+              left: geometry.sourceDocumentLeft,
+              top: geometry.sourceDocumentTop,
+              width: geometry.sourceWidth,
+              height: geometry.sourceHeight,
+              transformOrigin: "center center",
+              willChange: "transform",
+              backfaceVisibility: "hidden",
               pointerEvents: "none",
-              // Das Logo fliegt sichtbar vor dem Header. Das geoeffnete
-              // MobileMenu-Panel liegt separat auf Ebene 70 und deckt es ab.
               zIndex: 60,
             }}
           >
             {children}
-          </motion.div>,
+          </div>,
           document.body,
         )}
     </>

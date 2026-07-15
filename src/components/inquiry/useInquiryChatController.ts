@@ -47,14 +47,12 @@ function newRequestId(): string {
 
 type InquiryChatRefs = {
   chatViewportRef: RefObject<HTMLDivElement | null>;
-  currentPanelRef: RefObject<HTMLDivElement | null>;
   submissionErrorRef: RefObject<HTMLDivElement | null>;
   turnstileRef: RefObject<TurnstileWidgetHandle | null>;
 };
 
 export function useInquiryChatController({
   chatViewportRef,
-  currentPanelRef,
   submissionErrorRef,
   turnstileRef,
 }: InquiryChatRefs) {
@@ -105,24 +103,13 @@ export function useInquiryChatController({
 
   useLayoutEffect(() => {
     const viewport = chatViewportRef.current;
-    const panel = currentPanelRef.current;
-    if (!viewport || !panel || !hasInteractedRef.current) return;
+    if (!viewport || !hasInteractedRef.current) return;
 
-    // Der Chat besitzt einen eigenen stabilen Scrollbereich. Dadurch bewegt
-    // ein neuer Turn nicht mehr die gesamte Webseite. Die kleine Vorlaufzone
-    // hält die neue Assistant-Blase oberhalb der Antwortoptionen sichtbar.
-    viewport.scrollTo({
-      top: Math.max(0, panel.offsetTop - 96),
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-    });
-    panel.focus({ preventScroll: true });
-  }, [
-    chatViewportRef,
-    currentPanelRef,
-    currentQuestionId,
-    prefersReducedMotion,
-    stage,
-  ]);
+    // Nur der Antwortbereich wird zurueckgesetzt. Der kompakte Kontext bleibt
+    // ausserhalb dieses Scrollbereichs dauerhaft sichtbar. Direkt vor dem
+    // Paint entsteht dadurch weder eine lange Scrollfahrt noch Seitenbewegung.
+    viewport.scrollTop = 0;
+  }, [chatViewportRef, currentQuestionId, stage]);
 
   useEffect(() => {
     if (!submissionError) return;

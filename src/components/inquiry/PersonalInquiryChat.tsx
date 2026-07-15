@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChoiceQuestion } from "./ChoiceQuestion";
 import { ContactDetailsStep } from "./ContactDetailsStep";
 import { InquiryChatHeader } from "./InquiryChatHeader";
@@ -16,26 +16,9 @@ import { InquirySummary } from "./InquirySummary";
 import { InputQuestion } from "./InputQuestion";
 import { TurnstileWidget, type TurnstileWidgetHandle } from "./TurnstileWidget";
 import { useInquiryChatController } from "./useInquiryChatController";
-import {
-  PROJECT_TYPE_OPTIONS,
-  QUESTION_CATALOG,
-  getProjectTypeLabel,
-} from "@/lib/inquiry/catalog";
+import { PROJECT_TYPE_OPTIONS, getProjectTypeLabel } from "@/lib/inquiry/catalog";
 import type { ProjectType } from "@/lib/inquiry/types";
 import { easeGlass } from "@/lib/motion";
-
-const PROJECT_TYPE_TRANSITIONS: Record<ProjectType, string> = {
-  new_website:
-    "Dann schauen wir gemeinsam, was Ihre neue Webseite erreichen und für Sie übernehmen soll.",
-  website_redesign:
-    "Dann sehen wir uns kurz an, wo Ihre bestehende Webseite heute noch nicht überzeugt.",
-  digital_processes:
-    "Dann schauen wir darauf, welcher Ablauf heute unnötig Zeit kostet oder kompliziert ist.",
-  custom_software:
-    "Dann grenzen wir gemeinsam ein, welche Aufgabe die Anwendung für Sie übernehmen soll.",
-  not_sure:
-    "Das ist völlig in Ordnung. Mit ein paar kurzen Fragen lässt sich meist schnell erkennen, welche Lösung sinnvoll ist.",
-};
 
 export function PersonalInquiryChat() {
   const chatViewportRef = useRef<HTMLDivElement>(null);
@@ -44,7 +27,6 @@ export function PersonalInquiryChat() {
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const chat = useInquiryChatController({
     chatViewportRef,
-    currentPanelRef,
     submissionErrorRef,
     turnstileRef,
   });
@@ -63,36 +45,31 @@ export function PersonalInquiryChat() {
           onRestart={chat.resetInquiry}
         />
 
-        <div
-          ref={chatViewportRef}
-          className="relative h-[clamp(32rem,72vh,48rem)] overflow-y-auto overscroll-contain [scrollbar-gutter:stable]"
-        >
-          <div className="px-4 py-6 sm:px-6 sm:py-9">
-            <LayoutGroup id="inquiry-conversation">
-              <InquiryTranscript chat={chat} />
+        <div className="flex h-[clamp(32rem,72vh,48rem)] min-h-0 flex-col">
+          <div className="h-[12.5rem] shrink-0 overflow-hidden border-b border-border/80 px-4 py-4 sm:h-[13rem] sm:px-6 sm:py-5">
+            <InquiryTranscript chat={chat} />
+          </div>
 
+          <div
+            ref={chatViewportRef}
+            className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]"
+          >
+            <div className="px-4 py-6 sm:px-6 sm:py-7">
               <motion.div
                 ref={currentPanelRef}
                 tabIndex={-1}
                 role="region"
                 aria-label={chat.currentPanelLabel}
-                layout="position"
-                transition={{
-                  layout: {
-                    duration: chat.prefersReducedMotion ? 0 : 0.32,
-                    ease: easeGlass,
-                  },
-                }}
-                className="relative mt-8 border-t border-border/80 pt-8 outline-none sm:mt-10 sm:pt-9"
+                className="relative outline-none"
               >
-                <AnimatePresence initial={false} mode="popLayout">
+                <AnimatePresence initial={false} mode="wait">
                   <motion.div
                     key={`${chat.stage}-${chat.currentQuestionId ?? "panel"}`}
-                    initial={chat.prefersReducedMotion ? false : { opacity: 0, y: 4 }}
+                    initial={chat.prefersReducedMotion ? false : { opacity: 0, y: 3 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={chat.prefersReducedMotion ? undefined : { opacity: 0, y: -3 }}
+                    exit={chat.prefersReducedMotion ? undefined : { opacity: 0, y: -2 }}
                     transition={{
-                      duration: chat.prefersReducedMotion ? 0 : 0.22,
+                      duration: chat.prefersReducedMotion ? 0 : 0.16,
                       ease: easeGlass,
                     }}
                   >
@@ -121,7 +98,7 @@ export function PersonalInquiryChat() {
                   </motion.div>
                 </AnimatePresence>
               </motion.div>
-            </LayoutGroup>
+            </div>
           </div>
         </div>
       </div>
@@ -132,70 +109,67 @@ export function PersonalInquiryChat() {
 type InquiryChatController = ReturnType<typeof useInquiryChatController>;
 
 function InquiryTranscript({ chat }: { chat: InquiryChatController }) {
+  const lastCompletedQuestionId = chat.transcriptQuestionIds.at(-1);
   const currentQuestionIsPending =
     chat.stage === "questions" &&
     chat.currentQuestion &&
     chat.currentQuestionId &&
     !chat.transcriptQuestionIds.includes(chat.currentQuestionId);
 
+  const contextKey = [
+    chat.stage,
+    chat.currentQuestionId ?? "none",
+    lastCompletedQuestionId ?? chat.draft.projectType ?? "start",
+  ].join("-");
+
   return (
-    <motion.div
-      layout="position"
-      aria-label="Bisheriger Gesprächsverlauf"
+    <div
+      aria-label="Aktueller Gesprächskontext"
       aria-live="polite"
-      className="space-y-4"
+      className="flex h-full flex-col justify-end"
     >
-      <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
-        <span className="block font-medium">Schön, dass Sie da sind.</span>
-        <span className="mt-1.5 block">
-          Ich schaue mir jede Anfrage persönlich an. Damit ich Ihr Vorhaben besser einschätzen
-          kann, stelle ich Ihnen zunächst ein paar kurze Fragen.
-        </span>
-      </AssistantMessage>
-      <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
-        Wobei darf ich Sie unterstützen?
-      </AssistantMessage>
-      {chat.draft.projectType && (
-        <>
-          <UserMessage key="project-type-answer" reducedMotion={chat.prefersReducedMotion}>
-            {getProjectTypeLabel(chat.draft.projectType)}
-          </UserMessage>
-          <AssistantMessage
-            key="project-type-transition"
-            reducedMotion={chat.prefersReducedMotion}
-          >
-            {PROJECT_TYPE_TRANSITIONS[chat.draft.projectType]}
-          </AssistantMessage>
-        </>
-      )}
-      {chat.transcriptQuestionIds.flatMap((id) => [
-          <AssistantMessage key={`question-${id}`} reducedMotion={chat.prefersReducedMotion}>
-            {QUESTION_CATALOG[id].prompt}
-          </AssistantMessage>,
-          <UserMessage key={`answer-${id}`} reducedMotion={chat.prefersReducedMotion}>
-            {chat.formatAnswer(id).join(", ") || "Übersprungen"}
-          </UserMessage>,
-          ...(chat.draft.projectType === "not_sure" && id === "unsure_challenges"
-            ? [
-                <AssistantMessage
-                  key={`feedback-${id}`}
-                  reducedMotion={chat.prefersReducedMotion}
-                >
-                  Danke, damit kann ich bereits gut einschätzen, in welche Richtung eine
-                  sinnvolle Lösung gehen könnte.
-                </AssistantMessage>,
-              ]
-            : []),
-        ])}
-      {currentQuestionIsPending && chat.currentQuestion && chat.currentQuestionId && (
-        <AssistantMessage
-          key={`question-${chat.currentQuestionId}`}
-          reducedMotion={chat.prefersReducedMotion}
+      <AnimatePresence initial={false} mode="wait">
+        <motion.div
+          key={contextKey}
+          initial={chat.prefersReducedMotion ? false : { opacity: 0, y: 3 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={chat.prefersReducedMotion ? undefined : { opacity: 0, y: -2 }}
+          transition={{ duration: chat.prefersReducedMotion ? 0 : 0.16, ease: easeGlass }}
+          className="space-y-3"
         >
-          {chat.currentQuestion.prompt}
-        </AssistantMessage>
-      )}
-    </motion.div>
+          {chat.stage === "project-type" && !chat.draft.projectType && (
+            <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
+              Schön, dass Sie da sind. Ich stelle Ihnen ein paar kurze Fragen.
+            </AssistantMessage>
+          )}
+
+          {chat.stage !== "project-type" &&
+            (lastCompletedQuestionId ? (
+              <UserMessage reducedMotion={chat.prefersReducedMotion}>
+                <span className="font-normal text-foreground/70">Letzte Antwort: </span>
+                {chat.formatAnswer(lastCompletedQuestionId).join(", ") || "Übersprungen"}
+              </UserMessage>
+            ) : chat.draft.projectType ? (
+              <UserMessage reducedMotion={chat.prefersReducedMotion}>
+                <span className="font-normal text-foreground/70">Auswahl: </span>
+                {getProjectTypeLabel(chat.draft.projectType)}
+              </UserMessage>
+            ) : null)}
+
+          {chat.stage === "project-type" && (
+            <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
+              Wobei darf ich Sie unterstützen?
+            </AssistantMessage>
+          )}
+
+          {currentQuestionIsPending && chat.currentQuestion && (
+            <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
+              {chat.currentQuestion.prompt}
+            </AssistantMessage>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }
 

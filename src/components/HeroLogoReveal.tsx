@@ -97,6 +97,7 @@ export function HeroLogoReveal({
   }, [forceComplete, complete]);
 
   const d = (seconds: number) => (prefersReducedMotion || forceComplete ? 0 : seconds);
+  const effectivePhase: Phase = forceComplete ? "done" : phase;
 
   const tiltX = useTransform(mouseY, [-1, 1], prefersReducedMotion ? [0, 0] : [1, -1]);
   const tiltY = useTransform(mouseX, [-1, 1], prefersReducedMotion ? [0, 0] : [-1, 1]);
@@ -117,7 +118,7 @@ export function HeroLogoReveal({
           rotateY: tiltY,
           transformPerspective: 1200,
         }}
-        animate={stepAtLeast(phase, "settle") ? { scale: [1, 1.015, 1] } : { scale: 1 }}
+        animate={stepAtLeast(effectivePhase, "settle") ? { scale: [1, 1.015, 1] } : { scale: 1 }}
         transition={{ duration: d(0.6), ease: easeGlass }}
       >
         {/* Dunkle, hohe Form */}
@@ -126,7 +127,9 @@ export function HeroLogoReveal({
           fill="currentColor"
           initial={{ opacity: 0, x: -22, y: 14, rotate: -5 }}
           animate={
-            stepAtLeast(phase, "dark") ? { opacity: 1, x: 0, y: 0, rotate: 0 } : undefined
+            stepAtLeast(effectivePhase, "dark")
+              ? { opacity: 1, x: 0, y: 0, rotate: 0 }
+              : undefined
           }
           transition={{ duration: d(1.1), ease: easeGlass }}
         />
@@ -135,7 +138,11 @@ export function HeroLogoReveal({
           d="M 111.312 196.56 L 181.008 196.56 L 203.184 174.384 L 133.488 174.384 Z"
           fill="#d7d2cc"
           initial={{ opacity: 0, x: 18, y: 22 }}
-          animate={stepAtLeast(phase, "light") ? { opacity: 1, x: 0, y: 0 } : undefined}
+          animate={
+            stepAtLeast(effectivePhase, "light")
+              ? { opacity: 1, x: 0, y: 0 }
+              : undefined
+          }
           transition={{ duration: d(1.0), ease: easeGlass }}
         />
       </motion.svg>
