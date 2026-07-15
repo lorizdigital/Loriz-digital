@@ -43,3 +43,11 @@ next-env.d.ts
 
 # visueller Review-Workflow
 /review-screenshots
+
+# OpenNext
+.open-next
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
