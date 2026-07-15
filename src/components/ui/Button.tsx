@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { springSoft } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const MotionLink = motion.create(Link);
 
@@ -26,6 +27,7 @@ export function Button({
   external,
   onClick,
 }: ButtonProps) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const base =
     "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full font-medium tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
@@ -47,15 +49,15 @@ export function Button({
       href={href}
       onClick={onClick}
       className={cn(base, sizes[size], variants[variant], className)}
-      whileHover={{ y: -2, scale: 1.015 }}
-      whileTap={{ y: 0, scale: 0.985 }}
-      transition={springSoft}
+      whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.015 }}
+      whileTap={prefersReducedMotion ? undefined : { y: 0, scale: 0.985 }}
+      transition={prefersReducedMotion ? { duration: 0 } : springSoft}
       {...externalProps}
     >
       {variant === "primary" && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -translate-x-[130%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[130%]"
+          className="pointer-events-none absolute inset-0 -translate-x-[130%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[130%] motion-reduce:group-hover:-translate-x-[130%]"
         />
       )}
       <span className="relative">{children}</span>

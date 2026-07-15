@@ -7,6 +7,7 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 
 type TurnstileOptions = {
@@ -39,17 +40,20 @@ declare global {
 export type TurnstileWidgetHandle = {
   execute: () => Promise<string>;
   reset: () => void;
+  retry: () => void;
 };
 
 type TurnstileWidgetProps = {
   onReadyChange?: (ready: boolean) => void;
+  onErrorChange?: (message?: string) => void;
 };
 
 const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const EXECUTION_TIMEOUT_MS = 20_000;
 
 export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidgetProps>(
-  function TurnstileWidget({ onReadyChange }, ref) {
+  function TurnstileWidget({ onReadyChange, onErrorChange }, ref) {
+    const [scriptAttempt, setScriptAttempt] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<string | null>(null);
     const pendingRef = useRef<{
@@ -67,33 +71,40 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
     const renderWidget = useCallback(() => {
       if (!siteKey || !containerRef.current || !window.turnstile || widgetIdRef.current) return;
 
-      widgetIdRef.current = window.turnstile.render(containerRef.current, {
-        sitekey: siteKey,
-        execution: "execute",
-        appearance: "interaction-only",
-        size: "compact",
-        theme: "auto",
-        action: "project_inquiry",
-        callback(token) {
-          if (pendingRef.current) window.clearTimeout(pendingRef.current.timeoutId);
-          pendingRef.current?.resolve(token);
-          pendingRef.current = null;
-        },
-        "error-callback"() {
-          rejectPending("Die Sicherheitsprüfung konnte nicht abgeschlossen werden.");
-        },
-        "expired-callback"() {
-          rejectPending("Die Sicherheitsprüfung ist abgelaufen. Bitte versuchen Sie es erneut.");
-        },
-        "timeout-callback"() {
-          rejectPending("Die Sicherheitsprüfung hat zu lange gedauert. Bitte versuchen Sie es erneut.");
-        },
-        "unsupported-callback"() {
-          rejectPending("Die Sicherheitsprüfung wird von diesem Browser nicht unterstützt.");
-        },
-      });
-      onReadyChange?.(true);
-    }, [onReadyChange, rejectPending]);
+      try {
+        widgetIdRef.current = window.turnstile.render(containerRef.current, {
+          sitekey: siteKey,
+          execution: "execute",
+          appearance: "interaction-only",
+          size: "compact",
+          theme: "auto",
+          action: "project_inquiry",
+          callback(token) {
+            if (pendingRef.current) window.clearTimeout(pendingRef.current.timeoutId);
+            pendingRef.current?.resolve(token);
+            pendingRef.current = null;
+          },
+          "error-callback"() {
+            rejectPending("Die Sicherheitsprüfung konnte nicht abgeschlossen werden.");
+          },
+          "expired-callback"() {
+            rejectPending("Die Sicherheitsprüfung ist abgelaufen. Bitte versuchen Sie es erneut.");
+          },
+          "timeout-callback"() {
+            rejectPending("Die Sicherheitsprüfung hat zu lange gedauert. Bitte versuchen Sie es erneut.");
+          },
+          "unsupported-callback"() {
+            rejectPending("Die Sicherheitsprüfung wird von diesem Browser nicht unterstützt.");
+          },
+        });
+        onErrorChange?.(undefined);
+        onReadyChange?.(true);
+      } catch {
+        widgetIdRef.current = null;
+        onReadyChange?.(false);
+        onErrorChange?.("Die Sicherheitsprüfung konnte nicht geladen werden.");
+      }
+    }, [onErrorChange, onReadyChange, rejectPending]);
 
     useImperativeHandle(
       ref,
@@ -131,11 +142,27 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
           if (pendingRef.current) window.clearTimeout(pendingRef.current.timeoutId);
           pendingRef.current = null;
         },
+        retry() {
+          const widgetId = widgetIdRef.current;
+          if (widgetId && window.turnstile) window.turnstile.remove(widgetId);
+          widgetIdRef.current = null;
+          onReadyChange?.(false);
+          onErrorChange?.(undefined);
+          if (window.turnstile) {
+            window.setTimeout(renderWidget, 0);
+          } else {
+            setScriptAttempt((current) => current + 1);
+          }
+        },
       }),
-      [rejectPending, renderWidget],
+      [onErrorChange, onReadyChange, rejectPending, renderWidget],
     );
 
     useEffect(() => {
+      if (!siteKey) {
+        onReadyChange?.(false);
+        onErrorChange?.("Die Sicherheitsprüfung ist in dieser Umgebung nicht konfiguriert.");
+      }
       renderWidget();
       return () => {
         const widgetId = widgetIdRef.current;
@@ -143,15 +170,23 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
         rejectPending("Die Sicherheitsprüfung wurde beendet.");
         onReadyChange?.(false);
       };
-    }, [onReadyChange, rejectPending, renderWidget]);
+    }, [onErrorChange, onReadyChange, rejectPending, renderWidget]);
 
     return (
       <>
         {siteKey && (
           <Script
-            src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+            key={scriptAttempt}
+            src={`https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&retry=${scriptAttempt}`}
             strategy="afterInteractive"
-            onLoad={renderWidget}
+            onLoad={() => {
+              onErrorChange?.(undefined);
+              renderWidget();
+            }}
+            onError={() => {
+              onReadyChange?.(false);
+              onErrorChange?.("Die Sicherheitsprüfung konnte nicht geladen werden.");
+            }}
           />
         )}
         <div ref={containerRef} className="min-h-0 max-w-full overflow-hidden" />

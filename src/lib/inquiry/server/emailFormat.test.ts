@@ -49,7 +49,12 @@ describe("inquiry email formatting", () => {
       recipient: { email: "kunde@example.com", name: "Kunde" },
     });
 
-    expect(email.textContent).toContain("Ihre Angaben sind eingegangen");
+    expect(email.textContent).toContain("Vielen Dank für Ihre Anfrage bei Loriz Digital.");
+    expect(email.textContent).toContain("Ihre Angaben sind sicher bei mir eingegangen.");
+    expect(email.textContent).toContain(
+      "Diese E-Mail bestätigt lediglich den Eingang Ihrer Anfrage.",
+    );
+    expect(email.textContent).toContain("Referenz: 019f5c48-c6cf-7fc1-8fcc-02ecccea914a");
     expect(email.textContent).not.toContain("Projektart");
     expect(email.headers?.idempotencyKey).toBe("019f5c48-c6cf-7fc1-8fcc-02ecccea914b");
   });

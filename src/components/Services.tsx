@@ -5,6 +5,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { ModernWebsiteDemo } from "@/components/ModernWebsiteDemo";
 import { PersonalInquiryChat } from "@/components/inquiry/PersonalInquiryChat";
+import { MobileExpandableServiceVisual } from "@/components/MobileExpandableServiceVisual";
 import { cn } from "@/lib/cn";
 
 const services = [
@@ -51,7 +52,7 @@ function WebsiteVisual() {
   return <ModernWebsiteDemo />;
 }
 
-/** Eindeutig als Terminbuchung erkennbar: Kalender, Datum, Zeitslots, Bestätigung. */
+/** Kompakte Vorschau eines typischen Terminbuchungsablaufs. */
 function BookingVisual() {
   return (
     <div className="flex h-full flex-col justify-center p-8 sm:p-10">
@@ -61,10 +62,13 @@ function BookingVisual() {
           <div className="h-2 w-24 rounded-full bg-foreground/70" />
         </div>
         <div className="mt-4 grid grid-cols-7 gap-1.5">
-          {Array.from({ length: 14 }).map((_, i) => (
+          {Array.from({ length: 14 }).map((_, index) => (
             <span
-              key={i}
-              className={cn("aspect-square rounded-md", i === 9 ? "bg-accent" : "bg-surface-muted")}
+              key={index}
+              className={cn(
+                "aspect-square rounded-md",
+                index === 9 ? "bg-accent" : "bg-surface-muted",
+              )}
             />
           ))}
         </div>
@@ -85,7 +89,17 @@ function BookingVisual() {
 function ServiceVisual({ variant }: { variant: number }) {
   if (variant === 0) return <WebsiteVisual />;
   if (variant === 1) return <BookingVisual />;
-  return <PersonalInquiryChat />;
+  return (
+    <MobileExpandableServiceVisual
+      eyebrow="Persönliche Projektanfrage"
+      title="Möchten Sie mir von Ihrem Vorhaben erzählen?"
+      description="Die geführte Anfrage öffnet sich mit einem Klick und bringt die wichtigsten Punkte Ihres Vorhabens übersichtlich zusammen."
+      openLabel="Projektanfrage öffnen"
+      closeLabel="Anfrage schließen"
+    >
+      <PersonalInquiryChat />
+    </MobileExpandableServiceVisual>
+  );
 }
 
 export function Services() {
@@ -136,7 +150,8 @@ export function Services() {
                   </div>
                   <div
                     className={cn(
-                      "min-h-[260px] border-t border-border bg-surface-muted lg:min-h-0 lg:border-t-0",
+                      "border-t border-border bg-surface-muted lg:min-h-0 lg:border-t-0",
+                      i !== 2 && "min-h-[260px]",
                       i % 2 === 0 ? "lg:border-l" : "lg:border-r lg:[direction:ltr]",
                     )}
                   >

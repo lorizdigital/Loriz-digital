@@ -62,7 +62,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
         />
 
         <Link
-          href="#start"
+          href="/#start"
           className="flex items-center gap-2 rounded-full px-2 py-1 text-[1.05rem] font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
         >
           <motion.span
@@ -111,7 +111,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
         </nav>
 
         <div className="hidden md:block">
-          <Button href="#kontakt" variant="primary" size="sm">
+          <Button href="/#kontakt" variant="primary" size="sm">
             Projekt anfragen
           </Button>
         </div>

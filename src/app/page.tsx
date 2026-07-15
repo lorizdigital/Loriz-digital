@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <>
       <Navigation heroLogoDockEnabled />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <Hero />
         <ProblemSolution />
         <Services />

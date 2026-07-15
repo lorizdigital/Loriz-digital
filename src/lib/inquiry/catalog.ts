@@ -33,7 +33,7 @@ const other: QuestionOption = { value: OTHER_VALUE, label: "Sonstiges" };
 export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   new_website_goals: {
     id: "new_website_goals",
-    prompt: "Was soll die neue Webseite hauptsächlich für Sie leisten?",
+    prompt: "Woran würden Sie merken, dass Ihre neue Webseite erfolgreich für Sie arbeitet?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -49,7 +49,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   new_website_pages: {
     id: "new_website_pages",
-    prompt: "Welche Inhalte oder Bereiche werden voraussichtlich benötigt?",
+    prompt: "Welche Bereiche möchten Sie Ihren Besuchern voraussichtlich anbieten?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -68,7 +68,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   new_website_features: {
     id: "new_website_features",
-    prompt: "Welche Funktionen sind interessant?",
+    prompt: "Gibt es Funktionen, die Ihre Webseite für Sie oder Ihre Kunden übernehmen soll?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -76,10 +76,10 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
       { value: "contact_requests", label: "Kontaktanfragen" },
       { value: "booking", label: "Terminbuchung" },
       { value: "gallery", label: "Galerie oder Referenzen" },
-      { value: "downloads", label: "Downloads" },
-      { value: "multilingual", label: "Mehrsprachigkeit" },
+      { value: "downloads", label: "Dokumente oder Downloads bereitstellen" },
+      { value: "multilingual", label: "Inhalte in mehreren Sprachen" },
       { value: "newsletter", label: "Newsletter" },
-      { value: "customer_area", label: "Geschützter Kundenbereich" },
+      { value: "customer_area", label: "Geschützter Bereich für Kunden" },
       { value: "none", label: "Keine besonderen Funktionen", exclusive: true },
       { value: "not_sure", label: "Noch nicht sicher", exclusive: true },
       other,
@@ -99,7 +99,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   redesign_improvements: {
     id: "redesign_improvements",
-    prompt: "Was möchten Sie hauptsächlich verbessern?",
+    prompt: "Was soll an Ihrer bestehenden Webseite besser werden?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -117,7 +117,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   redesign_current_situation: {
     id: "redesign_current_situation",
-    prompt: "Was trifft auf Ihre aktuelle Webseite zu?",
+    prompt: "Was funktioniert aus Ihrer Sicht aktuell noch nicht gut?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -142,7 +142,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   redesign_scope: {
     id: "redesign_scope",
-    prompt: "Wie umfangreich soll die Überarbeitung sein?",
+    prompt: "Wie weit möchten Sie bei der Überarbeitung gehen?",
     type: "single",
     options: [
       { value: "design_only", label: "Nur Design modernisieren" },
@@ -154,7 +154,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   process_area: {
     id: "process_area",
-    prompt: "Welcher Bereich soll einfacher werden?",
+    prompt: "Welcher Ablauf kostet Sie heute besonders viel Zeit oder Aufwand?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -172,7 +172,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   process_current_workflow: {
     id: "process_current_workflow",
-    prompt: "Wie läuft der Vorgang aktuell hauptsächlich ab?",
+    prompt: "Wie bearbeiten Sie diesen Vorgang heute überwiegend?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -189,7 +189,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   process_outcomes: {
     id: "process_outcomes",
-    prompt: "Was soll durch die Lösung besser werden?",
+    prompt: "Was möchten Sie mit der neuen Lösung verbessern?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -206,7 +206,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   process_users: {
     id: "process_users",
-    prompt: "Wer soll die Lösung später nutzen?",
+    prompt: "Wer soll später mit der Lösung arbeiten?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -222,7 +222,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   software_solution_type: {
     id: "software_solution_type",
-    prompt: "Welche Art von Lösung stellen Sie sich vor?",
+    prompt: "Welche Form könnte die Lösung aus Ihrer Sicht haben?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -240,7 +240,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   software_tasks: {
     id: "software_tasks",
-    prompt: "Welche Aufgaben soll die Anwendung übernehmen?",
+    prompt: "Welche Aufgaben soll Ihnen die Anwendung abnehmen oder erleichtern?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -258,7 +258,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   software_access: {
     id: "software_access",
-    prompt: "Wer soll darauf zugreifen können?",
+    prompt: "Wer soll die Anwendung später nutzen können?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -274,7 +274,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   software_existing_relation: {
     id: "software_existing_relation",
-    prompt: "Gibt es bereits ein System, das ersetzt oder ergänzt werden soll?",
+    prompt: "Gibt es bereits ein System, das die neue Lösung ersetzen oder ergänzen soll?",
     type: "single",
     options: [
       { value: "replace", label: "Ja, soll ersetzt werden" },
@@ -293,7 +293,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   unsure_improvements: {
     id: "unsure_improvements",
-    prompt: "Was möchten Sie in Ihrem Unternehmen verbessern?",
+    prompt: "Was möchten Sie in Ihrem Unternehmen aktuell am liebsten verbessern?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -310,7 +310,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   unsure_challenges: {
     id: "unsure_challenges",
-    prompt: "Wo liegt aktuell die größte Herausforderung?",
+    prompt: "Wo spüren Sie diese Herausforderung im Alltag am stärksten?",
     type: "multiple",
     allowOther: true,
     otherMaxLength: 200,
@@ -328,7 +328,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   timeline: {
     id: "timeline",
-    prompt: "Wann möchten Sie ungefähr starten?",
+    prompt: "Wann möchten Sie Ihr Vorhaben ungefähr angehen?",
     type: "single",
     options: [
       { value: "asap", label: "So bald wie möglich" },
@@ -340,7 +340,7 @@ export const QUESTION_CATALOG: Record<QuestionId, QuestionDefinition> = {
   },
   project_stage: {
     id: "project_stage",
-    prompt: "Wie weit ist das Vorhaben bereits?",
+    prompt: "Wie konkret ist Ihr Vorhaben aktuell schon?",
     type: "single",
     options: [
       { value: "first_idea", label: "Erste Idee" },

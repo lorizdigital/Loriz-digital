@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { DesktopBrowserPreview } from "@/components/DesktopBrowserPreview";
 import { MobilePhonePreview } from "@/components/MobilePhonePreview";
 import { cn } from "@/lib/cn";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const TABLET_QUERY = "(min-width: 640px)";
 
@@ -56,6 +57,7 @@ export function ProjectShowcase({
   className,
 }: ProjectShowcaseProps) {
   const isTabletOrLarger = useIsTabletOrLarger();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
     <a
@@ -78,8 +80,8 @@ export function ProjectShowcase({
 
       {isTabletOrLarger ? (
         <motion.div
-          whileHover={{ y: -4 }}
-          transition={{ type: "spring", stiffness: 260, damping: 24 }}
+          whileHover={prefersReducedMotion ? undefined : { y: -4 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 24 }}
           className="relative w-full max-w-[640px]"
         >
           <DesktopBrowserPreview

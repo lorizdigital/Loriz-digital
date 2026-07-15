@@ -127,15 +127,18 @@ export function buildInquiryConfirmationEmail(options: {
   recipient: { email: string; name: string };
 }): TransactionalEmail {
   const { requestId, identity, recipient } = options;
-  const message =
-    "Vielen Dank für Ihre Anfrage bei Loriz Digital. Ihre Angaben sind eingegangen. Ich sehe mir Ihr Vorhaben persönlich an und melde mich zeitnah bei Ihnen.";
+  const paragraphs = [
+    "Vielen Dank für Ihre Anfrage bei Loriz Digital.",
+    "Ihre Angaben sind sicher bei mir eingegangen. Ich sehe mir Ihr Vorhaben persönlich an und melde mich zeitnah bei Ihnen.",
+    "Diese E-Mail bestätigt lediglich den Eingang Ihrer Anfrage.",
+  ];
 
   return {
     sender: { email: identity.fromEmail, name: identity.fromName },
     to: [recipient],
     subject: "Ihre Anfrage bei Loriz Digital ist eingegangen",
-    textContent: `${message}\n\nReferenz: ${requestId}`,
-    htmlContent: `<p>${escapeHtml(message)}</p><p><small>Referenz: ${escapeHtml(requestId)}</small></p>`,
+    textContent: `${paragraphs.join("\n\n")}\n\nReferenz: ${requestId}`,
+    htmlContent: `${paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}<p><small>Referenz: ${escapeHtml(requestId)}</small></p>`,
     headers: {
       "X-Loriz-Request-ID": requestId,
       idempotencyKey: emailIdempotencyKey(requestId, "confirmation"),

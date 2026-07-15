@@ -17,7 +17,7 @@ type LegalPageLayoutProps = {
  */
 export function LegalPageLayout({ title, subtitle, toc, children }: LegalPageLayoutProps) {
   return (
-    <main className="flex-1">
+    <main id="main-content" className="flex-1">
       <section className="section-padding pt-36 sm:pt-44 lg:pt-48">
         <Container>
           <header className="max-w-3xl">

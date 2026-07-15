@@ -17,10 +17,10 @@ export function InquirySummary({ sections, onEdit }: InquirySummaryProps) {
   return (
     <div>
       <h3 className="max-w-2xl text-xl font-medium leading-[1.3] tracking-[-0.02em] text-foreground sm:text-2xl">
-        Bitte prüfen Sie Ihre Angaben.
+        So habe ich Ihr Vorhaben verstanden.
       </h3>
       <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
-        Sie können jeden Abschnitt bearbeiten, ohne die Anfrage neu beginnen zu müssen.
+        Prüfen Sie die Angaben bitte noch einmal. Einzelne Bereiche können Sie jederzeit bearbeiten.
       </p>
 
       <div className="mt-7 space-y-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChoiceQuestion } from "./ChoiceQuestion";
 import {
@@ -32,9 +32,16 @@ import type {
 } from "@/lib/inquiry/types";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { easeGlass } from "@/lib/motion";
+import { LorizMark } from "@/components/icons/LorizMark";
 
 type Stage = "project-type" | "questions" | "contact" | "summary" | "success";
 type EditSection = "project" | "common" | "contact" | null;
+type EditSnapshot = {
+  draft: InquiryDraft;
+  completedQuestionIds: QuestionId[];
+  contact: InquiryContactDraft;
+  privacyAccepted: boolean;
+};
 
 type ApiError = {
   ok?: false;
@@ -57,6 +64,19 @@ const COMMON_QUESTION_IDS = new Set<QuestionId>([
   "additional_choice",
   "additional_message",
 ]);
+
+const PROJECT_TYPE_TRANSITIONS: Record<ProjectType, string> = {
+  new_website:
+    "Dann schauen wir gemeinsam, was Ihre neue Webseite erreichen und für Sie übernehmen soll.",
+  website_redesign:
+    "Dann sehen wir uns kurz an, wo Ihre bestehende Webseite heute noch nicht überzeugt.",
+  digital_processes:
+    "Dann schauen wir darauf, welcher Ablauf heute unnötig Zeit kostet oder kompliziert ist.",
+  custom_software:
+    "Dann grenzen wir gemeinsam ein, welche Aufgabe die Anwendung für Sie übernehmen soll.",
+  not_sure:
+    "Das ist völlig in Ordnung. Mit ein paar kurzen Fragen lässt sich meist schnell erkennen, welche Lösung sinnvoll ist.",
+};
 
 function newRequestId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
@@ -82,11 +102,15 @@ export function PersonalInquiryChat() {
   const [submissionError, setSubmissionError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [turnstileReady, setTurnstileReady] = useState(false);
+  const [turnstileError, setTurnstileError] = useState<string>();
   const [requestId, setRequestId] = useState(() => newRequestId());
+  const [showRestartConfirmation, setShowRestartConfirmation] = useState(false);
   const currentPanelRef = useRef<HTMLDivElement>(null);
   const submissionErrorRef = useRef<HTMLDivElement>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const hasInteractedRef = useRef(false);
+  const transitionTimeoutRef = useRef<number | null>(null);
+  const editSnapshotRef = useRef<EditSnapshot | null>(null);
 
   const fetchStartToken = useCallback(async () => {
     try {
@@ -131,12 +155,32 @@ export function PersonalInquiryChat() {
   const visibleQuestionIds = useMemo(() => getVisibleQuestionIds(draft), [draft]);
   const visibleQuestionSet = useMemo(() => new Set(visibleQuestionIds), [visibleQuestionIds]);
   const visibleCompletedIds = completedQuestionIds.filter((id) => visibleQuestionSet.has(id));
-  const recentCompletedIds = visibleCompletedIds.slice(-4);
-  const hiddenAnswerCount = Math.max(0, visibleCompletedIds.length - recentCompletedIds.length);
+  const transcriptCompletedIds = visibleCompletedIds.filter((id) => id !== currentQuestionId);
+  const recentCompletedIds = transcriptCompletedIds.slice(-4);
+  const hiddenAnswerCount = Math.max(0, transcriptCompletedIds.length - recentCompletedIds.length);
 
-  function delay(action: () => void) {
-    window.setTimeout(action, prefersReducedMotion ? 0 : 320);
-  }
+  const cancelPendingTransition = useCallback(() => {
+    if (transitionTimeoutRef.current === null) return;
+    window.clearTimeout(transitionTimeoutRef.current);
+    transitionTimeoutRef.current = null;
+  }, []);
+
+  const scheduleTransition = useCallback(
+    (action: () => void) => {
+      cancelPendingTransition();
+      if (prefersReducedMotion) {
+        action();
+        return;
+      }
+      transitionTimeoutRef.current = window.setTimeout(() => {
+        transitionTimeoutRef.current = null;
+        action();
+      }, 140);
+    },
+    [cancelPendingTransition, prefersReducedMotion],
+  );
+
+  useEffect(() => cancelPendingTransition, [cancelPendingTransition]);
 
   function branchQuestionIds(nextDraft = draft) {
     return getVisibleQuestionIds(nextDraft).filter((id) => !COMMON_QUESTION_IDS.has(id));
@@ -161,19 +205,19 @@ export function PersonalInquiryChat() {
       setCompletedQuestionIds((current) => current.filter((id) => COMMON_QUESTION_IDS.has(id)));
     }
     setQuestionError(undefined);
-    delay(() => {
+    scheduleTransition(() => {
       setStage("questions");
       setCurrentQuestionId(branchQuestionIds(nextDraft)[0] ?? "timeline");
     });
   }
 
-  function completeQuestion(id: QuestionId, nextDraft: InquiryDraft) {
+  function completeQuestion(id: QuestionId, nextDraft: InquiryDraft, advanceImmediately = false) {
     hasInteractedRef.current = true;
     setDraft(nextDraft);
     setQuestionError(undefined);
     setCompletedQuestionIds((current) => (current.includes(id) ? current : [...current, id]));
 
-    delay(() => {
+    const advance = () => {
       const visible = getVisibleQuestionIds(nextDraft);
       const currentIndex = visible.indexOf(id);
       const nextQuestion = visible[currentIndex + 1];
@@ -181,6 +225,7 @@ export function PersonalInquiryChat() {
       if (editSection === "project") {
         if (!nextQuestion || COMMON_QUESTION_IDS.has(nextQuestion)) {
           setEditSection(null);
+          editSnapshotRef.current = null;
           setCurrentQuestionId(null);
           setStage("summary");
           return;
@@ -189,6 +234,7 @@ export function PersonalInquiryChat() {
 
       if (editSection === "common" && !nextQuestion) {
         setEditSection(null);
+        editSnapshotRef.current = null;
         setCurrentQuestionId(null);
         setStage("summary");
         return;
@@ -200,7 +246,14 @@ export function PersonalInquiryChat() {
         setCurrentQuestionId(null);
         setStage("contact");
       }
-    });
+    };
+
+    if (advanceImmediately || prefersReducedMotion) {
+      cancelPendingTransition();
+      advance();
+    } else {
+      scheduleTransition(advance);
+    }
   }
 
   function selectChoice(value: string) {
@@ -261,7 +314,7 @@ export function PersonalInquiryChat() {
       setQuestionError("Bitte ergänzen Sie kurz die Auswahl Sonstiges.");
       return;
     }
-    completeQuestion(currentQuestionId, draft);
+    completeQuestion(currentQuestionId, draft, true);
   }
 
   function continueInput() {
@@ -290,7 +343,7 @@ export function PersonalInquiryChat() {
       ...draft,
       answers: { ...draft.answers, [currentQuestionId]: value },
     };
-    completeQuestion(currentQuestionId, nextDraft);
+    completeQuestion(currentQuestionId, nextDraft, true);
   }
 
   function validateContact(): boolean {
@@ -315,13 +368,24 @@ export function PersonalInquiryChat() {
   function continueContact() {
     hasInteractedRef.current = true;
     if (!validateContact()) return;
-    if (editSection === "contact") setEditSection(null);
+    cancelPendingTransition();
+    if (editSection === "contact") {
+      setEditSection(null);
+      editSnapshotRef.current = null;
+    }
     setSubmissionError(undefined);
     setStage("summary");
   }
 
   function editSummarySection(sectionId: string) {
     hasInteractedRef.current = true;
+    cancelPendingTransition();
+    editSnapshotRef.current = {
+      draft,
+      completedQuestionIds,
+      contact,
+      privacyAccepted,
+    };
     setSubmissionError(undefined);
     if (sectionId === "project") {
       setEditSection("project");
@@ -339,6 +403,70 @@ export function PersonalInquiryChat() {
     setStage("contact");
   }
 
+  function goBack() {
+    if (isSubmitting || (stage === "project-type" && !editSection) || stage === "success") return;
+    hasInteractedRef.current = true;
+    cancelPendingTransition();
+    setShowRestartConfirmation(false);
+    setQuestionError(undefined);
+    setSubmissionError(undefined);
+
+    if (editSection) {
+      const snapshot = editSnapshotRef.current;
+      if (snapshot) {
+        setDraft(snapshot.draft);
+        setCompletedQuestionIds(snapshot.completedQuestionIds);
+        setContact(snapshot.contact);
+        setPrivacyAccepted(snapshot.privacyAccepted);
+      }
+      editSnapshotRef.current = null;
+      setEditSection(null);
+      setCurrentQuestionId(null);
+      setStage("summary");
+      return;
+    }
+
+    if (stage === "summary") {
+      setStage("contact");
+      return;
+    }
+
+    if (stage === "contact") {
+      const visible = getVisibleQuestionIds(draft);
+      const previousQuestion = visible.at(-1);
+      if (previousQuestion) {
+        const targetIndex = visible.indexOf(previousQuestion);
+        setCompletedQuestionIds((current) =>
+          current.filter((id) => {
+            const index = visible.indexOf(id);
+            return index === -1 || index < targetIndex;
+          }),
+        );
+        setStage("questions");
+        setCurrentQuestionId(previousQuestion);
+      } else {
+        setStage("project-type");
+      }
+      return;
+    }
+
+    const visible = getVisibleQuestionIds(draft);
+    const currentIndex = currentQuestionId ? visible.indexOf(currentQuestionId) : -1;
+    if (currentIndex > 0) {
+      const targetIndex = currentIndex - 1;
+      setCompletedQuestionIds((current) =>
+        current.filter((id) => {
+          const index = visible.indexOf(id);
+          return index === -1 || index < targetIndex;
+        }),
+      );
+      setCurrentQuestionId(visible[targetIndex]);
+    } else {
+      setCurrentQuestionId(null);
+      setStage("project-type");
+    }
+  }
+
   function formatAnswer(id: QuestionId): string[] {
     const value = draft.answers[id];
     const values = Array.isArray(value) ? value : typeof value === "string" && value ? [value] : [];
@@ -351,7 +479,7 @@ export function PersonalInquiryChat() {
     );
   }
 
-  const summarySections = useMemo<InquirySummarySection[]>(() => {
+  const summarySections: InquirySummarySection[] = (() => {
     const projectRows = branchQuestionIds()
       .map((id) => ({ label: QUESTION_CATALOG[id].prompt, value: formatAnswer(id) }))
       .filter((row) => row.value.length > 0 && row.value.some(Boolean));
@@ -392,9 +520,7 @@ export function PersonalInquiryChat() {
         ],
       },
     ];
-    // The memo intentionally follows all draft/contact changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contact, draft]);
+  })();
 
   async function submitInquiry() {
     if (isSubmitting) return;
@@ -475,6 +601,7 @@ export function PersonalInquiryChat() {
   }
 
   function resetInquiry() {
+    cancelPendingTransition();
     setStage("project-type");
     setDraft({ answers: {}, customAnswers: {} });
     setCompletedQuestionIds([]);
@@ -482,8 +609,15 @@ export function PersonalInquiryChat() {
     setContact(EMPTY_CONTACT);
     setPrivacyAccepted(false);
     setContactErrors({});
+    setQuestionError(undefined);
+    setEditSection(null);
     setSubmissionError(undefined);
+    setHoneypot("");
+    setTurnstileReady(false);
+    setTurnstileError(undefined);
+    setShowRestartConfirmation(false);
     setRequestId(newRequestId());
+    editSnapshotRef.current = null;
     hasInteractedRef.current = true;
     setStartToken("");
     turnstileRef.current?.reset();
@@ -509,6 +643,11 @@ export function PersonalInquiryChat() {
               ? "Prüfen"
               : "Übermittelt";
   const stepLabel = stage === "project-type" ? "Kurzer Einstieg" : `Schritt ${currentStep} von ${totalSteps}`;
+  const canGoBack = (stage !== "project-type" || Boolean(editSection)) && stage !== "success" && !isSubmitting;
+  const canRestart =
+    stage !== "success" &&
+    !isSubmitting &&
+    (stage !== "project-type" || Boolean(draft.projectType));
 
   const currentQuestion = currentQuestionId ? QUESTION_CATALOG[currentQuestionId] : null;
   const currentAnswer = currentQuestionId ? draft.answers[currentQuestionId] : undefined;
@@ -517,6 +656,17 @@ export function PersonalInquiryChat() {
     : typeof currentAnswer === "string" && currentAnswer
       ? [currentAnswer]
       : [];
+  const currentPanelLabel =
+    currentQuestion?.prompt ??
+    (stage === "project-type"
+      ? "Wobei darf ich Sie unterstützen?"
+      : stage === "contact"
+        ? "Kontaktdaten"
+        : stage === "summary"
+          ? "Zusammenfassung prüfen"
+          : stage === "success"
+            ? "Anfrage erfolgreich übermittelt"
+            : "Aktueller Schritt der Projektanfrage");
 
   return (
     <div className="bg-surface-muted/70 p-2 sm:p-5 lg:p-6">
@@ -524,8 +674,12 @@ export function PersonalInquiryChat() {
         <div className="border-b border-border/80 px-4 py-4 sm:px-6 sm:py-5">
           <div className="flex flex-wrap items-start justify-between gap-x-5 gap-y-3">
             <div>
-              <p className="text-sm font-medium tracking-tight text-foreground">Persönliche Projektanfrage</p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Geführt, unverbindlich und direkt bei Loriz Digital</p>
+              <p className="text-sm font-medium tracking-tight text-foreground">
+                Erzählen Sie mir von Ihrem Projekt
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Ein paar kurze Fragen helfen mir, Ihr Vorhaben besser zu verstehen.
+              </p>
             </div>
             <div className="flex items-center gap-3" aria-label={`Fortschritt: ${phaseLabel}, ${stepLabel}`}>
               <span className="text-right text-[0.68rem] leading-tight text-muted-foreground">
@@ -547,12 +701,76 @@ export function PersonalInquiryChat() {
               </span>
             </div>
           </div>
+          {canRestart && (
+            <div className="mt-4 flex justify-end border-t border-border/70 pt-3.5">
+              <button
+                type="button"
+                onClick={() => setShowRestartConfirmation((current) => !current)}
+                aria-expanded={showRestartConfirmation}
+                aria-controls="inquiry-restart-confirmation"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2.5 py-2 text-xs font-medium text-muted-foreground transition-[background-color,color] hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
+              >
+                <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={1.8} />
+                Neu starten
+              </button>
+            </div>
+          )}
+          <AnimatePresence initial={false}>
+            {showRestartConfirmation && canRestart && (
+              <motion.div
+                id="inquiry-restart-confirmation"
+                initial={prefersReducedMotion ? false : { opacity: 0, height: 0, y: -4 }}
+                animate={{ opacity: 1, height: "auto", y: 0 }}
+                exit={prefersReducedMotion ? undefined : { opacity: 0, height: 0, y: -4 }}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.28, ease: easeGlass }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 rounded-xl border border-border bg-surface-muted/55 p-3.5 sm:flex sm:items-center sm:justify-between sm:gap-4">
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Möchten Sie alle bisherigen Antworten verwerfen?
+                  </p>
+                  <div className="mt-3 flex items-center gap-2 sm:mt-0 sm:shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowRestartConfirmation(false)}
+                      className="min-h-10 rounded-full px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
+                    >
+                      Abbrechen
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetInquiry}
+                      className="min-h-10 rounded-full bg-accent px-3.5 py-2 text-xs font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-glass-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted motion-reduce:hover:translate-y-0"
+                    >
+                      Neu starten
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div className="px-4 py-6 sm:px-6 sm:py-9">
           <div aria-label="Bisheriger Gesprächsverlauf" className="space-y-4">
+            <AssistantMessage reducedMotion={prefersReducedMotion}>
+              <span className="block font-medium">Schön, dass Sie da sind.</span>
+              <span className="mt-1.5 block">
+                Ich schaue mir jede Anfrage persönlich an. Damit ich Ihr Vorhaben besser
+                einschätzen kann, stelle ich Ihnen zunächst ein paar kurze Fragen.
+              </span>
+            </AssistantMessage>
             <AssistantMessage reducedMotion={prefersReducedMotion}>Wobei darf ich Sie unterstützen?</AssistantMessage>
-            {draft.projectType && <UserMessage reducedMotion={prefersReducedMotion}>{getProjectTypeLabel(draft.projectType)}</UserMessage>}
+            {draft.projectType && (
+              <>
+                <UserMessage reducedMotion={prefersReducedMotion}>
+                  {getProjectTypeLabel(draft.projectType)}
+                </UserMessage>
+                <AssistantMessage reducedMotion={prefersReducedMotion}>
+                  {PROJECT_TYPE_TRANSITIONS[draft.projectType]}
+                </AssistantMessage>
+              </>
+            )}
             {hiddenAnswerCount > 0 && (
               <p className="py-1 text-center text-xs text-muted-foreground">
                 {hiddenAnswerCount} frühere Antworten erscheinen später vollständig in der Zusammenfassung.
@@ -564,7 +782,8 @@ export function PersonalInquiryChat() {
                 <UserMessage reducedMotion={prefersReducedMotion}>{formatAnswer(id).join(", ") || "Übersprungen"}</UserMessage>
                 {draft.projectType === "not_sure" && id === "unsure_challenges" && (
                   <AssistantMessage reducedMotion={prefersReducedMotion}>
-                    Auf Basis Ihrer Auswahl können wir gemeinsam klären, welche Lösung sinnvoll ist.
+                    Danke, damit kann ich bereits gut einschätzen, in welche Richtung eine sinnvolle
+                    Lösung gehen könnte.
                   </AssistantMessage>
                 )}
               </div>
@@ -574,12 +793,13 @@ export function PersonalInquiryChat() {
           <motion.div
             ref={currentPanelRef}
             tabIndex={-1}
-            aria-label="Aktueller Schritt der Projektanfrage"
+            role="region"
+            aria-label={currentPanelLabel}
             key={`${stage}-${currentQuestionId ?? "panel"}`}
-            initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.38, ease: easeGlass }}
-            className="mt-8 border-t border-border/80 pt-8 outline-none sm:mt-10 sm:pt-9"
+            transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: easeGlass }}
+            className="mt-8 scroll-mt-28 border-t border-border/80 pt-8 outline-none sm:mt-10 sm:scroll-mt-32 sm:pt-9"
           >
             {stage === "project-type" && (
               <ChoiceQuestion
@@ -633,14 +853,27 @@ export function PersonalInquiryChat() {
             )}
 
             {stage === "contact" && (
-              <ContactDetailsStep
-                value={contact}
-                privacyAccepted={privacyAccepted}
-                errors={contactErrors}
-                onChange={setContact}
-                onPrivacyChange={setPrivacyAccepted}
-                onContinue={continueContact}
-              />
+              <div>
+                <AssistantMessage reducedMotion={prefersReducedMotion}>
+                  <span className="block font-medium">
+                    Perfekt. Ich habe jetzt einen guten ersten Eindruck von Ihrem Vorhaben.
+                  </span>
+                  <span className="mt-1.5 block">
+                    Zum Schluss benötige ich nur noch Ihre Kontaktdaten, damit ich mich persönlich
+                    bei Ihnen melden kann.
+                  </span>
+                </AssistantMessage>
+                <div className="mt-8 border-t border-border/80 pt-8">
+                  <ContactDetailsStep
+                    value={contact}
+                    privacyAccepted={privacyAccepted}
+                    errors={contactErrors}
+                    onChange={setContact}
+                    onPrivacyChange={setPrivacyAccepted}
+                    onContinue={continueContact}
+                  />
+                </div>
+              </div>
             )}
 
             {stage === "summary" && (
@@ -658,7 +891,26 @@ export function PersonalInquiryChat() {
                       onChange={(event) => setHoneypot(event.target.value)}
                     />
                   </div>
-                  <TurnstileWidget ref={turnstileRef} onReadyChange={setTurnstileReady} />
+                  <TurnstileWidget
+                    ref={turnstileRef}
+                    onReadyChange={setTurnstileReady}
+                    onErrorChange={setTurnstileError}
+                  />
+                  {turnstileError && (
+                    <div
+                      role="alert"
+                      className="mb-5 rounded-[1.1rem] border border-red-700/25 bg-red-50 p-4 text-sm leading-relaxed text-red-800 dark:border-red-300/25 dark:bg-red-950/25 dark:text-red-200"
+                    >
+                      <p>{turnstileError} Ihre Eingaben bleiben erhalten.</p>
+                      <button
+                        type="button"
+                        onClick={() => turnstileRef.current?.retry()}
+                        className="mt-3 min-h-10 rounded-full border border-current/20 px-3.5 py-2 text-xs font-medium transition-colors hover:bg-current/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/35"
+                      >
+                        Sicherheitsprüfung erneut laden
+                      </button>
+                    </div>
+                  )}
                   <AnimatePresence initial={false}>
                     {isSubmitting && (
                       <motion.div
@@ -670,8 +922,12 @@ export function PersonalInquiryChat() {
                       >
                         <SendingGlyph reducedMotion={prefersReducedMotion} />
                         <div>
-                          <p className="text-sm font-medium text-foreground">Ihre Anfrage wird sicher übermittelt.</p>
-                          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Bitte lassen Sie dieses Fenster einen kurzen Moment geöffnet.</p>
+                          <p className="text-sm font-medium text-foreground">
+                            Ihre Anfrage wird übermittelt.
+                          </p>
+                          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                            Einen kleinen Moment – Ihre Angaben werden jetzt sicher an mich übertragen.
+                          </p>
                         </div>
                       </motion.div>
                     )}
@@ -690,13 +946,15 @@ export function PersonalInquiryChat() {
                     type="button"
                     disabled={isSubmitting || !turnstileReady}
                     onClick={() => void submitInquiry()}
-                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-center text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow,opacity] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 sm:w-auto sm:px-7"
+                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-center text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow,opacity] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 motion-reduce:hover:translate-y-0 sm:w-auto sm:px-7"
                   >
                     {isSubmitting
                       ? "Anfrage wird übermittelt"
                       : turnstileReady
                         ? "Projektanfrage senden"
-                        : "Sicherheitsprüfung wird geladen"}
+                        : turnstileError
+                          ? "Sicherheitsprüfung nicht verfügbar"
+                          : "Sicherheitsprüfung wird geladen"}
                   </button>
                 </div>
               </div>
@@ -707,10 +965,13 @@ export function PersonalInquiryChat() {
                 <SuccessGlyph reducedMotion={prefersReducedMotion} />
                 <p className="mt-6 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Anfrage übermittelt</p>
                 <h3 className="mt-3 max-w-xl text-2xl font-medium tracking-[-0.025em] text-foreground sm:text-3xl">
-                  Vielen Dank für Ihre Anfrage.
+                  Vielen Dank – Ihre Anfrage ist angekommen.
                 </h3>
                 <p className="mt-3 max-w-xl text-[0.96rem] leading-relaxed text-muted-foreground">
                   Ich sehe mir Ihre Angaben persönlich an und melde mich zeitnah bei Ihnen.
+                </p>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                  Eine kurze Eingangsbestätigung wurde an Ihre E-Mail-Adresse gesendet.
                 </p>
                 <button
                   type="button"
@@ -719,6 +980,19 @@ export function PersonalInquiryChat() {
                 >
                   <RotateCcw aria-hidden="true" className="h-4 w-4" />
                   Neue Anfrage beginnen
+                </button>
+              </div>
+            )}
+
+            {canGoBack && (
+              <div className="mt-7 border-t border-border/80 pt-5">
+                <button
+                  type="button"
+                  onClick={goBack}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:border-clay/30 hover:bg-surface-muted/45 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:hover:translate-y-0"
+                >
+                  <ArrowLeft aria-hidden="true" className="h-4 w-4" strokeWidth={1.8} />
+                  Zurück
                 </button>
               </div>
             )}
@@ -743,9 +1017,8 @@ function AssistantMessage({
       transition={{ duration: reducedMotion ? 0 : 0.34, ease: easeGlass }}
       className="flex items-start gap-2.5"
     >
-      <span aria-hidden="true" className="relative mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface shadow-soft">
-        <span className="absolute h-3 w-[3px] -translate-x-[2px] -rotate-[28deg] rounded-full bg-foreground/85" />
-        <span className="absolute h-3 w-[3px] translate-x-[2px] rotate-[28deg] rounded-full bg-clay" />
+      <span aria-hidden="true" className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface shadow-soft">
+        <LorizMark className="h-4 w-4 text-foreground" />
       </span>
       <p className="max-w-[calc(100%_-_2.4rem)] break-words rounded-[1.1rem] border border-border/70 bg-surface-muted/65 px-4 py-3 text-sm leading-relaxed text-foreground shadow-soft [overflow-wrap:anywhere] sm:max-w-[85%]">
         <span className="sr-only">Loriz Digital: </span>
@@ -774,15 +1047,12 @@ function SendingGlyph({ reducedMotion }: { reducedMotion: boolean }) {
   return (
     <span aria-hidden="true" className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-clay/20 bg-surface">
       <motion.span
-        animate={reducedMotion ? undefined : { x: [-2, 1, -2], opacity: [0.55, 1, 0.55] }}
+        animate={reducedMotion ? undefined : { opacity: [0.55, 1, 0.55], scale: [0.96, 1, 0.96] }}
         transition={{ duration: 1.5, ease: "easeInOut", repeat: Infinity }}
-        className="absolute h-4 w-[3px] -translate-x-[2px] -rotate-[28deg] rounded-full bg-foreground/80"
-      />
-      <motion.span
-        animate={reducedMotion ? undefined : { x: [2, -1, 2], opacity: [0.55, 1, 0.55] }}
-        transition={{ duration: 1.5, ease: "easeInOut", repeat: Infinity }}
-        className="absolute h-4 w-[3px] translate-x-[2px] rotate-[28deg] rounded-full bg-clay"
-      />
+        className="flex items-center justify-center"
+      >
+        <LorizMark className="h-5 w-5 text-foreground" />
+      </motion.span>
     </span>
   );
 }
@@ -797,17 +1067,13 @@ function SuccessGlyph({ reducedMotion }: { reducedMotion: boolean }) {
       className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-clay/20 bg-accent-soft shadow-soft"
     >
       <motion.span
-        initial={reducedMotion ? false : { x: -7, opacity: 0 }}
-        animate={{ x: -2.5, opacity: 1 }}
-        transition={{ duration: reducedMotion ? 0 : 0.55, delay: reducedMotion ? 0 : 0.08, ease: easeGlass }}
-        className="absolute h-6 w-1 -rotate-[28deg] rounded-full bg-foreground/85"
-      />
-      <motion.span
-        initial={reducedMotion ? false : { x: 7, opacity: 0 }}
-        animate={{ x: 2.5, opacity: 1 }}
-        transition={{ duration: reducedMotion ? 0 : 0.55, delay: reducedMotion ? 0 : 0.12, ease: easeGlass }}
-        className="absolute h-6 w-1 rotate-[28deg] rounded-full bg-clay"
-      />
+        initial={reducedMotion ? false : { opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: reducedMotion ? 0 : 0.5, delay: reducedMotion ? 0 : 0.08, ease: easeGlass }}
+        className="flex items-center justify-center"
+      >
+        <LorizMark className="h-7 w-7 text-foreground" />
+      </motion.span>
     </motion.div>
   );
 }
@@ -876,7 +1142,7 @@ function InputQuestion({
       <button
         type="button"
         onClick={onContinue}
-        className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface sm:w-auto"
+        className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:hover:translate-y-0 sm:w-auto"
       >
         {optional && !value ? "Überspringen" : "Weiter"}
         <ArrowRight aria-hidden="true" className="h-4 w-4" strokeWidth={1.8} />

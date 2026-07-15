@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { LegalPageLayout, LegalSection, type TocEntry } from "@/components/legal/LegalPageLayout";
+import { siteConfig } from "@/lib/site";
 
 const toc: TocEntry[] = [
   { id: "angaben", label: "Angaben gemäß § 5 DDG" },
@@ -29,9 +30,9 @@ export default function ImpressumPage() {
             <br />
             Loriz Digital
             <br />
-            Wiesenweg 23
+            {siteConfig.address.street}
             <br />
-            34379 Calden
+            {siteConfig.address.postalCode} {siteConfig.address.city}
           </address>
         </LegalSection>
 
@@ -59,9 +60,9 @@ export default function ImpressumPage() {
           <address className="not-italic">
             Lino Loriz
             <br />
-            Wiesenweg 23
+            {siteConfig.address.street}
             <br />
-            34379 Calden
+            {siteConfig.address.postalCode} {siteConfig.address.city}
           </address>
         </LegalSection>
 

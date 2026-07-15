@@ -10,7 +10,7 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://loriz.digital";
+const siteUrl = siteConfig.url;
 
 const localBusinessJsonLd = {
   "@context": "https://schema.org",
@@ -23,10 +23,10 @@ const localBusinessJsonLd = {
   founder: { "@type": "Person", name: siteConfig.founder },
   address: {
     "@type": "PostalAddress",
-    streetAddress: "Wiesenweg 23",
-    postalCode: "34379",
-    addressLocality: "Calden",
-    addressCountry: "DE",
+    streetAddress: siteConfig.address.street,
+    postalCode: siteConfig.address.postalCode,
+    addressLocality: siteConfig.address.city,
+    addressCountry: siteConfig.address.countryCode,
   },
   description:
     "Moderne Webseiten und digitale Lösungen für kleine Unternehmen, Handwerksbetriebe und Selbstständige.",
@@ -82,6 +82,12 @@ export default function RootLayout({
   return (
     <html lang="de" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+        <a
+          href="#main-content"
+          className="sr-only fixed left-4 top-4 z-[100] rounded-full bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground shadow-glass-md focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-clay/45 focus:ring-offset-2 focus:ring-offset-background"
+        >
+          Zum Inhalt
+        </a>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}

@@ -135,7 +135,7 @@ export function ContactDetailsStep({
                   "flex min-h-12 items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[var(--ease-glass)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
                   selected
                     ? "border-clay/45 bg-accent-soft text-foreground shadow-soft"
-                    : "border-border bg-surface text-foreground hover:-translate-y-0.5 hover:border-clay/30 hover:shadow-soft",
+                    : "border-border bg-surface text-foreground hover:-translate-y-0.5 hover:border-clay/30 hover:shadow-soft motion-reduce:hover:translate-y-0",
                 )}
               >
                 <span>{label}</span>
@@ -196,7 +196,7 @@ export function ContactDetailsStep({
       <button
         type="button"
         onClick={onContinue}
-        className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+        className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground shadow-soft transition-[transform,box-shadow] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:shadow-glass-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:hover:translate-y-0"
       >
         Angaben prüfen
       </button>
