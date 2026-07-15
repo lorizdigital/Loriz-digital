@@ -63,7 +63,7 @@ export function FeaturedProject() {
                 href={projectUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-8 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
+                className="mt-8 inline-flex min-h-11 w-fit items-center gap-1.5 rounded-sm text-sm font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
               >
                 Projekt ansehen
                 <ArrowUpRight aria-hidden="true" className="h-4 w-4" strokeWidth={2} />

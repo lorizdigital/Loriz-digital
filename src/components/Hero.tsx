@@ -43,51 +43,37 @@ export function Hero() {
   const [logoStart, setLogoStart] = useState(false);
   const [logoReady, setLogoReady] = useState(false);
   const [forceMobileLogoComplete, setForceMobileLogoComplete] = useState(false);
-  const hasStartedRef = useRef(false);
-  const timeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
-
   useEffect(() => {
-    if (hasStartedRef.current) return;
-    hasStartedRef.current = true;
+    const timeouts = new Set<ReturnType<typeof setTimeout>>();
 
-    function wait(ms: number) {
-      return new Promise<void>((resolve) => {
-        const id = setTimeout(() => {
-          timeoutsRef.current.delete(id);
-          resolve();
-        }, ms);
-        timeoutsRef.current.add(id);
-      });
+    function schedule(callback: () => void, delay: number) {
+      const id = setTimeout(() => {
+        timeouts.delete(id);
+        callback();
+      }, delay);
+      timeouts.add(id);
     }
 
     if (shouldReduceMotion) {
-      wait(0).then(() => {
+      schedule(() => {
         setTextStep("founder");
         setLogoStart(true);
-      });
-      return;
+      }, 0);
+    } else {
+      schedule(() => setTextStep("claim"), 0);
+      schedule(() => setTextStep("description"), 350);
+      schedule(() => {
+        setTextStep("cta");
+        setLogoStart(true);
+      }, 700);
+      schedule(() => setTextStep("founder"), 1050);
     }
 
-    async function run() {
-      setTextStep("claim");
-      await wait(350);
-      setTextStep("description");
-      await wait(350);
-      setTextStep("cta");
-      setLogoStart(true);
-      await wait(350);
-      setTextStep("founder");
-    }
-    run();
+    // Der Effekt besitzt seine Timer selbst. Dadurch kann React ihn im
+    // Strict Mode probeweise aufraeumen und anschliessend vollstaendig neu
+    // starten, ohne dass transparente Hero-Inhalte zurueckbleiben.
+    return () => timeouts.forEach(clearTimeout);
   }, [shouldReduceMotion]);
-
-  useEffect(() => {
-    const timeouts = timeoutsRef.current;
-    return () => {
-      timeouts.forEach(clearTimeout);
-      timeouts.clear();
-    };
-  }, []);
 
   const handleLogoComplete = useCallback(() => setLogoReady(true), []);
 
@@ -106,24 +92,26 @@ export function Hero() {
   }, [logoReady]);
 
   return (
-    <section id="start" className="relative overflow-hidden pb-20 pt-36 sm:pt-44 lg:pb-28 lg:pt-52">
+    <section
+      id="start"
+      className="relative overflow-hidden pb-14 pt-32 sm:pb-16 sm:pt-40 lg:pb-28 lg:pt-52"
+    >
       <AtmosphericBackground />
 
-      <Container className="grid items-center gap-16 lg:grid-cols-[0.86fr_1.14fr] lg:gap-14">
+      <Container className="grid items-center gap-12 md:grid-cols-[1.2fr_0.8fr] md:gap-8 lg:grid-cols-2 lg:gap-14 xl:grid-cols-[0.86fr_1.14fr]">
         <motion.div ref={textRef} style={{ x: textMouseX, y: textY }}>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={textStepAtLeast(textStep, "claim") ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.8, ease: easeGlass }}
-            className="balance text-[2.75rem] font-semibold leading-[1.08] tracking-tight text-foreground sm:text-6xl lg:text-[3.6rem]"
+            className="balance text-[2.75rem] font-semibold leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-[3.25rem] lg:text-[3.6rem]"
           >
             {siteConfig.slogan}
           </motion.h1>
 
-          {/* Mobil/Tablet: Logo direkt unter der Headline statt ganz unten nach
-              der CTA-Reihe – wirkt als Begleiter der Marke, nicht als Anhang.
-              Ab lg übernimmt die Instanz in der zweiten Grid-Spalte. */}
-          <div className="my-5 sm:my-6 lg:hidden">
+          {/* Mobil: Logo direkt unter der Headline. Ab Tablet steht es platzsparend
+              in der zweiten Grid-Spalte; die Scroll-Ueberfuehrung bleibt rein mobil. */}
+          <div className="my-5 sm:my-6 md:hidden">
             <HeroLogoMobileDock ready={logoReady}>
               <HeroLogoReveal
                 start={logoStart}
@@ -148,7 +136,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={textStepAtLeast(textStep, "cta") ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.8, ease: easeGlass }}
-            className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center"
+            className="mt-10 flex flex-col gap-4 min-[860px]:flex-row min-[860px]:items-center"
           >
             <Button href="#kontakt" variant="primary">
               Projekt besprechen
@@ -173,7 +161,7 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
-        <div className="hidden lg:contents">
+        <div className="hidden md:contents">
           <HeroLogoReveal
             start={logoStart}
             mouseX={x}

@@ -1,10 +1,11 @@
-import { Calendar, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { InteractiveCard } from "@/components/ui/InteractiveCard";
 import { ModernWebsiteDemo } from "@/components/ModernWebsiteDemo";
 import { PersonalInquiryChat } from "@/components/inquiry/PersonalInquiryChat";
+import { InteractiveBookingDemo } from "@/components/booking/InteractiveBookingDemo";
 import { MobileExpandableServiceVisual } from "@/components/MobileExpandableServiceVisual";
 import { cn } from "@/lib/cn";
 
@@ -52,43 +53,21 @@ function WebsiteVisual() {
   return <ModernWebsiteDemo />;
 }
 
-/** Kompakte Vorschau eines typischen Terminbuchungsablaufs. */
-function BookingVisual() {
-  return (
-    <div className="flex h-full flex-col justify-center p-8 sm:p-10">
-      <div className="w-full max-w-[280px] rounded-xl border border-border bg-surface p-5 shadow-soft">
-        <div className="flex items-center gap-2">
-          <Calendar aria-hidden="true" className="h-4 w-4 text-clay" strokeWidth={2} />
-          <div className="h-2 w-24 rounded-full bg-foreground/70" />
-        </div>
-        <div className="mt-4 grid grid-cols-7 gap-1.5">
-          {Array.from({ length: 14 }).map((_, index) => (
-            <span
-              key={index}
-              className={cn(
-                "aspect-square rounded-md",
-                index === 9 ? "bg-accent" : "bg-surface-muted",
-              )}
-            />
-          ))}
-        </div>
-        <div className="mt-4 flex gap-2">
-          <span className="h-7 flex-1 rounded-full border border-border" />
-          <span className="h-7 flex-1 rounded-full bg-accent" />
-          <span className="h-7 flex-1 rounded-full border border-border" />
-        </div>
-        <div className="mt-4 flex items-center gap-2 rounded-lg bg-accent-soft px-3 py-2.5">
-          <Check aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-clay" strokeWidth={2.5} />
-          <div className="h-2 w-28 rounded-full bg-foreground/45" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ServiceVisual({ variant }: { variant: number }) {
   if (variant === 0) return <WebsiteVisual />;
-  if (variant === 1) return <BookingVisual />;
+  if (variant === 1) {
+    return (
+      <MobileExpandableServiceVisual
+        eyebrow="Interaktive Demo"
+        title="Wie kann eine einfache Terminbuchung aussehen?"
+        description="Probieren Sie einen beispielhaften Ablauf direkt auf der Seite aus. Es wird dabei kein Termin gebucht."
+        openLabel="Demo ansehen"
+        closeLabel="Demo schließen"
+      >
+        <InteractiveBookingDemo />
+      </MobileExpandableServiceVisual>
+    );
+  }
   return (
     <MobileExpandableServiceVisual
       eyebrow="Persönliche Projektanfrage"
@@ -121,7 +100,7 @@ export function Services() {
           {services.map((service, i) => (
             <Reveal key={service.index} variant={i % 2 === 0 ? "left" : "right"} delay={0.05}>
               <InteractiveCard
-                motionMode={i === 2 ? "highlight" : "tilt"}
+                motionMode={i === 0 ? "tilt" : "highlight"}
                 className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft"
               >
                 <div
@@ -151,7 +130,7 @@ export function Services() {
                   <div
                     className={cn(
                       "border-t border-border bg-surface-muted lg:min-h-0 lg:border-t-0",
-                      i !== 2 && "min-h-[260px]",
+                      i === 0 && "min-h-[260px]",
                       i % 2 === 0 ? "lg:border-l" : "lg:border-r lg:[direction:ltr]",
                     )}
                   >

@@ -29,7 +29,7 @@ export function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    className="inline-flex min-h-11 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                   >
                     {item.label}
                   </Link>
@@ -44,7 +44,7 @@ export function Footer() {
               <li>
                 <a
                   href={`mailto:${siteConfig.email}`}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                 >
                   {siteConfig.email}
                 </a>
@@ -58,7 +58,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/impressum"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                 >
                   Impressum
                 </Link>
@@ -66,7 +66,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/datenschutz"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  className="inline-flex min-h-11 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                 >
                   Datenschutz
                 </Link>

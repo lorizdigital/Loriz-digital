@@ -63,7 +63,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
 
         <Link
           href="/#start"
-          className="flex items-center gap-2 rounded-full px-2 py-1 text-[1.05rem] font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+          className="flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full px-2 py-1 text-[1.05rem] font-semibold tracking-tight text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
         >
           <motion.span
             id={heroLogoDockEnabled ? NAV_LOGO_DOM_ID : undefined}
@@ -78,7 +78,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
 
         <nav
           ref={navRef}
-          className="relative hidden items-center gap-1 md:flex"
+          className="relative hidden items-center gap-1 lg:flex"
           onMouseLeave={() => setHoverRect(null)}
         >
           {!shouldReduceMotion && (
@@ -101,7 +101,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
               href={item.href}
               onMouseEnter={(e) => handleLinkHover(e.currentTarget)}
               className={cn(
-                "relative z-10 rounded-full px-3.5 py-2 text-[0.95rem] text-foreground/80 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30",
+                "relative z-10 inline-flex min-h-11 items-center rounded-full px-3.5 py-2 text-[0.95rem] text-foreground/80 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30",
                 shouldReduceMotion && "hover:bg-foreground/[0.05]",
               )}
             >
@@ -110,7 +110,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <Button href="/#kontakt" variant="primary" size="sm">
             Projekt anfragen
           </Button>

@@ -39,7 +39,7 @@ export function MobileMenu() {
   }, [open]);
 
   useEffect(() => {
-    const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
     const closeOnDesktop = (event: MediaQueryListEvent) => {
       if (event.matches) setOpen(false);
     };
@@ -78,14 +78,14 @@ export function MobileMenu() {
   };
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? "Menü schließen" : "Menü öffnen"}
-        className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] relative z-50 flex h-10 w-10 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+        className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] relative z-50 flex h-11 w-11 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
       >
         {open ? (
           <X aria-hidden="true" className="h-5 w-5" />
@@ -138,7 +138,7 @@ export function MobileMenu() {
                           delay: prefersReducedMotion ? 0 : 0.06 + index * 0.05,
                           ease: [0.16, 1, 0.3, 1],
                         }}
-                        className="w-full rounded-2xl px-3 py-3 text-2xl font-medium tracking-tight text-foreground transition-colors hover:bg-foreground/[0.05]"
+                        className="w-full rounded-2xl px-3 py-3 text-2xl font-medium tracking-tight text-foreground transition-colors hover:bg-foreground/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                       >
                         {item.label}
                       </MotionLink>
@@ -174,14 +174,14 @@ export function MobileMenu() {
                     <Link
                       href="/impressum"
                       onClick={() => setOpen(false)}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="inline-flex min-h-11 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                     >
                       Impressum
                     </Link>
                     <Link
                       href="/datenschutz"
                       onClick={() => setOpen(false)}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="inline-flex min-h-11 items-center rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                     >
                       Datenschutz
                     </Link>

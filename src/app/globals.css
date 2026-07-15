@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
+
   /* Farbsystem – überwiegend hell, mit dunkler Akzentfarbe */
   --background: #faf9f5;
   --surface: #ffffff;
@@ -51,6 +53,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
+
     /* Farbsystem – warmes Dunkel, kein reines Schwarz; Akzent invertiert
        (helle Fläche auf dunklem Grund), damit Primär-Buttons weiterhin
        kontrastreich wirken. */

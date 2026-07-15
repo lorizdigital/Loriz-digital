@@ -89,7 +89,6 @@ export function ModernWebsiteDemo() {
   const buttonControls = useAnimationControls();
   const frameRef = useRef<HTMLDivElement>(null);
   const portRef = useRef<HTMLDivElement>(null);
-  const hasStartedRef = useRef(false);
   const runIdRef = useRef(0);
   const timeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
@@ -175,28 +174,33 @@ export function ModernWebsiteDemo() {
   }
 
   useEffect(() => {
-    if (!inView || hasStartedRef.current) return;
-    hasStartedRef.current = true;
+    if (!inView) return;
+
+    runIdRef.current += 1;
+    const myRunId = runIdRef.current;
 
     if (prefersReducedMotion) {
       // Sinnvoller statischer Endzustand direkt, ohne Cursor und ohne Sequenz.
       // Über wait() verzögert, damit setState nicht synchron im Effekt-Body läuft.
-      wait(0).then(() => setStep("done"));
-      return;
+      wait(0).then(() => {
+        if (runIdRef.current === myRunId) setStep("done");
+      });
+    } else {
+      runSequence(myRunId);
     }
 
-    runIdRef.current += 1;
-    runSequence(runIdRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, prefersReducedMotion]);
-
-  useEffect(() => {
+    // Strict Mode startet Effekte in der Entwicklung probeweise zweimal.
+    // Der erste Lauf wird invalidiert und vollstaendig aufgeraeumt, damit die
+    // eigentliche Sequenz im zweiten Lauf nicht in einem Zwischenzustand
+    // stecken bleibt.
     const timeouts = timeoutsRef.current;
     return () => {
+      runIdRef.current += 1;
       timeouts.forEach(clearTimeout);
       timeouts.clear();
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView, prefersReducedMotion]);
 
   function handleUserTakeover() {
     if (step === "done") return;

@@ -41,7 +41,7 @@ export default function ImpressumPage() {
             Telefon:{" "}
             <a
               href="tel:+491603329300"
-              className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+              className="rounded-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
             >
               +49 160 3329300
             </a>
@@ -49,7 +49,7 @@ export default function ImpressumPage() {
             E-Mail:{" "}
             <a
               href="mailto:hallo@loriz.digital"
-              className="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+              className="rounded-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
             >
               hallo@loriz.digital
             </a>

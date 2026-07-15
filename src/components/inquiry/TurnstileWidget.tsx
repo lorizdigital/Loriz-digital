@@ -167,6 +167,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
       return () => {
         const widgetId = widgetIdRef.current;
         if (widgetId && window.turnstile) window.turnstile.remove(widgetId);
+        widgetIdRef.current = null;
         rejectPending("Die Sicherheitsprüfung wurde beendet.");
         onReadyChange?.(false);
       };

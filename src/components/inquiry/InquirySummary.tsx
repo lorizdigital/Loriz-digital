@@ -29,20 +29,22 @@ export function InquirySummary({ sections, onEdit }: InquirySummaryProps) {
             key={section.id}
             className="rounded-[1.1rem] border border-border bg-surface-muted/32 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)] sm:p-5"
           >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+              <div className="flex min-w-0 items-center gap-3">
                 <span
                   aria-hidden="true"
                   className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-surface text-[0.68rem] font-medium tabular-nums text-muted-foreground"
                 >
                   {String(sectionIndex + 1).padStart(2, "0")}
                 </span>
-                <h4 className="font-medium tracking-tight text-foreground">{section.title}</h4>
+                <h4 className="break-words font-medium tracking-tight text-foreground">
+                  {section.title}
+                </h4>
               </div>
               <button
                 type="button"
                 onClick={() => onEdit(section.id)}
-                className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-foreground/75 transition-[background-color,color] hover:bg-accent-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-foreground/75 transition-[background-color,color] hover:bg-accent-soft hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
               >
                 <Pencil aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={1.8} />
                 Bearbeiten

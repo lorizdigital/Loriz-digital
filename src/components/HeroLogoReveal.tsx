@@ -37,7 +37,6 @@ export function HeroLogoReveal({
 }: HeroLogoRevealProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [phase, setPhase] = useState<Phase>("idle");
-  const hasStartedRef = useRef(false);
   const hasCompletedRef = useRef(false);
   const timeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
@@ -59,24 +58,32 @@ export function HeroLogoReveal({
   }
 
   useEffect(() => {
-    if (!start || hasStartedRef.current) return;
-    hasStartedRef.current = true;
+    if (!start || hasCompletedRef.current) return;
 
     if (prefersReducedMotion) {
       wait(0).then(complete);
-      return;
+    } else {
+      async function run() {
+        setPhase("dark");
+        await wait(450);
+        setPhase("light");
+        await wait(1000);
+        setPhase("settle");
+        await wait(500);
+        complete();
+      }
+      run();
     }
 
-    async function run() {
-      setPhase("dark");
-      await wait(450);
-      setPhase("light");
-      await wait(1000);
-      setPhase("settle");
-      await wait(500);
-      complete();
-    }
-    run();
+    // React prueft Effekte im Strict Mode mit einem zusaetzlichen
+    // Setup/Cleanup-Durchlauf. Ohne erneutes Scheduling bliebe die Marke nach
+    // dem ersten Teil der Animation unsichtbar. Die Completion-Sperre reicht
+    // aus, um echte Wiederholungen nach Abschluss zu verhindern.
+    const timeouts = timeoutsRef.current;
+    return () => {
+      timeouts.forEach(clearTimeout);
+      timeouts.clear();
+    };
   }, [start, prefersReducedMotion, complete]);
 
   // Beginnt der Nutzer auf Mobil bereits zu scrollen, gewinnt seine
@@ -88,14 +95,6 @@ export function HeroLogoReveal({
     timeoutsRef.current.clear();
     wait(0).then(complete);
   }, [forceComplete, complete]);
-
-  useEffect(() => {
-    const timeouts = timeoutsRef.current;
-    return () => {
-      timeouts.forEach(clearTimeout);
-      timeouts.clear();
-    };
-  }, []);
 
   const d = (seconds: number) => (prefersReducedMotion || forceComplete ? 0 : seconds);
 
@@ -110,7 +109,7 @@ export function HeroLogoReveal({
         viewBox="72.8 44 140.4 162.6"
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
-        className="h-20 w-auto text-foreground sm:h-28 lg:h-72 xl:h-80"
+        className="h-20 w-auto text-foreground sm:h-28 md:h-52 lg:h-72 xl:h-80"
         style={{
           x: driftX,
           y: driftY,

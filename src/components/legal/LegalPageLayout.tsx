@@ -29,7 +29,7 @@ export function LegalPageLayout({ title, subtitle, toc, children }: LegalPageLay
 
           {/* Mobil: einklappbares Inhaltsverzeichnis, ohne JavaScript */}
           <details className="group mt-10 rounded-xl border border-border bg-surface-muted/50 lg:hidden">
-            <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-medium text-foreground marker:content-none">
+            <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-5 py-4 text-sm font-medium text-foreground marker:content-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-clay/45">
               Inhaltsverzeichnis
               <span
                 aria-hidden="true"
@@ -44,7 +44,7 @@ export function LegalPageLayout({ title, subtitle, toc, children }: LegalPageLay
                   <li key={entry.id}>
                     <a
                       href={`#${entry.id}`}
-                      className="text-muted-foreground transition-colors hover:text-foreground"
+                      className="inline-flex min-h-11 items-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                     >
                       {entry.label}
                     </a>
@@ -64,7 +64,7 @@ export function LegalPageLayout({ title, subtitle, toc, children }: LegalPageLay
                     <li key={entry.id}>
                       <a
                         href={`#${entry.id}`}
-                        className="text-muted-foreground transition-colors hover:text-foreground"
+                        className="rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
                       >
                         {entry.label}
                       </a>
@@ -74,7 +74,7 @@ export function LegalPageLayout({ title, subtitle, toc, children }: LegalPageLay
               </div>
             </nav>
 
-            <div className="max-w-[65ch] text-[1.05rem] leading-relaxed text-foreground/90">
+            <div className="max-w-[65ch] [overflow-wrap:anywhere] text-[1.05rem] leading-relaxed text-foreground/90">
               {children}
             </div>
           </div>

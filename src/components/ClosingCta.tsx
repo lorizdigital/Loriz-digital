@@ -38,14 +38,14 @@ export function ClosingCta() {
             <div className="mt-6 flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-6">
               <a
                 href={`mailto:${siteConfig.email}`}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="inline-flex min-h-11 items-center gap-2 rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
               >
                 <Mail aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
                 {siteConfig.email}
               </a>
               <a
                 href={phoneHref}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="inline-flex min-h-11 items-center gap-2 rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45"
               >
                 <Phone aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
                 {siteConfig.phone}

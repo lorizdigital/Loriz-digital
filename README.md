@@ -35,5 +35,7 @@ liegt keine eigenständige Wrangler- oder OpenNext-Deploymentkonfiguration.
 Cloudflare hinterlegten Konfiguration abgeglichen werden.
 
 Die für den Anfrage-Chat benötigten Variablen sind in `.env.example`
-dokumentiert. Produktionsschlüssel gehören ausschließlich in die geschützten
-Cloudflare-Variablen und niemals in das Repository.
+dokumentiert. `NEXT_PUBLIC_TURNSTILE_SITE_KEY` muss bereits während des
+Produktions-Builds verfügbar sein; die übrigen Werte werden ausschließlich
+serverseitig zur Laufzeit benötigt. Produktionsschlüssel gehören nur in die
+geschützten Cloudflare-Variablen und niemals in das Repository.

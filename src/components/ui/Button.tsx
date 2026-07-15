@@ -39,7 +39,7 @@ export function Button({
   const variants = {
     primary: "bg-accent text-accent-foreground shadow-glass-sm",
     secondary:
-      "glass-subtle backdrop-blur-[var(--glass-blur-sm)] text-foreground transition-[background-color,border-color] duration-300 ease-out hover:bg-[rgb(255_255_255/0.52)] hover:border-[rgb(27_27_24/0.12)]",
+      "glass-subtle backdrop-blur-[var(--glass-blur-sm)] text-foreground transition-[background-color,border-color] duration-300 ease-out hover:border-clay/20 hover:bg-surface-muted/70",
   };
 
   const externalProps = external ? { target: "_blank", rel: "noopener noreferrer" } : {};

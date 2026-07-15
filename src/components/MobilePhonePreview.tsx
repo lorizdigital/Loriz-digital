@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { motion, useAnimationControls } from "framer-motion";
 import Image from "next/image";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -39,12 +39,12 @@ export function MobilePhonePreview({
   const startPercent = (startOffset / CAPTURE_HEIGHT) * 100;
   const endPercent = (endOffset / CAPTURE_HEIGHT) * 100;
 
-  const startPan = () => {
+  const startPan = useCallback(() => {
     controls.start({
       y: [`-${startPercent}%`, `-${startPercent}%`, `-${endPercent}%`, `-${endPercent}%`, `-${startPercent}%`],
       transition: { duration: PAN_DURATION, times: PAN_TIMES, repeat: Infinity, ease: "easeInOut" },
     });
-  };
+  }, [controls, endPercent, startPercent]);
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -52,8 +52,7 @@ export function MobilePhonePreview({
       return;
     }
     startPan();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefersReducedMotion, startPercent, endPercent]);
+  }, [controls, prefersReducedMotion, startPan, startPercent]);
 
   return (
     // Bewusst ohne eigenes `position`: Das steuert ausschließlich die

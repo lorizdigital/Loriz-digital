@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
@@ -46,12 +46,12 @@ export function DesktopBrowserPreview({
     return () => observer.disconnect();
   }, []);
 
-  const startPan = () => {
+  const startPan = useCallback(() => {
     controls.start({
       y: [-startOffset, -startOffset, -endOffset, -endOffset, -startOffset],
       transition: { duration: PAN_DURATION, times: PAN_TIMES, repeat: Infinity, ease: "easeInOut" },
     });
-  };
+  }, [controls, endOffset, startOffset]);
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -59,8 +59,7 @@ export function DesktopBrowserPreview({
       return;
     }
     startPan();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefersReducedMotion, startOffset, endOffset]);
+  }, [controls, prefersReducedMotion, startOffset, startPan]);
 
   const domain = new URL(url).hostname.replace(/^www\./, "");
   const iframeContentHeight = endOffset + WINDOW_HEIGHT;

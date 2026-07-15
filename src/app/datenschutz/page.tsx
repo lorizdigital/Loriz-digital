@@ -10,7 +10,8 @@ import {
 import { siteConfig } from "@/lib/site";
 
 const externalLinkProps = { target: "_blank", rel: "noopener noreferrer" } as const;
-const linkClass = "text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground";
+const linkClass =
+  "rounded-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45";
 
 const toc: TocEntry[] = [
   { id: "verantwortlicher", label: "1. Verantwortlicher" },
