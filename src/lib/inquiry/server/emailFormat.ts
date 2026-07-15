@@ -125,20 +125,23 @@ export function buildInquiryConfirmationEmail(options: {
   requestId: string;
   identity: EmailIdentity;
   recipient: { email: string; name: string };
+  contactEmail: string;
 }): TransactionalEmail {
-  const { requestId, identity, recipient } = options;
+  const { requestId, identity, recipient, contactEmail } = options;
   const paragraphs = [
     "Vielen Dank für Ihre Anfrage bei Loriz Digital.",
     "Ihre Angaben sind sicher bei mir eingegangen. Ich sehe mir Ihr Vorhaben persönlich an und melde mich zeitnah bei Ihnen.",
     "Diese E-Mail bestätigt lediglich den Eingang Ihrer Anfrage.",
+    "Bitte antworten Sie nicht direkt auf diese automatisch versendete E-Mail. Antworten an diese technische Absenderadresse werden nicht bearbeitet.",
   ];
+  const contactParagraph = `Bei Rückfragen erreichen Sie mich unter ${contactEmail}. Bitte geben Sie dabei die untenstehende Referenz an.`;
 
   return {
     sender: { email: identity.fromEmail, name: identity.fromName },
     to: [recipient],
     subject: "Ihre Anfrage bei Loriz Digital ist eingegangen",
-    textContent: `${paragraphs.join("\n\n")}\n\nReferenz: ${requestId}`,
-    htmlContent: `${paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}<p><small>Referenz: ${escapeHtml(requestId)}</small></p>`,
+    textContent: `${paragraphs.join("\n\n")}\n\n${contactParagraph}\n\nReferenz: ${requestId}`,
+    htmlContent: `${paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}<p>Bei Rückfragen erreichen Sie mich unter <a href="mailto:${escapeHtml(contactEmail)}">${escapeHtml(contactEmail)}</a>. Bitte geben Sie dabei die untenstehende Referenz an.</p><p><small>Referenz: ${escapeHtml(requestId)}</small></p>`,
     headers: {
       "X-Loriz-Request-ID": requestId,
       idempotencyKey: emailIdempotencyKey(requestId, "confirmation"),

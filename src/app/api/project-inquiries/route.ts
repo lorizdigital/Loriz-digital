@@ -93,6 +93,7 @@ function handlers() {
       buildInquiryConfirmationEmail({
         requestId,
         identity,
+        contactEmail: env.toEmail,
         recipient: {
           email: inquiry.contact.email,
           name: inquiry.contact.name,

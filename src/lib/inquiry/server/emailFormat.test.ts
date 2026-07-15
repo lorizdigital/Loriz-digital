@@ -46,6 +46,7 @@ describe("inquiry email formatting", () => {
     const email = buildInquiryConfirmationEmail({
       requestId: "019f5c48-c6cf-7fc1-8fcc-02ecccea914a",
       identity,
+      contactEmail: "hallo@loriz.digital",
       recipient: { email: "kunde@example.com", name: "Kunde" },
     });
 
@@ -54,8 +55,16 @@ describe("inquiry email formatting", () => {
     expect(email.textContent).toContain(
       "Diese E-Mail bestätigt lediglich den Eingang Ihrer Anfrage.",
     );
+    expect(email.textContent).toContain(
+      "Antworten an diese technische Absenderadresse werden nicht bearbeitet.",
+    );
+    expect(email.textContent).toContain(
+      "Bei Rückfragen erreichen Sie mich unter hallo@loriz.digital.",
+    );
+    expect(email.htmlContent).toContain('href="mailto:hallo@loriz.digital"');
     expect(email.textContent).toContain("Referenz: 019f5c48-c6cf-7fc1-8fcc-02ecccea914a");
     expect(email.textContent).not.toContain("Projektart");
+    expect(email.replyTo).toBeUndefined();
     expect(email.headers?.idempotencyKey).toBe("019f5c48-c6cf-7fc1-8fcc-02ecccea914b");
   });
 
