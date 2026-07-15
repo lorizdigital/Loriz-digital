@@ -42,6 +42,28 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/datenschutz",
   },
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    url: "/datenschutz",
+    siteName: siteConfig.name,
+    title: "Datenschutzerklärung | Loriz Digital",
+    description: "Datenschutzerklärung von Loriz Digital gemäß DSGVO.",
+    images: [
+      {
+        url: "/social/loriz-digital-light.png",
+        width: 1200,
+        height: 630,
+        alt: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Datenschutzerklärung | Loriz Digital",
+    description: "Datenschutzerklärung von Loriz Digital gemäß DSGVO.",
+    images: ["/social/loriz-digital-light.png"],
+  },
 };
 
 export default function DatenschutzPage() {

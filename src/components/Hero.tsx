@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -152,8 +153,18 @@ export function Hero() {
             transition={{ duration: 0.8, ease: easeGlass }}
             className="mt-10 flex items-center gap-3"
           >
-            <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#2a2a25] to-accent text-[0.7rem] font-medium text-accent-foreground shadow-[inset_0_1px_0_0_rgb(255_255_255/0.35)]">
-              LL
+            <span
+              aria-hidden="true"
+              className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-[#ded3c4] ring-1 ring-border shadow-soft"
+            >
+              <Image
+                src="/images/lino-loriz-avatar.webp"
+                alt=""
+                fill
+                sizes="32px"
+                quality={80}
+                className="object-cover"
+              />
             </span>
             <span className="text-sm text-muted-foreground">
               Persönlich entwickelt von {siteConfig.founder}

@@ -17,6 +17,28 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/impressum",
   },
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    url: "/impressum",
+    siteName: siteConfig.name,
+    title: "Impressum | Loriz Digital",
+    description: "Impressum von Loriz Digital – Angaben gemäß § 5 DDG.",
+    images: [
+      {
+        url: "/social/loriz-digital-light.png",
+        width: 1200,
+        height: 630,
+        alt: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Impressum | Loriz Digital",
+    description: "Impressum von Loriz Digital – Angaben gemäß § 5 DDG.",
+    images: ["/social/loriz-digital-light.png"],
+  },
 };
 
 export default function ImpressumPage() {
