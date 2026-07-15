@@ -28,11 +28,11 @@ ausgeführt.
 
 ## Deployment
 
-Die produktive Website läuft über Cloudflare Workers. Build-Einstellungen und
-Runtime-Secrets werden derzeit im Cloudflare-Projekt verwaltet; im Repository
-liegt keine eigenständige Wrangler- oder OpenNext-Deploymentkonfiguration.
-Änderungen an diesem Deploymentweg müssen deshalb zuerst mit der tatsächlich in
-Cloudflare hinterlegten Konfiguration abgeglichen werden.
+Die produktive Website läuft über Cloudflare Workers. Die versionierten
+Einstellungen befinden sich in `wrangler.jsonc` und `open-next.config.ts`; die
+zugehörigen Build- und Deploymentbefehle sind in `package.json` definiert.
+Runtime-Secrets werden ausschließlich als geschützte Cloudflare-Variablen
+verwaltet und gehören nicht in das Repository.
 
 Die für den Anfrage-Chat benötigten Variablen sind in `.env.example`
 dokumentiert. `NEXT_PUBLIC_TURNSTILE_SITE_KEY` muss bereits während des
