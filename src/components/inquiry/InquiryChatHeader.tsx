@@ -1,5 +1,6 @@
 import { RotateCcw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { InquiryContactAvatar } from "./InquiryContactAvatar";
 import { easeGlass } from "@/lib/motion";
 
 type InquiryChatHeaderProps = {
@@ -26,13 +27,16 @@ export function InquiryChatHeader({
   return (
     <div className="border-b border-border/80 px-4 py-4 sm:px-6 sm:py-5">
       <div className="flex flex-wrap items-start justify-between gap-x-5 gap-y-3">
-        <div>
-          <p className="text-sm font-medium tracking-tight text-foreground">
-            Erzählen Sie mir von Ihrem Projekt
-          </p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Ein paar kurze Fragen helfen mir, Ihr Vorhaben besser zu verstehen.
-          </p>
+        <div className="flex min-w-0 items-center gap-3">
+          <InquiryContactAvatar className="h-10 w-10" imageSize="40px" />
+          <div className="min-w-0">
+            <p className="text-sm font-medium tracking-tight text-foreground">
+              Erzählen Sie mir von Ihrem Projekt
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Lino Loriz · Ihr persönlicher Ansprechpartner
+            </p>
+          </div>
         </div>
         <div
           className="flex items-center gap-3"

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { LorizMark } from "@/components/icons/LorizMark";
+import { InquiryContactAvatar } from "./InquiryContactAvatar";
 import { easeGlass } from "@/lib/motion";
 
 type MotionPreference = {
@@ -17,12 +18,7 @@ export function AssistantMessage({
       transition={{ duration: reducedMotion ? 0 : 0.34, ease: easeGlass }}
       className="flex items-start gap-2.5"
     >
-      <span
-        aria-hidden="true"
-        className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface shadow-soft"
-      >
-        <LorizMark className="h-4 w-4 text-foreground" />
-      </span>
+      <InquiryContactAvatar className="mt-1 h-7 w-7" imageSize="28px" />
       <p className="max-w-[calc(100%_-_2.4rem)] break-words rounded-[1.1rem] border border-border/70 bg-surface-muted/65 px-4 py-3 text-sm leading-relaxed text-foreground shadow-soft [overflow-wrap:anywhere] sm:max-w-[85%]">
         <span className="sr-only">Loriz Digital: </span>
         {children}

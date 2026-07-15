@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -9,20 +10,34 @@ export function About() {
         <div className="grid items-center gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           <Reveal variant="left">
             <div
-              aria-hidden="true"
-              className="shadow-glass-lg relative mx-auto flex aspect-[4/5] w-full max-w-sm items-center justify-center overflow-hidden rounded-2xl"
+              className="shadow-glass-lg relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[2rem] bg-[#d8cbbc] ring-1 ring-border/70"
             >
-              {/* Markentreue, immer dunkle Grundfläche – bewusst unabhängig vom
-                  Farbschema, damit sie wie ein gestaltetes Signature-Element
-                  wirkt und nicht wie eine leere Platzhalterfläche. */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#211f1a] via-[#2a2621] to-[#39301f]" />
-              <div className="absolute -right-10 -top-14 h-48 w-48 rounded-full bg-clay/30 blur-3xl" />
-              <div className="absolute -bottom-16 -left-12 h-56 w-56 rounded-full bg-[#bfcddb]/15 blur-3xl" />
-              <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-[linear-gradient(145deg,#f2eee7_0%,#ded3c4_52%,#bca587_100%)]"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute -left-[18%] -top-[14%] h-[74%] w-[136%] rounded-[50%] border border-white/40"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-[12%] bottom-[7%] h-px bg-gradient-to-r from-transparent via-white/45 to-transparent"
+              />
 
-              <span className="relative text-[5.5rem] font-semibold tracking-tight text-[#f3f1ea] sm:text-[6.5rem]">
-                LL
-              </span>
+              <Image
+                src="/images/lino-loriz-portrait.webp"
+                alt="Lino Loriz, Gründer von Loriz Digital"
+                fill
+                sizes="(max-width: 639px) calc(100vw - 3rem), 384px"
+                quality={80}
+                className="origin-bottom scale-[1.08] object-contain object-bottom"
+              />
+
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/25"
+              />
             </div>
           </Reveal>
 
