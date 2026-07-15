@@ -6,10 +6,10 @@ import { motionValue } from "framer-motion";
  * Navigation.tsx – als plain MotionValue, damit beide Seiten reagieren können,
  * ohne dass ein React-Re-Render über eine Context-Grenze nötig ist.
  */
-// Der sichere Grundzustand ist das sichtbare Navigationslogo. Nur der aktive
-// Dock auf der Startseite setzt den Wert synchron auf seinen Scrollfortschritt.
-// So koennen Rechtstextseiten und Breakpoint-Wechsel keinen alten, unsichtbaren
-// Zustand erben.
-export const heroLogoDockProgress = motionValue(1);
+// Auf der Startseite muss der erste mobile Browser-Paint bereits dem Anfang der
+// Überführung entsprechen. Ein sichtbarer Standardwert würde das Nav-Logo vor
+// der Hydrierung für einen Frame aufblitzen lassen. Navigation.tsx erzwingt den
+// sichtbaren Zustand auf Desktop; Seiten ohne Dock verwenden den Wert nicht.
+export const heroLogoDockProgress = motionValue(0);
 
 export const NAV_LOGO_DOM_ID = "nav-logo-mark";

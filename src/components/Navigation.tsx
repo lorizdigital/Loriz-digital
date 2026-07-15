@@ -68,7 +68,13 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
           <motion.span
             id={heroLogoDockEnabled ? NAV_LOGO_DOM_ID : undefined}
             aria-hidden="true"
-            className="flex h-5 w-5 shrink-0 items-center justify-center"
+            className={cn(
+              "flex h-5 w-5 shrink-0 items-center justify-center",
+              // Der mobile Server-Render startet unsichtbar, damit das Ziel-Logo
+              // nicht vor der Dock-Initialisierung aufblitzt. Ab Tablet bleibt
+              // die Marke wie bisher dauerhaft sichtbar.
+              heroLogoDockEnabled && "md:!opacity-100",
+            )}
             style={heroLogoDockEnabled ? { opacity: dockedLogoOpacity } : { opacity: 1 }}
           >
             <LorizMark className="h-full w-full" />
