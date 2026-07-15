@@ -30,7 +30,15 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
   const dockedLogoOpacity = useTransform(heroLogoDockProgress, [0.9, 0.92], [0, 1]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    let wasScrolled = false;
+
+    const onScroll = () => {
+      const isScrolled = window.scrollY > 24;
+      if (isScrolled === wasScrolled) return;
+      wasScrolled = isScrolled;
+      setScrolled(isScrolled);
+    };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -47,18 +55,22 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4">
       <motion.div
         className={cn(
-          "relative isolate flex w-full items-center justify-between backdrop-blur-[2px] transition-[max-width,margin-top,padding,border-radius] duration-700 ease-[var(--ease-glass)]",
+          // Mobil bleibt die Zielgeometrie des Logos stabil. Der transparente
+          // Header ist am Seitenanfang optisch unveraendert; beim Scrollen muss
+          // nur noch die Glasflaeche eingeblendet werden. Den Layout-Morph gibt
+          // es weiterhin ab Tablet-Groesse, wo kein Logo-Dock aktiv ist.
+          "relative isolate mt-3 flex w-full max-w-[calc(1200px-2rem)] items-center justify-between rounded-full px-5 py-3 backdrop-blur-[2px] sm:px-6 md:transition-[max-width,margin-top,padding,border-radius] md:duration-700 md:ease-[var(--ease-glass)]",
           scrolled
-            ? "mt-3 max-w-[calc(1200px-2rem)] rounded-full px-5 py-3 sm:px-6"
-            : "max-w-[1200px] px-6 py-6 sm:px-8 lg:px-10",
+            ? "md:mt-3 md:max-w-[calc(1200px-2rem)] md:rounded-full md:px-6 md:py-3"
+            : "md:mt-0 md:max-w-[1200px] md:rounded-none md:px-8 md:py-6 lg:px-10",
         )}
       >
         <motion.div
           aria-hidden="true"
           initial={false}
           animate={{ opacity: scrolled ? 1 : 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.7, ease: easeGlass }}
-          className="glass-floating backdrop-blur-[var(--glass-blur-lg)] pointer-events-none absolute inset-0 -z-10 rounded-[inherit]"
+          transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: easeGlass }}
+          className="glass-floating pointer-events-none absolute inset-0 -z-10 rounded-[inherit] backdrop-blur-[var(--glass-blur-md)] md:backdrop-blur-[var(--glass-blur-lg)]"
         />
 
         <Link

@@ -13,9 +13,10 @@ export function AssistantMessage({
 }: React.PropsWithChildren<MotionPreference>) {
   return (
     <motion.div
+      layout="position"
       initial={reducedMotion ? false : { opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reducedMotion ? 0 : 0.34, ease: easeGlass }}
+      transition={{ duration: reducedMotion ? 0 : 0.26, ease: easeGlass }}
       className="flex items-start gap-2.5"
     >
       <InquiryContactAvatar className="mt-1 h-7 w-7" imageSize="28px" />
@@ -33,9 +34,10 @@ export function UserMessage({
 }: React.PropsWithChildren<MotionPreference>) {
   return (
     <motion.div
+      layout="position"
       initial={reducedMotion ? false : { opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reducedMotion ? 0 : 0.34, ease: easeGlass }}
+      transition={{ duration: reducedMotion ? 0 : 0.26, ease: easeGlass }}
       className="flex justify-end"
     >
       <p className="max-w-[92%] break-words rounded-[1.1rem] border border-clay/20 bg-accent-soft px-4 py-3 text-sm font-medium leading-relaxed text-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.28)] [overflow-wrap:anywhere] sm:max-w-[82%]">

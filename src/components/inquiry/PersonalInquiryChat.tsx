@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { ChoiceQuestion } from "./ChoiceQuestion";
 import { ContactDetailsStep } from "./ContactDetailsStep";
 import { InquiryChatHeader } from "./InquiryChatHeader";
@@ -38,10 +38,16 @@ const PROJECT_TYPE_TRANSITIONS: Record<ProjectType, string> = {
 };
 
 export function PersonalInquiryChat() {
+  const chatViewportRef = useRef<HTMLDivElement>(null);
   const currentPanelRef = useRef<HTMLDivElement>(null);
   const submissionErrorRef = useRef<HTMLDivElement>(null);
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
-  const chat = useInquiryChatController({ currentPanelRef, submissionErrorRef, turnstileRef });
+  const chat = useInquiryChatController({
+    chatViewportRef,
+    currentPanelRef,
+    submissionErrorRef,
+    turnstileRef,
+  });
 
   return (
     <div className="bg-surface-muted/70 p-2 sm:p-5 lg:p-6">
@@ -57,42 +63,66 @@ export function PersonalInquiryChat() {
           onRestart={chat.resetInquiry}
         />
 
-        <div className="px-4 py-6 sm:px-6 sm:py-9">
-          <InquiryTranscript chat={chat} />
+        <div
+          ref={chatViewportRef}
+          className="relative h-[clamp(32rem,72vh,48rem)] overflow-y-auto overscroll-contain [scrollbar-gutter:stable]"
+        >
+          <div className="px-4 py-6 sm:px-6 sm:py-9">
+            <LayoutGroup id="inquiry-conversation">
+              <InquiryTranscript chat={chat} />
 
-          <motion.div
-            ref={currentPanelRef}
-            tabIndex={-1}
-            role="region"
-            aria-label={chat.currentPanelLabel}
-            key={`${chat.stage}-${chat.currentQuestionId ?? "panel"}`}
-            initial={chat.prefersReducedMotion ? false : { opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: chat.prefersReducedMotion ? 0 : 0.3,
-              ease: easeGlass,
-            }}
-            className="mt-8 scroll-mt-28 border-t border-border/80 pt-8 outline-none sm:mt-10 sm:scroll-mt-32 sm:pt-9"
-          >
-            <InquiryCurrentStep
-              chat={chat}
-              submissionErrorRef={submissionErrorRef}
-              turnstileRef={turnstileRef}
-            />
+              <motion.div
+                ref={currentPanelRef}
+                tabIndex={-1}
+                role="region"
+                aria-label={chat.currentPanelLabel}
+                layout="position"
+                transition={{
+                  layout: {
+                    duration: chat.prefersReducedMotion ? 0 : 0.32,
+                    ease: easeGlass,
+                  },
+                }}
+                className="relative mt-8 border-t border-border/80 pt-8 outline-none sm:mt-10 sm:pt-9"
+              >
+                <AnimatePresence initial={false} mode="popLayout">
+                  <motion.div
+                    key={`${chat.stage}-${chat.currentQuestionId ?? "panel"}`}
+                    initial={chat.prefersReducedMotion ? false : { opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={chat.prefersReducedMotion ? undefined : { opacity: 0, y: -3 }}
+                    transition={{
+                      duration: chat.prefersReducedMotion ? 0 : 0.22,
+                      ease: easeGlass,
+                    }}
+                  >
+                    <InquiryCurrentStep
+                      chat={chat}
+                      submissionErrorRef={submissionErrorRef}
+                      turnstileRef={turnstileRef}
+                    />
 
-            {chat.canGoBack && (
-              <div className="mt-7 border-t border-border/80 pt-5">
-                <button
-                  type="button"
-                  onClick={chat.goBack}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:border-clay/30 hover:bg-surface-muted/45 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:hover:translate-y-0"
-                >
-                  <ArrowLeft aria-hidden="true" className="h-4 w-4" strokeWidth={1.8} />
-                  Zurück
-                </button>
-              </div>
-            )}
-          </motion.div>
+                    {chat.canGoBack && (
+                      <div className="mt-7 border-t border-border/80 pt-5">
+                        <button
+                          type="button"
+                          onClick={chat.goBack}
+                          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-[background-color,border-color,box-shadow,transform] duration-300 ease-[var(--ease-glass)] hover:-translate-y-0.5 hover:border-clay/30 hover:bg-surface-muted/45 hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:hover:translate-y-0"
+                        >
+                          <ArrowLeft
+                            aria-hidden="true"
+                            className="h-4 w-4"
+                            strokeWidth={1.8}
+                          />
+                          Zurück
+                        </button>
+                      </div>
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </motion.div>
+            </LayoutGroup>
+          </div>
         </div>
       </div>
     </div>
@@ -102,8 +132,19 @@ export function PersonalInquiryChat() {
 type InquiryChatController = ReturnType<typeof useInquiryChatController>;
 
 function InquiryTranscript({ chat }: { chat: InquiryChatController }) {
+  const currentQuestionIsPending =
+    chat.stage === "questions" &&
+    chat.currentQuestion &&
+    chat.currentQuestionId &&
+    !chat.transcriptQuestionIds.includes(chat.currentQuestionId);
+
   return (
-    <div aria-label="Bisheriger Gesprächsverlauf" className="space-y-4">
+    <motion.div
+      layout="position"
+      aria-label="Bisheriger Gesprächsverlauf"
+      aria-live="polite"
+      className="space-y-4"
+    >
       <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
         <span className="block font-medium">Schön, dass Sie da sind.</span>
         <span className="mt-1.5 block">
@@ -116,37 +157,45 @@ function InquiryTranscript({ chat }: { chat: InquiryChatController }) {
       </AssistantMessage>
       {chat.draft.projectType && (
         <>
-          <UserMessage reducedMotion={chat.prefersReducedMotion}>
+          <UserMessage key="project-type-answer" reducedMotion={chat.prefersReducedMotion}>
             {getProjectTypeLabel(chat.draft.projectType)}
           </UserMessage>
-          <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
+          <AssistantMessage
+            key="project-type-transition"
+            reducedMotion={chat.prefersReducedMotion}
+          >
             {PROJECT_TYPE_TRANSITIONS[chat.draft.projectType]}
           </AssistantMessage>
         </>
       )}
-      {chat.hiddenAnswerCount > 0 && (
-        <p className="py-1 text-center text-xs text-muted-foreground">
-          {chat.hiddenAnswerCount} frühere Antworten erscheinen später vollständig in der
-          Zusammenfassung.
-        </p>
-      )}
-      {chat.recentCompletedIds.map((id) => (
-        <div key={id} className="space-y-3">
-          <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
+      {chat.transcriptQuestionIds.flatMap((id) => [
+          <AssistantMessage key={`question-${id}`} reducedMotion={chat.prefersReducedMotion}>
             {QUESTION_CATALOG[id].prompt}
-          </AssistantMessage>
-          <UserMessage reducedMotion={chat.prefersReducedMotion}>
+          </AssistantMessage>,
+          <UserMessage key={`answer-${id}`} reducedMotion={chat.prefersReducedMotion}>
             {chat.formatAnswer(id).join(", ") || "Übersprungen"}
-          </UserMessage>
-          {chat.draft.projectType === "not_sure" && id === "unsure_challenges" && (
-            <AssistantMessage reducedMotion={chat.prefersReducedMotion}>
-              Danke, damit kann ich bereits gut einschätzen, in welche Richtung eine sinnvolle
-              Lösung gehen könnte.
-            </AssistantMessage>
-          )}
-        </div>
-      ))}
-    </div>
+          </UserMessage>,
+          ...(chat.draft.projectType === "not_sure" && id === "unsure_challenges"
+            ? [
+                <AssistantMessage
+                  key={`feedback-${id}`}
+                  reducedMotion={chat.prefersReducedMotion}
+                >
+                  Danke, damit kann ich bereits gut einschätzen, in welche Richtung eine
+                  sinnvolle Lösung gehen könnte.
+                </AssistantMessage>,
+              ]
+            : []),
+        ])}
+      {currentQuestionIsPending && chat.currentQuestion && chat.currentQuestionId && (
+        <AssistantMessage
+          key={`question-${chat.currentQuestionId}`}
+          reducedMotion={chat.prefersReducedMotion}
+        >
+          {chat.currentQuestion.prompt}
+        </AssistantMessage>
+      )}
+    </motion.div>
   );
 }
 
@@ -193,6 +242,7 @@ function InquiryCurrentStep({
           onOtherChange={chat.currentQuestion.allowOther ? chat.updateOther : undefined}
           onContinue={chat.currentQuestion.type === "multiple" ? chat.continueMultiple : undefined}
           reducedMotion={chat.prefersReducedMotion}
+          hidePromptVisually
         />
       );
     }
@@ -209,6 +259,7 @@ function InquiryCurrentStep({
         error={chat.questionError}
         onChange={chat.updateCurrentAnswer}
         onContinue={chat.continueInput}
+        hidePromptVisually
       />
     );
   }

@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/cn";
 
 type InputQuestionProps = {
   id: string;
@@ -11,6 +12,7 @@ type InputQuestionProps = {
   error?: string;
   onChange: (value: string) => void;
   onContinue: () => void;
+  hidePromptVisually?: boolean;
 };
 
 export function InputQuestion({
@@ -24,6 +26,7 @@ export function InputQuestion({
   error,
   onChange,
   onContinue,
+  hidePromptVisually = false,
 }: InputQuestionProps) {
   const errorId = `${id}-error`;
 
@@ -31,7 +34,10 @@ export function InputQuestion({
     <div>
       <label
         htmlFor={id}
-        className="max-w-2xl text-xl font-medium leading-[1.3] tracking-[-0.02em] text-foreground sm:text-2xl"
+        className={cn(
+          "max-w-2xl text-xl font-medium leading-[1.3] tracking-[-0.02em] text-foreground sm:text-2xl",
+          hidePromptVisually && "sr-only",
+        )}
       >
         {prompt}
       </label>

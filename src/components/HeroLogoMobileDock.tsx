@@ -8,13 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import {
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useScroll,
-  useTransform,
-} from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useIsMounted } from "@/hooks/useIsMounted";
 import { heroLogoDockProgress, NAV_LOGO_DOM_ID } from "@/lib/heroLogoDock";
@@ -26,10 +20,9 @@ import { heroLogoDockProgress, NAV_LOGO_DOM_ID } from "@/lib/heroLogoDock";
  * zusätzliche Höhen-Messung als weitere Fehlerquelle einzuführen.
  */
 const DOCK_DISTANCE = 300;
-const NAV_THRESHOLD_SCROLL_Y = 24;
-const NAV_MORPH_TRACK_MS = 700;
 
 type Rect = { top: number; left: number; width: number; height: number };
+type TargetGeometry = { centerX: number; centerY: number; height: number };
 
 const MOBILE_QUERY = "(max-width: 767px)";
 
@@ -83,10 +76,12 @@ function HeroLogoDockActive({ children, ready }: HeroLogoMobileDockProps) {
   const sourceMarkRef = useRef<HTMLDivElement>(null);
   const [initialRect, setInitialRect] = useState<Rect | null>(null);
   const [initialMarkHeight, setInitialMarkHeight] = useState(0);
+  const [targetGeometry, setTargetGeometry] = useState<TargetGeometry | null>(null);
   const mounted = useIsMounted();
-  const targetCenterX = useMotionValue(0);
-  const targetCenterY = useMotionValue(0);
-  const targetHeight = useMotionValue(0);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const scale = useMotionValue(1);
+  const heroOpacity = useMotionValue(1);
 
   // Startgeometrie: eigene, im Fluss stehende Platzhalter-Box. In eine
   // scroll-invariante ("Dokument"-)Referenz umgerechnet, damit die spätere
@@ -112,148 +107,123 @@ function HeroLogoDockActive({ children, ready }: HeroLogoMobileDockProps) {
     const el = placeholderRef.current;
     const resizeObserver = new ResizeObserver(measure);
     if (el) resizeObserver.observe(el);
-    window.addEventListener("resize", measure);
+
+    // Mobile Browserleisten veraendern beim Scrollen nur die Viewport-Hoehe
+    // und feuern dabei resize. Die Startgeometrie ist davon unabhaengig; eine
+    // erneute React-State-Aktualisierung wuerde hier nur Frames kosten.
+    let viewportWidth = window.innerWidth;
+    function onResize() {
+      if (window.innerWidth === viewportWidth) return;
+      viewportWidth = window.innerWidth;
+      measure();
+    }
+
+    window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", measure);
 
     return () => {
       resizeObserver.disconnect();
-      window.removeEventListener("resize", measure);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", measure);
     };
   }, []);
 
-  // Zielgeometrie: das echte Navigationslogo. Beim Schwellwert von 24 px morphen
-  // Padding und Position der Navigation per Layout-Animation. Deshalb wird die
-  // Zielbox waehrend dieses kurzen Fensters bildsynchron nachgemessen; eine
-  // einzelne verzoegerte Messung koennte sonst einen sichtbaren Endsprung
-  // verursachen.
+  // Zielgeometrie: das echte Navigationslogo. Die mobile Navigation behaelt
+  // waehrend des Scrollens bewusst dieselbe Geometrie. Deshalb genuegt eine
+  // Messung bei Mount bzw. echter Breiten-/Orientierungsaenderung; synchrone
+  // Layout-Reads in jedem Scroll-Frame sind nicht mehr erforderlich.
   useLayoutEffect(() => {
     function measure() {
       const el = document.getElementById(NAV_LOGO_DOM_ID);
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      targetCenterX.set(rect.left + rect.width / 2);
-      targetCenterY.set(rect.top + rect.height / 2);
-      targetHeight.set(rect.height);
+      setTargetGeometry({
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2,
+        height: rect.height,
+      });
     }
 
     measure();
 
-    let wasScrolled = window.scrollY > NAV_THRESHOLD_SCROLL_Y;
-    let animationFrame: number | null = null;
-    let trackUntil = 0;
-
-    function trackTargetFor(duration: number) {
-      trackUntil = Math.max(trackUntil, performance.now() + duration);
-      if (animationFrame !== null) return;
-
-      function tick() {
-        measure();
-        if (performance.now() < trackUntil) {
-          animationFrame = requestAnimationFrame(tick);
-        } else {
-          animationFrame = null;
-        }
-      }
-
-      animationFrame = requestAnimationFrame(tick);
-    }
-
-    function onScroll() {
+    let viewportWidth = window.innerWidth;
+    function onResize() {
+      if (window.innerWidth === viewportWidth) return;
+      viewportWidth = window.innerWidth;
       measure();
-      const isScrolled = window.scrollY > NAV_THRESHOLD_SCROLL_Y;
-      if (isScrolled !== wasScrolled) {
-        wasScrolled = isScrolled;
-        trackTargetFor(NAV_MORPH_TRACK_MS);
-      }
     }
 
-    function onViewportChange() {
-      measure();
-      trackTargetFor(NAV_MORPH_TRACK_MS);
-    }
-
-    // Deckt initiale Layout-Animationen sowie restaurierte Scrollpositionen ab.
-    trackTargetFor(NAV_MORPH_TRACK_MS);
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onViewportChange);
-    window.addEventListener("orientationchange", onViewportChange);
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", measure);
 
     const el = document.getElementById(NAV_LOGO_DOM_ID);
     const resizeObserver = new ResizeObserver(measure);
     if (el) resizeObserver.observe(el);
 
     return () => {
-      if (animationFrame !== null) cancelAnimationFrame(animationFrame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onViewportChange);
-      window.removeEventListener("orientationchange", onViewportChange);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", measure);
       resizeObserver.disconnect();
     };
-  }, [targetCenterX, targetCenterY, targetHeight]);
+  }, []);
 
-  const { scrollY } = useScroll();
-
-  const rawProgress = useTransform(
-    scrollY,
-    [0, 0.15 * DOCK_DISTANCE, 0.65 * DOCK_DISTANCE, DOCK_DISTANCE],
-    [0, 0.02, 0.85, 1],
-    { clamp: true },
-  );
-  const readyProgress = useMotionValue(ready ? 1 : 0);
-
+  // Alle visuellen Werte werden in demselben Scroll-Callback aus exakt
+  // demselben window.scrollY berechnet. Dadurch koennen Position, Skalierung
+  // und Crossfade bei grossen Scrollspruengen nicht in verschiedenen Frames
+  // auf alten Zwischenwerten stehen bleiben. Der Callback enthaelt nur
+  // Arithmetik und MotionValue-Writes, keine Layout-Reads oder React-Updates.
   useLayoutEffect(() => {
-    readyProgress.set(ready ? 1 : 0);
-  }, [ready, readyProgress]);
+    if (!initialRect || !targetGeometry) return;
 
-  const dockProgress = useTransform(
-    [rawProgress, readyProgress],
-    (values: number[]) => (values[1] === 1 ? values[0] : 0),
-  );
-
-  // Die räumliche Reise endet bewusst vor der visuellen Übergabe. Erst wenn
-  // beide Marken exakt deckungsgleich sind, übernimmt das echte Nav-Logo.
-  // Dadurch gibt es kurz vor dem Ziel keine versetzte Doppelkontur.
-  const travelProgress = useTransform(dockProgress, [0, 0.9], [0, 1], { clamp: true });
-
-  const x = useTransform([travelProgress, targetCenterX], (values: number[]) => {
-    const [p, targetX] = values;
-    if (!initialRect) return 0;
+    const currentTargetGeometry = targetGeometry;
     const initialCenterX = initialRect.left + initialRect.width / 2;
-    return (targetX - initialCenterX) * p;
-  });
-
-  const y = useTransform([travelProgress, scrollY, targetCenterY], (values: number[]) => {
-    const [p, sy, targetY] = values;
-    if (!initialRect) return 0;
     const initialCenterY = initialRect.top + initialRect.height / 2;
-    return (targetY - initialCenterY) * p - sy * (1 - p);
-  });
+    const targetScale =
+      initialMarkHeight > 0 && currentTargetGeometry.height > 0
+        ? currentTargetGeometry.height / initialMarkHeight
+        : 1;
 
-  const scale = useTransform([travelProgress, targetHeight], (values: number[]) => {
-    const [p, measuredTargetHeight] = values;
-    if (initialMarkHeight === 0 || measuredTargetHeight === 0) return 1;
-    const targetScale = measuredTargetHeight / initialMarkHeight;
-    return 1 + (targetScale - 1) * p;
-  });
+    function updateFromScroll() {
+      const scrollPosition = window.scrollY;
+      const normalized = Math.min(1, Math.max(0, scrollPosition) / DOCK_DISTANCE);
+      const smoothProgress = normalized * normalized * (3 - 2 * normalized);
+      const dockProgress = ready ? smoothProgress : 0;
+      const travelProgress = Math.min(1, Math.max(0, dockProgress / 0.9));
 
-  // Das Nav-Logo ist zu diesem Zeitpunkt bereits deckungsgleich eingeblendet.
-  // Beim Ausblenden des Portal-Logos bleibt die resultierende Deckkraft daher
-  // konstant, statt in der Mitte eines klassischen Crossfades abzufallen.
-  const heroOpacity = useTransform(dockProgress, [0.94, 1], [1, 0]);
+      x.set((currentTargetGeometry.centerX - initialCenterX) * travelProgress);
+      // Negative Scrollwerte werden bewusst beibehalten: Das Portal folgt so
+      // auch dem elastischen Mobile-Overscroll gemeinsam mit dem Hero-Inhalt.
+      y.set(
+        (currentTargetGeometry.centerY - initialCenterY) * travelProgress -
+          scrollPosition * (1 - travelProgress),
+      );
+      scale.set(1 + (targetScale - 1) * travelProgress);
 
-  useMotionValueEvent(dockProgress, "change", (v) => {
-    heroLogoDockProgress.set(v);
-  });
+      const opacity = Math.min(1, Math.max(0, (1 - dockProgress) / 0.06));
+      heroOpacity.set(opacity);
+      heroLogoDockProgress.set(dockProgress);
+    }
 
-  // useMotionValueEvent reagiert erst auf Aenderungen. Bei Reload, Back-Navigation
-  // oder Breakpoint-Wechsel muss der aktuelle Scrollstand bereits vor dem Paint
-  // im Navigations-Crossfade ankommen.
+    updateFromScroll();
+    window.addEventListener("scroll", updateFromScroll, { passive: true });
+    return () => window.removeEventListener("scroll", updateFromScroll);
+  }, [
+    heroOpacity,
+    initialMarkHeight,
+    initialRect,
+    ready,
+    scale,
+    targetGeometry,
+    x,
+    y,
+  ]);
+
   useLayoutEffect(() => {
-    heroLogoDockProgress.set(dockProgress.get());
+    // Beim (Wieder-)Aktivieren des mobilen Docks darf kein alter globaler
+    // Fortschrittswert aus einem vorherigen Breakpoint-Zustand aufblitzen.
+    heroLogoDockProgress.set(0);
     return () => heroLogoDockProgress.set(1);
-  }, [dockProgress]);
+  }, []);
 
   return (
     <>
@@ -284,6 +254,7 @@ function HeroLogoDockActive({ children, ready }: HeroLogoMobileDockProps) {
               y,
               scale,
               opacity: heroOpacity,
+              willChange: "transform, opacity",
               pointerEvents: "none",
               // Das Logo fliegt sichtbar vor dem Header. Das geoeffnete
               // MobileMenu-Panel liegt separat auf Ebene 70 und deckt es ab.

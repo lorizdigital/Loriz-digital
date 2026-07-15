@@ -63,7 +63,7 @@ export function ChoiceQuestion({
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        {options.map((option, index) => {
+        {options.map((option) => {
           const selected = selectedValues.includes(option.value);
           return (
             <motion.button
@@ -74,8 +74,7 @@ export function ChoiceQuestion({
               initial={reducedMotion ? false : { opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
-                duration: reducedMotion ? 0 : 0.32,
-                delay: reducedMotion ? 0 : Math.min(index * 0.025, 0.16),
+                duration: reducedMotion ? 0 : 0.22,
                 ease: easeGlass,
               }}
               whileHover={reducedMotion ? undefined : { y: -2 }}

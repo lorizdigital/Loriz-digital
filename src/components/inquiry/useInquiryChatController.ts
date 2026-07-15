@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import type { TurnstileWidgetHandle } from "./TurnstileWidget";
 import type { InquiryContactDraft } from "./ContactDetailsStep";
 import type {
@@ -38,12 +46,14 @@ function newRequestId(): string {
 }
 
 type InquiryChatRefs = {
+  chatViewportRef: RefObject<HTMLDivElement | null>;
   currentPanelRef: RefObject<HTMLDivElement | null>;
   submissionErrorRef: RefObject<HTMLDivElement | null>;
   turnstileRef: RefObject<TurnstileWidgetHandle | null>;
 };
 
 export function useInquiryChatController({
+  chatViewportRef,
   currentPanelRef,
   submissionErrorRef,
   turnstileRef,
@@ -93,18 +103,26 @@ export function useInquiryChatController({
     return () => window.clearTimeout(timeout);
   }, [fetchStartToken]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const viewport = chatViewportRef.current;
     const panel = currentPanelRef.current;
-    if (!panel || !hasInteractedRef.current) return;
-    const frame = requestAnimationFrame(() => {
-      panel.scrollIntoView({
-        block: "nearest",
-        behavior: prefersReducedMotion ? "auto" : "smooth",
-      });
-      if (hasInteractedRef.current) panel.focus({ preventScroll: true });
+    if (!viewport || !panel || !hasInteractedRef.current) return;
+
+    // Der Chat besitzt einen eigenen stabilen Scrollbereich. Dadurch bewegt
+    // ein neuer Turn nicht mehr die gesamte Webseite. Die kleine Vorlaufzone
+    // hält die neue Assistant-Blase oberhalb der Antwortoptionen sichtbar.
+    viewport.scrollTo({
+      top: Math.max(0, panel.offsetTop - 96),
+      behavior: prefersReducedMotion ? "auto" : "smooth",
     });
-    return () => cancelAnimationFrame(frame);
-  }, [currentPanelRef, currentQuestionId, prefersReducedMotion, stage]);
+    panel.focus({ preventScroll: true });
+  }, [
+    chatViewportRef,
+    currentPanelRef,
+    currentQuestionId,
+    prefersReducedMotion,
+    stage,
+  ]);
 
   useEffect(() => {
     if (!submissionError) return;
@@ -114,12 +132,9 @@ export function useInquiryChatController({
   const visibleQuestionIds = useMemo(() => getVisibleQuestionIds(draft), [draft]);
   const visibleQuestionSet = useMemo(() => new Set(visibleQuestionIds), [visibleQuestionIds]);
   const visibleCompletedIds = completedQuestionIds.filter((id) => visibleQuestionSet.has(id));
-  const transcriptCompletedIds = visibleCompletedIds.filter((id) => id !== currentQuestionId);
-  const recentCompletedIds = transcriptCompletedIds.slice(-4);
-  const hiddenAnswerCount = Math.max(
-    0,
-    transcriptCompletedIds.length - recentCompletedIds.length,
-  );
+  // Append-only: Abgeschlossene Turns bleiben im DOM. So wird beim naechsten
+  // Schritt kein variabel hoher alter Nachrichtenblock oben entfernt.
+  const transcriptQuestionIds = visibleCompletedIds;
 
   const cancelPendingTransition = useCallback(() => {
     if (transitionTimeoutRef.current === null) return;
@@ -176,7 +191,6 @@ export function useInquiryChatController({
   function completeQuestion(
     id: QuestionId,
     nextDraft: InquiryDraft,
-    advanceImmediately = false,
   ) {
     hasInteractedRef.current = true;
     setDraft(nextDraft);
@@ -216,7 +230,7 @@ export function useInquiryChatController({
       }
     };
 
-    if (advanceImmediately || prefersReducedMotion) {
+    if (prefersReducedMotion) {
       cancelPendingTransition();
       advance();
     } else {
@@ -290,7 +304,7 @@ export function useInquiryChatController({
       setQuestionError("Bitte ergänzen Sie kurz die Auswahl Sonstiges.");
       return;
     }
-    completeQuestion(currentQuestionId, draft, true);
+    completeQuestion(currentQuestionId, draft);
   }
 
   function continueInput() {
@@ -319,7 +333,7 @@ export function useInquiryChatController({
       ...draft,
       answers: { ...draft.answers, [currentQuestionId]: value },
     };
-    completeQuestion(currentQuestionId, nextDraft, true);
+    completeQuestion(currentQuestionId, nextDraft);
   }
 
   function validateContact(): boolean {
@@ -615,7 +629,6 @@ export function useInquiryChatController({
     editSummarySection,
     formatAnswer,
     goBack,
-    hiddenAnswerCount,
     honeypot,
     isSubmitting,
     phaseIndex,
@@ -623,7 +636,6 @@ export function useInquiryChatController({
     prefersReducedMotion,
     privacyAccepted,
     questionError,
-    recentCompletedIds,
     resetInquiry,
     selectChoice,
     setContact,
@@ -640,6 +652,7 @@ export function useInquiryChatController({
     summarySections,
     turnstileError,
     turnstileReady,
+    transcriptQuestionIds,
     updateCurrentAnswer,
     updateOther,
   };
