@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Button } from "@/components/ui/Button";
 import { LorizMark } from "@/components/icons/LorizMark";
-import { easeGlass, springLayout } from "@/lib/motion";
+import { springLayout } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { MOBILE_LOGO_TARGET_ID } from "@/lib/mobileLogoDock";
@@ -47,7 +47,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4">
-      <motion.div
+      <div
         className={cn(
           // Mobil bleibt die Zielgeometrie des Logos stabil. Der transparente
           // Header ist am Seitenanfang optisch unveraendert; beim Scrollen muss
@@ -59,12 +59,13 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
             : "md:mt-0 md:max-w-[1200px] md:rounded-none md:px-8 md:py-6 lg:px-10",
         )}
       >
-        <motion.div
+        <div
           aria-hidden="true"
-          initial={false}
-          animate={{ opacity: scrolled ? 1 : 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: easeGlass }}
-          className="glass-floating pointer-events-none absolute inset-0 -z-10 rounded-[inherit] backdrop-blur-[3px] md:backdrop-blur-[var(--glass-blur-lg)]"
+          style={{ opacity: scrolled ? 1 : 0 }}
+          className={cn(
+            "glass-floating pointer-events-none absolute inset-0 -z-10 rounded-[inherit] transition-opacity ease-[var(--ease-glass)] md:backdrop-blur-[var(--glass-blur-lg)]",
+            shouldReduceMotion ? "duration-0" : "duration-[350ms]",
+          )}
         />
 
         <Link
@@ -127,7 +128,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
         </div>
 
         <MobileMenu />
-      </motion.div>
+      </div>
     </header>
   );
 }

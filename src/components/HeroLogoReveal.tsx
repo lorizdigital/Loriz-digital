@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useState,
   useSyncExternalStore,
   type AnimationEvent as ReactAnimationEvent,
 } from "react";
@@ -62,6 +63,7 @@ export function HeroLogoReveal({
     getMobileSnapshot,
     getMobileServerSnapshot,
   );
+  const [isComplete, setIsComplete] = useState(false);
   const hasCompletedRef = useRef(false);
   const viewportActive = debugId === "mobile" ? isMobile : !isMobile;
   const effectiveStart = start && viewportActive;
@@ -72,6 +74,7 @@ export function HeroLogoReveal({
     if (isMotionDebugRecording()) {
       recordMotionDebugEvent("logo_reveal_complete", { id: debugId });
     }
+    setIsComplete(true);
     onComplete?.();
   }, [debugId, onComplete]);
 
@@ -95,7 +98,7 @@ export function HeroLogoReveal({
   }, [viewportActive, forceComplete, complete, debugId]);
 
   function recordCssAnimation(
-    event: ReactAnimationEvent<SVGGElement>,
+    event: ReactAnimationEvent<HTMLDivElement>,
     action: "start" | "end",
   ) {
     if (isMotionDebugRecording()) {
@@ -116,16 +119,15 @@ export function HeroLogoReveal({
   const driftX = useTransform(mouseX, [-1, 1], prefersReducedMotion ? [0, 0] : [-6, 6]);
   const driftY = useTransform(mouseY, [-1, 1], prefersReducedMotion ? [0, 0] : [-5, 5]);
   const showCompleteState =
-    viewportActive && (forceComplete || prefersReducedMotion);
+    viewportActive && (isComplete || forceComplete || prefersReducedMotion);
 
   return (
     <div className="flex w-full items-center justify-center py-1 sm:py-4 lg:py-0">
-      <motion.svg
-        viewBox="72.8 44 140.4 162.6"
+      <motion.div
         aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-20 w-auto text-foreground sm:h-28 md:h-52 lg:h-72 xl:h-80"
+        className="relative h-20 text-foreground sm:h-28 md:h-52 lg:h-72 xl:h-80"
         style={{
+          aspectRatio: "140.4 / 162.6",
           x: driftX,
           y: driftY,
           rotateX: tiltX,
@@ -133,27 +135,41 @@ export function HeroLogoReveal({
           transformPerspective: 1200,
         }}
       >
-        <g
+        <div
           className={cn(
-            "hero-logo-reveal-parts",
+            "hero-logo-reveal-parts absolute inset-0",
             effectiveStart && !showCompleteState && "hero-logo-reveal-started",
             showCompleteState && "hero-logo-reveal-complete",
           )}
           onAnimationStart={(event) => recordCssAnimation(event, "start")}
           onAnimationEnd={(event) => recordCssAnimation(event, "end")}
         >
-          <path
-            className="hero-logo-reveal-dark"
-            d="M 82.8 196.56 L 82.8 54 L 104.976 76.176 L 104.976 168.048 Z"
-            fill="currentColor"
-          />
-          <path
-            className="hero-logo-reveal-light"
-            d="M 111.312 196.56 L 181.008 196.56 L 203.184 174.384 L 133.488 174.384 Z"
-            fill="#d7d2cc"
-          />
-        </g>
-      </motion.svg>
+          <div className="hero-logo-reveal-dark absolute inset-0">
+            <svg
+              viewBox="72.8 44 140.4 162.6"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-full w-full"
+            >
+              <path
+                d="M 82.8 196.56 L 82.8 54 L 104.976 76.176 L 104.976 168.048 Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <div className="hero-logo-reveal-light absolute inset-0">
+            <svg
+              viewBox="72.8 44 140.4 162.6"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-full w-full"
+            >
+              <path
+                d="M 111.312 196.56 L 181.008 196.56 L 203.184 174.384 L 133.488 174.384 Z"
+                fill="#d7d2cc"
+              />
+            </svg>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

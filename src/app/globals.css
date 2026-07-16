@@ -236,7 +236,7 @@
 .hero-logo-reveal-parts,
 .hero-logo-reveal-dark,
 .hero-logo-reveal-light {
-  transform-box: fill-box;
+  backface-visibility: hidden;
   transform-origin: center;
 }
 
@@ -271,6 +271,7 @@
   animation: none;
   opacity: 1;
   transform: none;
+  will-change: auto;
 }
 
 @keyframes hero-logo-reveal-dark {
