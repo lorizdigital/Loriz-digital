@@ -182,6 +182,14 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
   }, [active]);
 
   useLayoutEffect(() => {
+    if (!active || !geometry || !isMotionDebugRecording()) return;
+    recordMotionDebugEvent("logo_driver", {
+      source: "dock-mounted",
+      driver: cssTimelineSupported ? "css-scroll-timeline" : "js-scroll-events",
+    });
+  }, [active, cssTimelineSupported, geometry]);
+
+  useLayoutEffect(() => {
     const element = flyingLogoRef.current;
     if (!active || cssTimelineSupported || !element || !geometry) return;
     const flyingElement = element;

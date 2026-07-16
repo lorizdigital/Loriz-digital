@@ -228,6 +228,84 @@
 }
 
 /*
+ * Der initiale Logo-Aufbau laeuft bewusst als reine CSS-Animation. Framer
+ * bleibt nur fuer die optionale Pointer-Parallaxe am aeusseren SVG aktiv;
+ * die sichtbaren Pfade und der Settle-Impuls bleiben dadurch auch waehrend
+ * iOS-seitiger JavaScript/rAF-Pausen compositor-getrieben.
+ */
+.hero-logo-reveal-parts,
+.hero-logo-reveal-dark,
+.hero-logo-reveal-light {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.hero-logo-reveal-dark {
+  opacity: 0;
+  transform: translate3d(-22px, 14px, 0) rotate(-5deg);
+}
+
+.hero-logo-reveal-light {
+  opacity: 0;
+  transform: translate3d(18px, 22px, 0);
+}
+
+.hero-logo-reveal-started {
+  will-change: transform;
+  animation: hero-logo-reveal-settle 600ms var(--ease-glass) 1450ms both;
+}
+
+.hero-logo-reveal-started .hero-logo-reveal-dark {
+  will-change: transform, opacity;
+  animation: hero-logo-reveal-dark 1100ms var(--ease-glass) both;
+}
+
+.hero-logo-reveal-started .hero-logo-reveal-light {
+  will-change: transform, opacity;
+  animation: hero-logo-reveal-light 1000ms var(--ease-glass) 450ms both;
+}
+
+.hero-logo-reveal-complete,
+.hero-logo-reveal-complete .hero-logo-reveal-dark,
+.hero-logo-reveal-complete .hero-logo-reveal-light {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes hero-logo-reveal-dark {
+  from {
+    opacity: 0;
+    transform: translate3d(-22px, 14px, 0) rotate(-5deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-logo-reveal-light {
+  from {
+    opacity: 0;
+    transform: translate3d(18px, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-logo-reveal-settle {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+/*
  * Die mobile Bildmarke folgt auf Safari 26.4+ der compositor-seitigen
  * Scroll-Timeline. Die vielen kleinen Transform-Stuetzpunkte bilden die
  * bisherige Smoothstep-Flugbahn nach, ohne auf main-thread Scroll-Events zu
