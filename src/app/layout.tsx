@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import Script from "next/script";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CursorFollower } from "@/components/CursorFollower";
+import { MotionDebugPanel } from "@/components/MotionDebugPanel";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -67,6 +68,7 @@ export default function RootLayout({
         {children}
         <ScrollToTop />
         <CursorFollower />
+        <MotionDebugPanel />
       </body>
     </html>
   );

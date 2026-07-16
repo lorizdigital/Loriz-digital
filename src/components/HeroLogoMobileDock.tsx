@@ -11,6 +11,11 @@ import { createPortal } from "react-dom";
 import { useIsMounted } from "@/hooks/useIsMounted";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { MOBILE_LOGO_TARGET_ID } from "@/lib/mobileLogoDock";
+import {
+  getMotionDebugRecordingId,
+  isMotionDebugRecording,
+  recordMotionDebugEvent,
+} from "@/lib/motionDebug";
 
 const MOBILE_QUERY = "(max-width: 767px)";
 const DOCK_DISTANCE = 300;
@@ -42,6 +47,10 @@ function getMobileServerSnapshot() {
 
 function smoothstep(value: number) {
   return value * value * (3 - 2 * value);
+}
+
+function debugRound(value: number) {
+  return Math.round(value * 1_000) / 1_000;
 }
 
 /**
@@ -129,9 +138,43 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
     let animationFrame: number | null = null;
     let mode: "absolute" | "fixed" = "absolute";
     let lastEndpoint: 0 | 1 | null = null;
+    let lastDebugRenderAt: number | null = null;
+    let geometryLoggedForRecording = false;
+    let lastDebugRecordingId = 0;
 
     function renderAtCurrentScroll() {
       animationFrame = null;
+      const debugRecording = isMotionDebugRecording();
+      const debugRecordingId = debugRecording ? getMotionDebugRecordingId() : 0;
+      if (debugRecording && debugRecordingId !== lastDebugRecordingId) {
+        lastDebugRecordingId = debugRecordingId;
+        lastDebugRenderAt = null;
+        geometryLoggedForRecording = false;
+      }
+      if (debugRecording && !geometryLoggedForRecording) {
+        geometryLoggedForRecording = recordMotionDebugEvent("logo_geometry", {
+          dockDistance: DOCK_DISTANCE,
+          sourceDocumentLeft: debugRound(dockGeometry.sourceDocumentLeft),
+          sourceDocumentTop: debugRound(dockGeometry.sourceDocumentTop),
+          sourceWidth: debugRound(dockGeometry.sourceWidth),
+          sourceHeight: debugRound(dockGeometry.sourceHeight),
+          sourceMarkHeight: debugRound(dockGeometry.sourceMarkHeight),
+          targetCenterX: debugRound(dockGeometry.targetCenterX),
+          targetCenterY: debugRound(dockGeometry.targetCenterY),
+          targetHeight: debugRound(dockGeometry.targetHeight),
+        });
+      } else if (!debugRecording) {
+        lastDebugRecordingId = 0;
+        geometryLoggedForRecording = false;
+      }
+      const debugNow = debugRecording ? performance.now() : 0;
+      const debugFrameDelta =
+        debugRecording && lastDebugRenderAt !== null
+          ? debugRound(debugNow - lastDebugRenderAt)
+          : null;
+      if (debugRecording) lastDebugRenderAt = debugNow;
+      else lastDebugRenderAt = null;
+
       const scrollY = window.scrollY;
       const normalized = Math.min(1, Math.max(0, scrollY / DOCK_DISTANCE));
       const progress = smoothstep(normalized);
@@ -148,13 +191,46 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
             : "absolute";
 
       if (nextMode === "fixed" && normalized === 1 && lastEndpoint === 1) {
+        if (debugRecording) {
+          recordMotionDebugEvent("logo_render", {
+            scrollY: debugRound(scrollY),
+            normalized,
+            progress,
+            verticalProgress,
+            mode,
+            nextMode,
+            skippedEndpointWrite: true,
+            frameDeltaMs: debugFrameDelta,
+          });
+        }
         return;
       }
       if (nextMode === "absolute" && normalized === 0 && lastEndpoint === 0) {
+        if (debugRecording) {
+          recordMotionDebugEvent("logo_render", {
+            scrollY: debugRound(scrollY),
+            normalized,
+            progress,
+            verticalProgress,
+            mode,
+            nextMode,
+            skippedEndpointWrite: true,
+            frameDeltaMs: debugFrameDelta,
+          });
+        }
         return;
       }
 
       if (nextMode !== mode) {
+        if (debugRecording) {
+          recordMotionDebugEvent("logo_mode_change", {
+            scrollY: debugRound(scrollY),
+            from: mode,
+            to: nextMode,
+            normalized,
+            verticalProgress,
+          });
+        }
         mode = nextMode;
         flyingElement.style.position = mode;
         if (mode === "fixed") {
@@ -192,6 +268,25 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
       }
 
       lastEndpoint = normalized === 0 ? 0 : normalized === 1 ? 1 : null;
+
+      if (debugRecording) {
+        recordMotionDebugEvent("logo_render", {
+          scrollY: debugRound(scrollY),
+          normalized: debugRound(normalized),
+          progress: debugRound(progress),
+          verticalProgress: debugRound(verticalProgress),
+          mode,
+          scale: debugRound(scale),
+          desiredCenterX: debugRound(desiredCenterX),
+          desiredViewportY: debugRound(desiredViewportY),
+          targetCenterX: debugRound(dockGeometry.targetCenterX),
+          targetCenterY: debugRound(dockGeometry.targetCenterY),
+          visualViewportHeight: debugRound(window.visualViewport?.height ?? window.innerHeight),
+          visualViewportOffsetTop: debugRound(window.visualViewport?.offsetTop ?? 0),
+          frameDeltaMs: debugFrameDelta,
+          skippedEndpointWrite: false,
+        });
+      }
     }
 
     function scheduleRender() {
