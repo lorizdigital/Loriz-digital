@@ -111,6 +111,10 @@ export function MotionDebugPanel() {
 
   function start() {
     startMotionDebugRecording();
+    const logo = document.querySelector<HTMLElement>("[data-logo-driver]");
+    recordMotionDebugEvent("logo_driver", {
+      driver: logo?.dataset.logoDriver ?? "not-mounted",
+    });
     setEventCount(0);
     setCopyLabel("JSON kopieren");
     setStatus("recording");

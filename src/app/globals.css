@@ -227,6 +227,106 @@
   }
 }
 
+/*
+ * Die mobile Bildmarke folgt auf Safari 26.4+ der compositor-seitigen
+ * Scroll-Timeline. Die vielen kleinen Transform-Stuetzpunkte bilden die
+ * bisherige Smoothstep-Flugbahn nach, ohne auf main-thread Scroll-Events zu
+ * warten. Kurz vor dem Ziel uebernimmt die feste Header-Marke; dadurch bleibt
+ * das Quelllogo am Seitenanfang trotzdem Teil des nativen iOS-Overscrolls.
+ */
+.mobile-logo-scroll-source {
+  animation: mobile-logo-scroll-source linear both;
+  animation-timeline: scroll(root block);
+  animation-range: 0 300px;
+}
+
+.mobile-logo-scroll-target {
+  opacity: 0;
+  will-change: opacity;
+  animation: mobile-logo-scroll-target linear both;
+  animation-timeline: scroll(root block);
+  animation-range: 0 300px;
+}
+
+@keyframes mobile-logo-scroll-source {
+  0% {
+    transform: var(--mobile-logo-transform-0);
+    opacity: 1;
+  }
+  5% {
+    transform: var(--mobile-logo-transform-1);
+  }
+  10% {
+    transform: var(--mobile-logo-transform-2);
+  }
+  15% {
+    transform: var(--mobile-logo-transform-3);
+  }
+  20% {
+    transform: var(--mobile-logo-transform-4);
+  }
+  25% {
+    transform: var(--mobile-logo-transform-5);
+  }
+  30% {
+    transform: var(--mobile-logo-transform-6);
+  }
+  35% {
+    transform: var(--mobile-logo-transform-7);
+  }
+  40% {
+    transform: var(--mobile-logo-transform-8);
+  }
+  45% {
+    transform: var(--mobile-logo-transform-9);
+  }
+  50% {
+    transform: var(--mobile-logo-transform-10);
+  }
+  55% {
+    transform: var(--mobile-logo-transform-11);
+  }
+  60% {
+    transform: var(--mobile-logo-transform-12);
+  }
+  65% {
+    transform: var(--mobile-logo-transform-13);
+  }
+  70% {
+    transform: var(--mobile-logo-transform-14);
+  }
+  75% {
+    transform: var(--mobile-logo-transform-15);
+  }
+  80% {
+    transform: var(--mobile-logo-transform-16);
+  }
+  85% {
+    transform: var(--mobile-logo-transform-17);
+  }
+  90% {
+    transform: var(--mobile-logo-transform-18);
+  }
+  95% {
+    transform: var(--mobile-logo-transform-19);
+    opacity: 1;
+  }
+  100% {
+    transform: var(--mobile-logo-transform-20);
+    opacity: 0;
+  }
+}
+
+@keyframes mobile-logo-scroll-target {
+  0%,
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 640px) {
   .atmos-blob {
     animation: none;

@@ -5,12 +5,20 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { LorizMark } from "@/components/icons/LorizMark";
 import { useIsMounted } from "@/hooks/useIsMounted";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { MOBILE_LOGO_TARGET_ID } from "@/lib/mobileLogoDock";
+import {
+  getMobileLogoDockFrame,
+  MOBILE_LOGO_DOCK_DISTANCE,
+  MOBILE_LOGO_TARGET_ID,
+  MOBILE_LOGO_TIMELINE_STEPS,
+  type MobileLogoDockGeometry,
+} from "@/lib/mobileLogoDock";
 import {
   getMotionDebugRecordingId,
   isMotionDebugRecording,
@@ -18,18 +26,6 @@ import {
 } from "@/lib/motionDebug";
 
 const MOBILE_QUERY = "(max-width: 767px)";
-const DOCK_DISTANCE = 300;
-
-type DockGeometry = {
-  sourceDocumentLeft: number;
-  sourceDocumentTop: number;
-  sourceWidth: number;
-  sourceHeight: number;
-  sourceMarkHeight: number;
-  targetCenterX: number;
-  targetCenterY: number;
-  targetHeight: number;
-};
 
 function subscribeMobile(callback: () => void) {
   const query = window.matchMedia(MOBILE_QUERY);
@@ -45,19 +41,37 @@ function getMobileServerSnapshot() {
   return false;
 }
 
-function smoothstep(value: number) {
-  return value * value * (3 - 2 * value);
-}
-
 function debugRound(value: number) {
   return Math.round(value * 1_000) / 1_000;
 }
 
+function supportsCssScrollTimeline() {
+  return (
+    typeof CSS !== "undefined" &&
+    CSS.supports("animation-timeline: scroll()") &&
+    CSS.supports(`animation-range: 0px ${MOBILE_LOGO_DOCK_DISTANCE}px`)
+  );
+}
+
+function buildCssTimelineStyle(geometry: MobileLogoDockGeometry) {
+  const style: Record<string, string | number> = {};
+
+  for (let index = 0; index <= MOBILE_LOGO_TIMELINE_STEPS; index += 1) {
+    const scrollY =
+      (index / MOBILE_LOGO_TIMELINE_STEPS) * MOBILE_LOGO_DOCK_DISTANCE;
+    const frame = getMobileLogoDockFrame(geometry, scrollY);
+    style[`--mobile-logo-transform-${index}`] =
+      `translate3d(${frame.absoluteTranslateX}px, ${frame.absoluteTranslateY}px, 0) scale(${frame.scale})`;
+  }
+
+  return style as CSSProperties;
+}
+
 /**
- * Eine einzige mobile Logo-Instanz. Bis zum Beginn der Ueberfuehrung liegt
- * sie absolut an ihrer natuerlichen Dokumentposition und scrollt damit ohne
- * JavaScript-Lag. Nur waehrend der kurzen Reise wird ein GPU-Transform
- * aktualisiert; am Ziel wechselt dieselbe Instanz auf fixed und bleibt dort.
+ * Auf modernen Browsern treibt die native CSS-Scroll-Timeline die Reise auf
+ * dem Compositor. Das Quelllogo bleibt dabei absolut im Dokument (inklusive
+ * iOS-Overscroll), waehrend am Ziel eine deckungsgleiche feste Bildmarke
+ * weich uebernimmt. Aeltere Browser behalten den JavaScript-Fallback.
  */
 export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
   const mounted = useIsMounted();
@@ -70,8 +84,9 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
   const placeholderRef = useRef<HTMLDivElement>(null);
   const sourceMarkRef = useRef<HTMLDivElement>(null);
   const flyingLogoRef = useRef<HTMLDivElement>(null);
-  const [geometry, setGeometry] = useState<DockGeometry | null>(null);
+  const [geometry, setGeometry] = useState<MobileLogoDockGeometry | null>(null);
   const active = mounted && isMobile && !prefersReducedMotion;
+  const cssTimelineSupported = active && supportsCssScrollTimeline();
 
   useLayoutEffect(() => {
     if (!active) return;
@@ -99,6 +114,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
         sourceMarkHeight: sourceMarkRect.height,
         targetCenterX: targetRect.left + targetRect.width / 2,
         targetCenterY: targetRect.top + targetRect.height / 2,
+        targetWidth: targetRect.width,
         targetHeight: targetRect.height,
       });
     }
@@ -131,7 +147,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     const element = flyingLogoRef.current;
-    if (!active || !element || !geometry) return;
+    if (!active || cssTimelineSupported || !element || !geometry) return;
     const flyingElement = element;
     const dockGeometry = geometry;
 
@@ -153,7 +169,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
       }
       if (debugRecording && !geometryLoggedForRecording) {
         geometryLoggedForRecording = recordMotionDebugEvent("logo_geometry", {
-          dockDistance: DOCK_DISTANCE,
+          dockDistance: MOBILE_LOGO_DOCK_DISTANCE,
           sourceDocumentLeft: debugRound(dockGeometry.sourceDocumentLeft),
           sourceDocumentTop: debugRound(dockGeometry.sourceDocumentTop),
           sourceWidth: debugRound(dockGeometry.sourceWidth),
@@ -161,6 +177,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
           sourceMarkHeight: debugRound(dockGeometry.sourceMarkHeight),
           targetCenterX: debugRound(dockGeometry.targetCenterX),
           targetCenterY: debugRound(dockGeometry.targetCenterY),
+          targetWidth: debugRound(dockGeometry.targetWidth),
           targetHeight: debugRound(dockGeometry.targetHeight),
         });
       } else if (!debugRecording) {
@@ -176,11 +193,8 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
       else lastDebugRenderAt = null;
 
       const scrollY = window.scrollY;
-      const normalized = Math.min(1, Math.max(0, scrollY / DOCK_DISTANCE));
-      const progress = smoothstep(normalized);
-      const verticalPhase = Math.min(1, Math.max(0, (normalized - 0.45) / 0.55));
-      const verticalProgress = smoothstep(verticalPhase);
-      const targetScale = dockGeometry.targetHeight / dockGeometry.sourceMarkHeight;
+      const frame = getMobileLogoDockFrame(dockGeometry, scrollY);
+      const { normalized, progress, verticalProgress, scale } = frame;
       const nextMode =
         mode === "fixed"
           ? verticalProgress >= 0.78
@@ -242,29 +256,14 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
         }
       }
 
-      const sourceCenterX =
-        dockGeometry.sourceDocumentLeft + dockGeometry.sourceWidth / 2;
-      const sourceCenterY =
-        dockGeometry.sourceDocumentTop + dockGeometry.sourceHeight / 2;
-      const sourceViewportY = sourceCenterY - scrollY;
-      const desiredCenterX =
-        sourceCenterX + (dockGeometry.targetCenterX - sourceCenterX) * progress;
-      const desiredViewportY =
-        sourceViewportY +
-        (dockGeometry.targetCenterY - sourceViewportY) * verticalProgress;
       // Die vertikale Reise beginnt bewusst spaeter als Skalierung und
       // Seitwaertsbewegung. So bleibt die Marke zuerst im freien Hero-Bereich
       // und steigt erst als bereits kleine Form in den Header auf, statt mit
       // der grossen Headline optisch zu verschmelzen.
-      const scale = 1 + (targetScale - 1) * progress;
-
       if (mode === "fixed") {
-        flyingElement.style.transform = `translate3d(${desiredCenterX - dockGeometry.sourceWidth / 2}px, ${desiredViewportY - dockGeometry.sourceHeight / 2}px, 0) scale(${scale})`;
+        flyingElement.style.transform = `translate3d(${frame.fixedTranslateX}px, ${frame.fixedTranslateY}px, 0) scale(${scale})`;
       } else {
-        const translateX = desiredCenterX - sourceCenterX;
-        const desiredDocumentY = scrollY + desiredViewportY;
-        const translateY = desiredDocumentY - sourceCenterY;
-        flyingElement.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+        flyingElement.style.transform = `translate3d(${frame.absoluteTranslateX}px, ${frame.absoluteTranslateY}px, 0) scale(${scale})`;
       }
 
       lastEndpoint = normalized === 0 ? 0 : normalized === 1 ? 1 : null;
@@ -277,8 +276,8 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
           verticalProgress: debugRound(verticalProgress),
           mode,
           scale: debugRound(scale),
-          desiredCenterX: debugRound(desiredCenterX),
-          desiredViewportY: debugRound(desiredViewportY),
+          desiredCenterX: debugRound(frame.desiredCenterX),
+          desiredViewportY: debugRound(frame.desiredViewportY),
           targetCenterX: debugRound(dockGeometry.targetCenterX),
           targetCenterY: debugRound(dockGeometry.targetCenterY),
           visualViewportHeight: debugRound(window.visualViewport?.height ?? window.innerHeight),
@@ -303,7 +302,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
       window.removeEventListener("scroll", scheduleRender);
       window.removeEventListener("pageshow", scheduleRender);
     };
-  }, [active, geometry]);
+  }, [active, cssTimelineSupported, geometry]);
 
   return (
     <>
@@ -330,24 +329,46 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
       {active &&
         geometry &&
         createPortal(
-          <div
-            ref={flyingLogoRef}
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              left: geometry.sourceDocumentLeft,
-              top: geometry.sourceDocumentTop,
-              width: geometry.sourceWidth,
-              height: geometry.sourceHeight,
-              transformOrigin: "center center",
-              willChange: "transform",
-              backfaceVisibility: "hidden",
-              pointerEvents: "none",
-              zIndex: 60,
-            }}
-          >
-            {children}
-          </div>,
+          <>
+            <div
+              ref={flyingLogoRef}
+              aria-hidden="true"
+              data-logo-driver={
+                cssTimelineSupported ? "css-scroll-timeline" : "js-scroll-events"
+              }
+              className={cssTimelineSupported ? "mobile-logo-scroll-source" : undefined}
+              style={{
+                position: "absolute",
+                left: geometry.sourceDocumentLeft,
+                top: geometry.sourceDocumentTop,
+                width: geometry.sourceWidth,
+                height: geometry.sourceHeight,
+                transformOrigin: "center center",
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+                pointerEvents: "none",
+                zIndex: 60,
+                ...(cssTimelineSupported ? buildCssTimelineStyle(geometry) : {}),
+              }}
+            >
+              {children}
+            </div>
+
+            {cssTimelineSupported && (
+              <div
+                aria-hidden="true"
+                className="mobile-logo-scroll-target pointer-events-none fixed z-[60] text-foreground"
+                style={{
+                  left: geometry.targetCenterX - geometry.targetWidth / 2,
+                  top: geometry.targetCenterY - geometry.targetHeight / 2,
+                  width: geometry.targetWidth,
+                  height: geometry.targetHeight,
+                }}
+              >
+                <LorizMark className="h-full w-full" />
+              </div>
+            )}
+          </>,
           document.body,
         )}
     </>
