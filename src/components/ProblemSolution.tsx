@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { InteractiveCard } from "@/components/ui/InteractiveCard";
+import { ProblemEyebrowReveal } from "@/components/ProblemEyebrowReveal";
 
 const benefits = [
   {
@@ -30,9 +31,9 @@ export function ProblemSolution() {
     <section className="section-padding">
       <Container>
         <div className="max-w-2xl">
-          <Reveal>
+          <ProblemEyebrowReveal>
             <Eyebrow>Der erste Eindruck</Eyebrow>
-          </Reveal>
+          </ProblemEyebrowReveal>
           <Reveal delay={0.08}>
             <h2 className="balance mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               Gute Arbeit sollte auch online gut aussehen.
