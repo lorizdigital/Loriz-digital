@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion, type Variants } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -36,30 +35,6 @@ const offsets: Record<NonNullable<RevealProps["variant"]>, Variants> = {
   },
 };
 
-const FINE_POINTER_QUERY = "(hover: hover) and (pointer: fine)";
-
-const mobileHiddenClasses: Record<NonNullable<RevealProps["variant"]>, string> = {
-  up: "translate-y-7 opacity-0",
-  fade: "opacity-0",
-  left: "-translate-x-7 opacity-0",
-  right: "translate-x-7 opacity-0",
-  scale: "scale-[0.96] opacity-0",
-};
-
-function subscribeFinePointer(callback: () => void) {
-  const query = window.matchMedia(FINE_POINTER_QUERY);
-  query.addEventListener("change", callback);
-  return () => query.removeEventListener("change", callback);
-}
-
-function getFinePointerSnapshot() {
-  return window.matchMedia(FINE_POINTER_QUERY).matches;
-}
-
-function getFinePointerServerSnapshot() {
-  return false;
-}
-
 export function Reveal({
   children,
   className,
@@ -68,54 +43,9 @@ export function Reveal({
   duration = 0.7,
 }: RevealProps) {
   const shouldReduceMotion = usePrefersReducedMotion();
-  const hasFinePointer = useSyncExternalStore(
-    subscribeFinePointer,
-    getFinePointerSnapshot,
-    getFinePointerServerSnapshot,
-  );
-  const mobileRef = useRef<HTMLDivElement>(null);
-  const [mobileVisible, setMobileVisible] = useState(false);
-
-  useEffect(() => {
-    if (hasFinePointer || shouldReduceMotion || mobileVisible) return;
-    const element = mobileRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setMobileVisible(true);
-        observer.disconnect();
-      },
-      { rootMargin: "-10% 0px -10% 0px" },
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [hasFinePointer, shouldReduceMotion, mobileVisible]);
 
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>;
-  }
-
-  if (!hasFinePointer) {
-    return (
-      <div
-        ref={mobileRef}
-        className={cn(
-          "transition-[opacity,transform] ease-[var(--ease-glass)]",
-          mobileVisible
-            ? "translate-x-0 translate-y-0 scale-100 opacity-100"
-            : mobileHiddenClasses[variant],
-          className,
-        )}
-        style={{
-          transitionDelay: `${delay}s`,
-          transitionDuration: `${duration}s`,
-        }}
-      >
-        {children}
-      </div>
-    );
   }
 
   return (
