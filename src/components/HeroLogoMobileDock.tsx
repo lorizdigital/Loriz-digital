@@ -67,6 +67,16 @@ function buildCssTimelineStyle(geometry: MobileLogoDockGeometry) {
   return style as CSSProperties;
 }
 
+function sameGeometry(
+  current: MobileLogoDockGeometry | null,
+  next: MobileLogoDockGeometry,
+) {
+  if (!current) return false;
+  return (Object.keys(next) as Array<keyof MobileLogoDockGeometry>).every(
+    (key) => Math.abs(current[key] - next[key]) < 0.25,
+  );
+}
+
 /**
  * Auf modernen Browsern treibt die native CSS-Scroll-Timeline die Reise auf
  * dem Compositor. Das Quelllogo bleibt dabei absolut im Dokument (inklusive
@@ -84,6 +94,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
   const placeholderRef = useRef<HTMLDivElement>(null);
   const sourceMarkRef = useRef<HTMLDivElement>(null);
   const flyingLogoRef = useRef<HTMLDivElement>(null);
+  const geometryRef = useRef<MobileLogoDockGeometry | null>(null);
   const [geometry, setGeometry] = useState<MobileLogoDockGeometry | null>(null);
   const active = mounted && isMobile && !prefersReducedMotion;
   const cssTimelineSupported = active && supportsCssScrollTimeline();
@@ -94,7 +105,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
     let width = window.innerWidth;
     let cancelled = false;
 
-    function measure() {
+    function measure(reason: string) {
       if (cancelled) return;
       const placeholder = placeholderRef.current;
       const sourceMark = sourceMarkRef.current;
@@ -106,7 +117,7 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
       const targetRect = target.getBoundingClientRect();
       if (!sourceRect.width || !sourceMarkRect.height || !targetRect.height) return;
 
-      setGeometry({
+      const nextGeometry: MobileLogoDockGeometry = {
         sourceDocumentLeft: sourceRect.left + window.scrollX,
         sourceDocumentTop: sourceRect.top + window.scrollY,
         sourceWidth: sourceRect.width,
@@ -116,32 +127,57 @@ export function HeroLogoMobileDock({ children }: { children: ReactNode }) {
         targetCenterY: targetRect.top + targetRect.height / 2,
         targetWidth: targetRect.width,
         targetHeight: targetRect.height,
-      });
+      };
+      const changed = !sameGeometry(geometryRef.current, nextGeometry);
+
+      if (isMotionDebugRecording()) {
+        recordMotionDebugEvent("logo_geometry_measure", {
+          reason,
+          changed,
+          sourceTop: debugRound(nextGeometry.sourceDocumentTop),
+          sourceWidth: debugRound(nextGeometry.sourceWidth),
+          sourceHeight: debugRound(nextGeometry.sourceHeight),
+          targetCenterX: debugRound(nextGeometry.targetCenterX),
+          targetCenterY: debugRound(nextGeometry.targetCenterY),
+        });
+      }
+
+      if (!changed) return;
+      geometryRef.current = nextGeometry;
+      setGeometry(nextGeometry);
     }
 
     function onResize() {
       if (window.innerWidth === width) return;
       width = window.innerWidth;
-      measure();
+      measure("window-resize");
     }
 
-    measure();
+    function onOrientationChange() {
+      measure("orientation-change");
+    }
+
+    function onPageShow() {
+      measure("pageshow");
+    }
+
+    measure("layout-effect");
     const placeholder = placeholderRef.current;
     const target = document.getElementById(MOBILE_LOGO_TARGET_ID);
-    const resizeObserver = new ResizeObserver(measure);
+    const resizeObserver = new ResizeObserver(() => measure("resize-observer"));
     if (placeholder) resizeObserver.observe(placeholder);
     if (target) resizeObserver.observe(target);
     window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", measure);
-    window.addEventListener("pageshow", measure);
-    void document.fonts?.ready.then(measure);
+    window.addEventListener("orientationchange", onOrientationChange);
+    window.addEventListener("pageshow", onPageShow);
+    void document.fonts?.ready.then(() => measure("fonts-ready"));
 
     return () => {
       cancelled = true;
       resizeObserver.disconnect();
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("orientationchange", measure);
-      window.removeEventListener("pageshow", measure);
+      window.removeEventListener("orientationchange", onOrientationChange);
+      window.removeEventListener("pageshow", onPageShow);
     };
   }, [active]);
 

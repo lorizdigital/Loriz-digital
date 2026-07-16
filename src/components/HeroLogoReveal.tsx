@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useTransform, type MotionValue } from "framer-motion";
 import { easeGlass } from "@/lib/motion";
+import {
+  isMotionDebugRecording,
+  recordMotionDebugEvent,
+} from "@/lib/motionDebug";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 /**
@@ -25,6 +29,7 @@ type HeroLogoRevealProps = {
   mouseX: MotionValue<number>;
   mouseY: MotionValue<number>;
   forceComplete?: boolean;
+  debugId?: "mobile" | "desktop";
   onComplete?: () => void;
 };
 
@@ -33,6 +38,7 @@ export function HeroLogoReveal({
   mouseX,
   mouseY,
   forceComplete = false,
+  debugId = "desktop",
   onComplete,
 }: HeroLogoRevealProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -43,9 +49,12 @@ export function HeroLogoReveal({
   const complete = useCallback(() => {
     if (hasCompletedRef.current) return;
     hasCompletedRef.current = true;
+    if (isMotionDebugRecording()) {
+      recordMotionDebugEvent("logo_reveal_complete", { id: debugId });
+    }
     setPhase("done");
     onComplete?.();
-  }, [onComplete]);
+  }, [debugId, onComplete]);
 
   function wait(ms: number) {
     return new Promise<void>((resolve) => {
@@ -60,6 +69,10 @@ export function HeroLogoReveal({
   useEffect(() => {
     if (!start || hasCompletedRef.current) return;
 
+    if (isMotionDebugRecording()) {
+      recordMotionDebugEvent("logo_reveal_start", { id: debugId });
+    }
+
     if (prefersReducedMotion) {
       wait(0).then(complete);
     } else {
@@ -69,7 +82,10 @@ export function HeroLogoReveal({
         setPhase("light");
         await wait(1000);
         setPhase("settle");
-        await wait(500);
+        // Die Settle-Bewegung dauert 600 ms. Erst danach darf das Fertig-
+        // Signal den Hero umschalten, sonst wird ihr letzter Abschnitt auf
+        // Safari beim Refresh sichtbar abgeschnitten.
+        await wait(650);
         complete();
       }
       run();
@@ -84,17 +100,25 @@ export function HeroLogoReveal({
       timeouts.forEach(clearTimeout);
       timeouts.clear();
     };
-  }, [start, prefersReducedMotion, complete]);
+  }, [start, prefersReducedMotion, complete, debugId]);
+
+  useEffect(() => {
+    if (!isMotionDebugRecording()) return;
+    recordMotionDebugEvent("logo_reveal_phase", { id: debugId, phase });
+  }, [debugId, phase]);
 
   // Beginnt der Nutzer auf Mobil bereits zu scrollen, gewinnt seine
   // Interaktion: Das Logo springt in seinen ruhigen Endzustand, bevor der
   // scrollgebundene Dock es bewegt. So fliegen nie nur einzelne Logohaelften.
   useEffect(() => {
     if (!forceComplete || hasCompletedRef.current) return;
+    if (isMotionDebugRecording()) {
+      recordMotionDebugEvent("logo_reveal_force_complete", { id: debugId });
+    }
     timeoutsRef.current.forEach(clearTimeout);
     timeoutsRef.current.clear();
     wait(0).then(complete);
-  }, [forceComplete, complete]);
+  }, [forceComplete, complete, debugId]);
 
   const d = (seconds: number) => (prefersReducedMotion || forceComplete ? 0 : seconds);
   const effectivePhase: Phase = forceComplete ? "done" : phase;

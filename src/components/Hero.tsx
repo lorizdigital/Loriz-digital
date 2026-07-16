@@ -109,7 +109,8 @@ export function Hero() {
                 start={logoStart}
                 mouseX={x}
                 mouseY={y}
-                forceComplete={forceMobileLogoComplete || logoReady}
+                forceComplete={forceMobileLogoComplete}
+                debugId="mobile"
                 onComplete={handleLogoComplete}
               />
             </HeroLogoMobileDock>
@@ -168,6 +169,7 @@ export function Hero() {
             start={logoStart}
             mouseX={x}
             mouseY={y}
+            debugId="desktop"
             onComplete={handleLogoComplete}
           />
         </div>

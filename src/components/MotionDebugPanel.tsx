@@ -9,8 +9,10 @@ import {
   recordMotionDebugEvent,
   resetMotionDebugRecording,
   serializeMotionDebugReport,
+  shouldContinueMotionDebugAfterRefresh,
   startMotionDebugRecording,
   stopMotionDebugRecording,
+  subscribeMotionDebugStatus,
   type MotionDebugStatus,
 } from "@/lib/motionDebug";
 
@@ -28,13 +30,29 @@ function getServerDebugSnapshot() {
   return false;
 }
 
+function getServerStatusSnapshot(): MotionDebugStatus {
+  return "idle";
+}
+
+function recordLogoDriver(trigger: "manual" | "refresh") {
+  const logo = document.querySelector<HTMLElement>("[data-logo-driver]");
+  recordMotionDebugEvent("logo_driver", {
+    trigger,
+    driver: logo?.dataset.logoDriver ?? "not-mounted",
+  });
+}
+
 export function MotionDebugPanel() {
   const enabled = useSyncExternalStore(
     subscribeDebugUrl,
     isMotionDebugEnabled,
     getServerDebugSnapshot,
   );
-  const [status, setStatus] = useState<MotionDebugStatus>(() => getMotionDebugStatus());
+  const status = useSyncExternalStore(
+    subscribeMotionDebugStatus,
+    getMotionDebugStatus,
+    getServerStatusSnapshot,
+  );
   const [eventCount, setEventCount] = useState(0);
   const [copyLabel, setCopyLabel] = useState("JSON kopieren");
   const frameRef = useRef<number | null>(null);
@@ -56,7 +74,6 @@ export function MotionDebugPanel() {
       if (!recorded) {
         frameRef.current = null;
         setEventCount(getMotionDebugEventCount());
-        setStatus("stopped");
         return;
       }
       frameRef.current = window.requestAnimationFrame(captureFrame);
@@ -107,30 +124,37 @@ export function MotionDebugPanel() {
     };
   }, [enabled, status]);
 
+  useEffect(() => {
+    if (
+      !enabled ||
+      status !== "idle" ||
+      !shouldContinueMotionDebugAfterRefresh()
+    ) {
+      return;
+    }
+
+    startMotionDebugRecording("refresh");
+    recordLogoDriver("refresh");
+  }, [enabled, status]);
+
   if (!enabled) return null;
 
   function start() {
-    startMotionDebugRecording();
-    const logo = document.querySelector<HTMLElement>("[data-logo-driver]");
-    recordMotionDebugEvent("logo_driver", {
-      driver: logo?.dataset.logoDriver ?? "not-mounted",
-    });
+    startMotionDebugRecording("manual");
+    recordLogoDriver("manual");
     setEventCount(0);
     setCopyLabel("JSON kopieren");
-    setStatus("recording");
   }
 
   function stop() {
     stopMotionDebugRecording();
     setEventCount(getMotionDebugEventCount());
-    setStatus("stopped");
   }
 
   function reset() {
     resetMotionDebugRecording();
     setEventCount(0);
     setCopyLabel("JSON kopieren");
-    setStatus("idle");
   }
 
   async function copy() {
@@ -173,7 +197,8 @@ export function MotionDebugPanel() {
         </span>
       </div>
       <p className="mt-2 text-xs leading-relaxed text-white/65">
-        Starten, einmal langsam herunter und wieder hoch scrollen, dann stoppen und JSON exportieren.
+        Für Refresh-Probleme: Aufnahme starten und die Seite neu laden. Die Aufzeichnung startet
+        danach automatisch neu. Anschließend stoppen und JSON exportieren.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">

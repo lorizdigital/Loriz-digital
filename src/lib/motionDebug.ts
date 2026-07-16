@@ -15,6 +15,7 @@ type MotionDebugReport = {
 };
 
 const MAX_EVENTS = 20_000;
+const REFRESH_CONTINUATION_KEY = "loriz-motion-debug-recording";
 
 let status: MotionDebugStatus = "idle";
 let recordingId = 0;
@@ -22,6 +23,7 @@ let startedAt = 0;
 let stoppedAt = 0;
 let metadata: Record<string, unknown> = {};
 let events: MotionDebugEvent[] = [];
+const statusListeners = new Set<() => void>();
 
 function round(value: number, digits = 3) {
   const factor = 10 ** digits;
@@ -46,7 +48,23 @@ function viewportMetadata() {
     visualViewportScale: viewport?.scale ?? null,
     prefersReducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     path: window.location.pathname,
+    recordingStartedAtNavigationMs: round(performance.now()),
   };
+}
+
+function notifyStatusListeners() {
+  statusListeners.forEach((listener) => listener());
+}
+
+function persistRefreshContinuation(enabled: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    if (enabled) window.sessionStorage.setItem(REFRESH_CONTINUATION_KEY, "1");
+    else window.sessionStorage.removeItem(REFRESH_CONTINUATION_KEY);
+  } catch {
+    // Die Diagnose bleibt auch bei gesperrtem Storage normal nutzbar; nur die
+    // automatische Fortsetzung nach einem Refresh entfaellt dann.
+  }
 }
 
 export function isMotionDebugEnabled() {
@@ -62,6 +80,20 @@ export function getMotionDebugStatus() {
   return status;
 }
 
+export function subscribeMotionDebugStatus(listener: () => void) {
+  statusListeners.add(listener);
+  return () => statusListeners.delete(listener);
+}
+
+export function shouldContinueMotionDebugAfterRefresh() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(REFRESH_CONTINUATION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function getMotionDebugRecordingId() {
   return recordingId;
 }
@@ -70,7 +102,7 @@ export function getMotionDebugEventCount() {
   return events.length;
 }
 
-export function startMotionDebugRecording() {
+export function startMotionDebugRecording(trigger: "manual" | "refresh" = "manual") {
   if (typeof window === "undefined") return;
   recordingId += 1;
   status = "recording";
@@ -78,10 +110,13 @@ export function startMotionDebugRecording() {
   stoppedAt = 0;
   events = [];
   metadata = viewportMetadata();
+  persistRefreshContinuation(true);
   recordMotionDebugEvent("recording_start", {
+    trigger,
     scrollY: round(window.scrollY),
     visualViewportOffsetTop: round(window.visualViewport?.offsetTop ?? 0),
   });
+  notifyStatusListeners();
 }
 
 export function stopMotionDebugRecording() {
@@ -91,6 +126,8 @@ export function stopMotionDebugRecording() {
   });
   stoppedAt = performance.now();
   status = "stopped";
+  persistRefreshContinuation(false);
+  notifyStatusListeners();
 }
 
 export function resetMotionDebugRecording() {
@@ -99,6 +136,8 @@ export function resetMotionDebugRecording() {
   stoppedAt = 0;
   metadata = {};
   events = [];
+  persistRefreshContinuation(false);
+  notifyStatusListeners();
 }
 
 export function recordMotionDebugEvent(
@@ -109,6 +148,8 @@ export function recordMotionDebugEvent(
   if (events.length >= MAX_EVENTS) {
     stoppedAt = performance.now();
     status = "stopped";
+    persistRefreshContinuation(false);
+    notifyStatusListeners();
     return false;
   }
   events.push({
