@@ -91,7 +91,10 @@ export function Hero() {
       <AtmosphericBackground />
 
       <Container className="grid items-center gap-12 md:grid-cols-[1.2fr_0.8fr] md:gap-8 lg:grid-cols-2 lg:gap-14 xl:grid-cols-[0.86fr_1.14fr]">
-        <motion.div style={{ x: textMouseX, y: textMouseY }}>
+        <motion.div
+          className="hero-pointer-parallax"
+          style={{ x: textMouseX, y: textMouseY }}
+        >
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={textStepAtLeast(textStep, "claim") ? { opacity: 1, y: 0 } : undefined}
@@ -139,11 +142,10 @@ export function Hero() {
             </Button>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={textStepAtLeast(textStep, "founder") ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.8, ease: easeGlass }}
-            className="mt-10 flex items-center gap-3"
+          <div
+            className={`mt-10 flex items-center gap-3 transition-opacity ease-[var(--ease-glass)] ${
+              shouldReduceMotion ? "duration-0" : "duration-[800ms]"
+            } ${textStepAtLeast(textStep, "founder") ? "opacity-100" : "opacity-0"}`}
           >
             <span
               aria-hidden="true"
@@ -161,7 +163,7 @@ export function Hero() {
             <span className="text-sm text-muted-foreground">
               Persönlich entwickelt von {siteConfig.founder}
             </span>
-          </motion.div>
+          </div>
         </motion.div>
 
         <div className="hidden md:contents">

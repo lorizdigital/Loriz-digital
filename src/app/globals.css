@@ -413,6 +413,15 @@
   }
 }
 
+/* Auf Touch-Geraeten existiert keine Pointer-Parallaxe. Das explizite
+   transform:none verhindert, dass WebKit beim Hydrieren trotzdem einen
+   Null-Transform-Layer anlegt und Text um Subpixel neu rastert. */
+@media (pointer: coarse) {
+  .hero-pointer-parallax {
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
