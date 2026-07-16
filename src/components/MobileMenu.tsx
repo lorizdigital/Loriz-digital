@@ -85,7 +85,7 @@ export function MobileMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? "Menü schließen" : "Menü öffnen"}
-        className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] relative z-50 flex h-11 w-11 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+        className="glass-subtle navigation-control-glass relative z-50 flex h-11 w-11 items-center justify-center rounded-full text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
       >
         {open ? (
           <X aria-hidden="true" className="h-5 w-5" />

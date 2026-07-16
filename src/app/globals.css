@@ -143,6 +143,66 @@
     border: 1px solid var(--glass-border);
     box-shadow: var(--shadow-glass-lg);
   }
+
+  /* Die Navigation braucht im Dark Mode eine eigene, dunklere Glasbasis:
+     Helle Hero-Elemente duerfen durchscheinen, aber nie die Lesbarkeit der
+     ebenfalls hellen Navigation reduzieren. */
+  .navigation-glass {
+    background:
+      linear-gradient(135deg, rgb(255 255 255 / 0.42), transparent 46%),
+      var(--glass-bg-floating);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass-md);
+    -webkit-backdrop-filter: blur(26px) saturate(145%);
+    backdrop-filter: blur(26px) saturate(145%);
+  }
+
+  .navigation-hover-glass {
+    background: var(--glass-bg-subtle);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-glass-sm);
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm)) saturate(135%);
+    backdrop-filter: blur(var(--glass-blur-sm)) saturate(135%);
+  }
+
+  .navigation-control-glass {
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    backdrop-filter: blur(18px) saturate(145%);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  @layer utilities {
+    .navigation-glass {
+      background:
+        linear-gradient(135deg, rgb(255 255 255 / 0.12), transparent 44%),
+        rgb(25 24 18 / 0.82);
+      border-color: rgb(255 255 255 / 0.22);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.22),
+        inset 0 -1px 0 rgb(0 0 0 / 0.2),
+        0 18px 50px -26px rgb(0 0 0 / 0.9),
+        0 4px 14px -8px rgb(0 0 0 / 0.75);
+      -webkit-backdrop-filter: blur(28px) saturate(165%);
+      backdrop-filter: blur(28px) saturate(165%);
+    }
+
+    .navigation-hover-glass {
+      background: rgb(255 255 255 / 0.11);
+      border-color: rgb(255 255 255 / 0.16);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.16),
+        0 8px 20px -14px rgb(0 0 0 / 0.85);
+    }
+
+    .navigation-control-glass {
+      background: rgb(25 24 18 / 0.72);
+      border-color: rgb(255 255 255 / 0.18);
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.18),
+        0 10px 24px -16px rgb(0 0 0 / 0.85);
+    }
+  }
 }
 
 @layer base {

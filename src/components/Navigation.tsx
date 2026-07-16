@@ -49,11 +49,11 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4">
       <div
         className={cn(
-          // Mobil bleibt die Zielgeometrie des Logos stabil. Der transparente
-          // Header ist am Seitenanfang optisch unveraendert; beim Scrollen muss
-          // nur noch die Glasflaeche eingeblendet werden. Den Layout-Morph gibt
+          // Mobil bleibt die Zielgeometrie des Logos stabil. Im Light Mode
+          // erscheint die Glasflaeche erst beim Scrollen; im Dark Mode bleibt
+          // sie als kontrastreiche Basis immer sichtbar. Den Layout-Morph gibt
           // es weiterhin ab Tablet-Groesse, wo kein Logo-Dock aktiv ist.
-          "relative isolate mt-3 flex w-full max-w-[calc(1200px-2rem)] items-center justify-between rounded-full px-5 py-3 sm:px-6 md:backdrop-blur-[2px] md:transition-[max-width,margin-top,padding,border-radius] md:duration-700 md:ease-[var(--ease-glass)]",
+          "relative isolate mt-3 flex w-full max-w-[calc(1200px-2rem)] items-center justify-between rounded-full px-5 py-3 sm:px-6 md:transition-[max-width,margin-top,padding,border-radius] md:duration-700 md:ease-[var(--ease-glass)]",
           scrolled
             ? "md:mt-3 md:max-w-[calc(1200px-2rem)] md:rounded-full md:px-6 md:py-3"
             : "md:mt-0 md:max-w-[1200px] md:rounded-none md:px-8 md:py-6 lg:px-10",
@@ -61,9 +61,9 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
       >
         <div
           aria-hidden="true"
-          style={{ opacity: scrolled ? 1 : 0 }}
           className={cn(
-            "glass-floating pointer-events-none absolute inset-0 -z-10 rounded-[inherit] transition-opacity ease-[var(--ease-glass)] md:backdrop-blur-[var(--glass-blur-lg)]",
+            "navigation-glass pointer-events-none absolute inset-0 -z-10 rounded-[inherit] transition-opacity ease-[var(--ease-glass)]",
+            scrolled ? "opacity-100" : "opacity-0 dark:opacity-100",
             shouldReduceMotion ? "duration-0" : "duration-[350ms]",
           )}
         />
@@ -101,7 +101,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
                   animate={{ opacity: 1, x: hoverRect.left, width: hoverRect.width }}
                   exit={{ opacity: 0 }}
                   transition={springLayout}
-                  className="glass-subtle backdrop-blur-[var(--glass-blur-sm)] pointer-events-none absolute inset-y-0 left-0 z-0 h-full rounded-full"
+                  className="navigation-hover-glass pointer-events-none absolute inset-y-0 left-0 z-0 h-full rounded-full"
                 />
               )}
             </AnimatePresence>
@@ -112,7 +112,7 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
               href={item.href}
               onMouseEnter={(e) => handleLinkHover(e.currentTarget)}
               className={cn(
-                "relative z-10 inline-flex min-h-11 items-center rounded-full px-3.5 py-2 text-[0.95rem] text-foreground/80 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30",
+                "relative z-10 inline-flex min-h-11 items-center rounded-full px-3.5 py-2 text-[0.95rem] font-medium text-foreground/90 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30",
                 shouldReduceMotion && "hover:bg-foreground/[0.05]",
               )}
             >
