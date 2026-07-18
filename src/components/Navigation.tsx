@@ -51,12 +51,12 @@ export function Navigation({ heroLogoDockEnabled = false }: NavigationProps) {
         className={cn(
           // Mobil bleibt die Zielgeometrie des Logos stabil. Im Light Mode
           // erscheint die Glasflaeche erst beim Scrollen; im Dark Mode bleibt
-          // sie als kontrastreiche Basis immer sichtbar. Den Layout-Morph gibt
-          // es weiterhin ab Tablet-Groesse, wo kein Logo-Dock aktiv ist.
-          "relative isolate mt-3 flex w-full max-w-[calc(1200px-2rem)] items-center justify-between rounded-full px-5 py-3 sm:px-6 md:transition-[max-width,margin-top,padding,border-radius] md:duration-700 md:ease-[var(--ease-glass)]",
+          // sie als kontrastreiche Basis immer sichtbar. Die Pillenform bleibt
+          // in beiden Zustaenden erhalten; nur Groesse und Abstand morphen.
+          "relative isolate mt-3 flex w-full max-w-[calc(1200px-2rem)] items-center justify-between rounded-full px-5 py-3 sm:px-6 md:transition-[max-width,margin-top,padding] md:duration-700 md:ease-[var(--ease-glass)]",
           scrolled
-            ? "md:mt-3 md:max-w-[calc(1200px-2rem)] md:rounded-full md:px-6 md:py-3"
-            : "md:mt-0 md:max-w-[1200px] md:rounded-none md:px-8 md:py-6 lg:px-10",
+            ? "md:mt-3 md:max-w-[calc(1200px-2rem)] md:px-6 md:py-3"
+            : "md:mt-0 md:max-w-[1200px] md:px-8 md:py-6 lg:px-10",
         )}
       >
         <div
