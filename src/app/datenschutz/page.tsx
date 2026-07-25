@@ -25,15 +25,14 @@ const toc: TocEntry[] = [
   { id: "turnstile-missbrauchsschutz", label: "9. Turnstile und Missbrauchsschutz" },
   { id: "brevo", label: "10. E-Mail-Versand über Brevo" },
   { id: "kommunikation-per-e-mail", label: "11. Kommunikation per E-Mail (iCloud Mail)" },
-  { id: "einbindung-von-referenzprojekten", label: "12. Einbindung von Referenzprojekten" },
-  { id: "cookies", label: "13. Cookies und Zugriffe auf Endeinrichtungen" },
-  { id: "speicherdauer", label: "14. Speicherdauer" },
-  { id: "empfaenger-personenbezogener-daten", label: "15. Empfänger personenbezogener Daten" },
-  { id: "ihre-rechte", label: "16. Ihre Rechte" },
-  { id: "beschwerderecht", label: "17. Beschwerderecht" },
-  { id: "widerspruchsrecht", label: "18. Widerspruchsrecht" },
-  { id: "datensicherheit", label: "19. Datensicherheit" },
-  { id: "aenderungen", label: "20. Änderungen dieser Datenschutzerklärung" },
+  { id: "cookies", label: "12. Cookies und Zugriffe auf Endeinrichtungen" },
+  { id: "speicherdauer", label: "13. Speicherdauer" },
+  { id: "empfaenger-personenbezogener-daten", label: "14. Empfänger personenbezogener Daten" },
+  { id: "ihre-rechte", label: "15. Ihre Rechte" },
+  { id: "beschwerderecht", label: "16. Beschwerderecht" },
+  { id: "widerspruchsrecht", label: "17. Widerspruchsrecht" },
+  { id: "datensicherheit", label: "18. Datensicherheit" },
+  { id: "aenderungen", label: "19. Änderungen dieser Datenschutzerklärung" },
 ];
 
 export const metadata: Metadata = {
@@ -522,42 +521,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="einbindung-von-referenzprojekten" heading="12. Einbindung von Referenzprojekten">
-            <p>Diese Website enthält eine Live-Vorschau eines Referenzprojekts.</p>
-            <p>
-              Hierfür wird die Website{" "}
-              <a href="https://einzelstueckbyelisa.de" className={linkClass} {...externalLinkProps}>
-                https://einzelstueckbyelisa.de
-              </a>{" "}
-              innerhalb eines Browser-Frames dargestellt.
-            </p>
-            <p>
-              Beim Laden dieser Vorschau kann Ihr Browser eine Verbindung zu dieser Domain
-              herstellen.
-            </p>
-            <p>Hierbei können insbesondere verarbeitet werden:</p>
-            <LegalList
-              items={[
-                "IP-Adresse",
-                "Browserinformationen",
-                "Betriebssystem",
-                "Datum und Uhrzeit",
-                "technische Verbindungsdaten",
-                "Referrer",
-              ]}
-            />
-            <p>
-              Die Einbindung erfolgt ausschließlich zur Präsentation eines von mir entwickelten
-              Projekts.
-            </p>
-            <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.</p>
-            <p>
-              Mein berechtigtes Interesse besteht darin, Besuchern meiner Website reale
-              Referenzprojekte präsentieren zu können.
-            </p>
-          </LegalSection>
-
-          <LegalSection id="cookies" heading="13. Cookies und Zugriffe auf Endeinrichtungen">
+          <LegalSection id="cookies" heading="12. Cookies und Zugriffe auf Endeinrichtungen">
             <p>
               Diese Website verwendet keine Cookies zu Werbe-, Marketing- oder
               Profilbildungszwecken.
@@ -576,7 +540,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="speicherdauer" heading="14. Speicherdauer">
+          <LegalSection id="speicherdauer" heading="13. Speicherdauer">
             <p>
               Personenbezogene Daten werden nur so lange gespeichert, wie dies zur Erfüllung des
               jeweiligen Zwecks erforderlich ist.
@@ -602,7 +566,7 @@ export default function DatenschutzPage() {
             <p>Anschließend werden die Daten gelöscht.</p>
           </LegalSection>
 
-          <LegalSection id="empfaenger-personenbezogener-daten" heading="15. Empfänger personenbezogener Daten">
+          <LegalSection id="empfaenger-personenbezogener-daten" heading="14. Empfänger personenbezogener Daten">
             <p>Personenbezogene Daten werden nur dann an Dritte übermittelt, wenn</p>
             <LegalList
               items={[
@@ -629,7 +593,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="ihre-rechte" heading="16. Ihre Rechte">
+          <LegalSection id="ihre-rechte" heading="15. Ihre Rechte">
             <p>Sie haben nach der DSGVO insbesondere folgende Rechte:</p>
             <LegalList
               items={[
@@ -650,7 +614,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="beschwerderecht" heading="17. Beschwerderecht">
+          <LegalSection id="beschwerderecht" heading="16. Beschwerderecht">
             <p>
               Sie haben das Recht, sich bei einer Datenschutzaufsichtsbehörde über die
               Verarbeitung Ihrer personenbezogenen Daten zu beschweren.
@@ -671,7 +635,7 @@ export default function DatenschutzPage() {
             </address>
           </LegalSection>
 
-          <LegalSection id="widerspruchsrecht" heading="18. Widerspruchsrecht">
+          <LegalSection id="widerspruchsrecht" heading="17. Widerspruchsrecht">
             <p>
               Werden personenbezogene Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
               verarbeitet, haben Sie das Recht, aus Gründen, die sich aus Ihrer besonderen
@@ -692,7 +656,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="datensicherheit" heading="19. Datensicherheit">
+          <LegalSection id="datensicherheit" heading="18. Datensicherheit">
             <p>Diese Website verwendet eine SSL- beziehungsweise TLS-Verschlüsselung.</p>
             <p>Dadurch werden übermittelte Daten während der Übertragung geschützt.</p>
             <p>
@@ -702,7 +666,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="aenderungen" heading="20. Änderungen dieser Datenschutzerklärung">
+          <LegalSection id="aenderungen" heading="19. Änderungen dieser Datenschutzerklärung">
             <p>
               Ich behalte mir vor, diese Datenschutzerklärung anzupassen, wenn dies aufgrund
               technischer Weiterentwicklungen, gesetzlicher Änderungen oder neuer Angebote
