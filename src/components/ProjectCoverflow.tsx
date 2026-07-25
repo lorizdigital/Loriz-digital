@@ -27,6 +27,10 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
   const openLinkRef = useRef<HTMLAnchorElement>(null);
   const moveFocusOnFlip = useRef(false);
 
+  // Nach einem Wisch feuert der Browser noch einen Klick auf das Element unter
+  // dem Finger. Ohne diese Merkhilfe würde er die Karte umklappen.
+  const wasDragged = useRef(false);
+
   useEffect(() => {
     if (!moveFocusOnFlip.current) return;
     moveFocusOnFlip.current = false;
@@ -104,9 +108,15 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                   isActive ? "cursor-default" : "cursor-pointer"
                 }`}
                 onClick={() => !isActive && goTo(index)}
+                onPointerDown={() => {
+                  wasDragged.current = false;
+                }}
                 drag={isActive ? "x" : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.14}
+                onDragStart={() => {
+                  wasDragged.current = true;
+                }}
                 onDragEnd={(_, info) => {
                   if (info.offset.x > 70) showPrevious();
                   if (info.offset.x < -70) showNext();
@@ -143,6 +153,24 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                         </div>
                       </div>
                       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-24 bg-gradient-to-t from-surface/60 to-transparent sm:block" />
+
+                      {/* Mobil ist die Vorschau selbst die naheliegendste
+                          Tippfläche. Für Tastatur und Screenreader bleibt der
+                          Button in der Titelzeile der einzige Weg, deshalb ist
+                          diese Verdopplung bewusst nicht fokussierbar. */}
+                      {isActive && (
+                        <button
+                          type="button"
+                          aria-hidden="true"
+                          tabIndex={-1}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            if (wasDragged.current) return;
+                            setFlippedIndex(index);
+                          }}
+                          className="absolute inset-0 cursor-pointer sm:hidden"
+                        />
+                      )}
                     </div>
                     <div className="flex h-20 items-center justify-between gap-3 px-5 sm:h-[5.5rem] sm:gap-4 sm:px-7">
                       <h3 className="min-w-0 text-lg font-semibold leading-tight tracking-tight text-foreground sm:text-2xl">
