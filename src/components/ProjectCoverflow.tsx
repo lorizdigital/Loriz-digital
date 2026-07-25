@@ -154,7 +154,7 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                       </div>
                       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-24 bg-gradient-to-t from-surface/60 to-transparent sm:block" />
 
-                      {/* Mobil ist die Vorschau selbst die naheliegendste
+                      {/* Die Vorschau selbst ist die naheliegendste Klick- und
                           Tippfläche. Für Tastatur und Screenreader bleibt der
                           Button in der Titelzeile der einzige Weg, deshalb ist
                           diese Verdopplung bewusst nicht fokussierbar. */}
@@ -168,7 +168,7 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                             if (wasDragged.current) return;
                             setFlippedIndex(index);
                           }}
-                          className="absolute inset-0 cursor-pointer sm:hidden"
+                          className="absolute inset-0 cursor-pointer"
                         />
                       )}
                     </div>
@@ -193,9 +193,17 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                     </div>
                   </div>
 
+                  {/* Gegenstück zur Klickfläche auf der Vorderseite: ein Klick
+                      auf die Rückseite führt zurück zur Vorschau. Die beiden
+                      Bedienelemente unten stoppen die Weitergabe selbst. */}
                   <div
                     aria-hidden={!isFlipped}
-                    className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-elevated [backface-visibility:hidden] [transform:rotateY(180deg)] sm:p-10"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (wasDragged.current) return;
+                      setFlippedIndex(null);
+                    }}
+                    className="absolute inset-0 flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-elevated [backface-visibility:hidden] [transform:rotateY(180deg)] sm:p-10"
                   >
                     <div>
                       <p className="text-sm font-medium text-clay">{project.title}</p>
