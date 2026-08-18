@@ -2,3 +2,23 @@
 # https://opennext.js.org/cloudflare/caching#static-assets-caching
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable
+
+# Achtung: /_next/image faellt NICHT unter diese Regeln. Der OpenNext-Worker
+# faengt den Pfad ab, bevor der Next-Handler laeuft, deshalb kommen von dort
+# weder Cache-Control noch ETag zurueck. images.minimumCacheTTL in
+# next.config.ts wertet der Cloudflare-Adapter zur Laufzeit ebenfalls nicht
+# aus. Der einzige wirksame Hebel ist eine Cache Rule im Cloudflare-Dashboard
+# auf starts_with(http.request.uri.path, "/_next/image").
+
+# Versionierte Marken-Assets, werden bei Aenderung unter neuem Namen abgelegt.
+/icons/*
+  Cache-Control: public,max-age=31536000,immutable
+/social/*
+  Cache-Control: public,max-age=31536000,immutable
+
+# Inhaltsbilder werden gelegentlich unter gleichem Namen ersetzt, deshalb
+# eine Woche statt immutable.
+/images/*
+  Cache-Control: public,max-age=604800,stale-while-revalidate=86400
+/projects/*
+  Cache-Control: public,max-age=604800,stale-while-revalidate=86400
