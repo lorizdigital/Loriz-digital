@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "review:screenshots": "node scripts/review-screenshots.mjs",
-    "capture:einzelstueck": "node scripts/capture-mobile-screenshot.mjs",
+    "capture:einzelstueck": "node scripts/capture-screenshot.mjs",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",

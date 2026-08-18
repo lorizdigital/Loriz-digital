@@ -1,14 +1,19 @@
-// Wiederverwendbares Mobil-Screenshot-Skript.
+// Wiederverwendbares Screenshot-Skript für Referenzprojekte.
 //
-// Öffnet eine URL im echten Mobilmodus (Viewport, Touch, Device-Scale-Factor)
-// und speichert genau den sichtbaren Viewport – keine vollständige Seite,
-// keine Browserleiste – als optimiertes WebP.
+// Öffnet eine URL und speichert genau den sichtbaren Viewport – keine
+// vollständige Seite, keine Browserleiste – als optimiertes WebP.
 //
-// Aufruf mit Standardwerten (Einzelstück by Elisa):
-//   npm run capture:einzelstueck
+// Die beiden Voreinstellungen liefern exakt die Maße, die der Coverflow
+// erwartet (siehe src/components/ProjectCoverflow.tsx):
+//   --mobile   390x844  bei Device-Scale-Factor 3  ->  1170x2532
+//   --desktop  1440x1540 bei Device-Scale-Factor 1 ->  1440x1540
 //
-// Aufruf mit eigenen Werten (für weitere Projekte wiederverwendbar):
-//   node scripts/capture-mobile-screenshot.mjs <url> <ausgabe.webp>
+// Aufruf:
+//   node scripts/capture-screenshot.mjs <url> <ausgabe.webp> [--mobile|--desktop]
+//
+// Ohne Angabe wird --mobile verwendet. Beispiel für ein neues Projekt:
+//   node scripts/capture-screenshot.mjs https://example.de public/projects/example-desktop.webp --desktop
+//   node scripts/capture-screenshot.mjs https://example.de public/projects/example-mobile.webp
 
 import { chromium } from "playwright";
 import sharp from "sharp";
@@ -17,6 +22,21 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const PRESETS = {
+  mobile: {
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  },
+  desktop: {
+    viewport: { width: 1440, height: 1540 },
+    deviceScaleFactor: 1,
+    isMobile: false,
+    hasTouch: false,
+  },
+};
 
 const DEFAULT_URL = "https://einzelstueckbyelisa.de";
 const DEFAULT_OUTPUT = path.join(
@@ -27,11 +47,18 @@ const DEFAULT_OUTPUT = path.join(
   "einzelstueck-by-elisa-mobile.webp",
 );
 
-const targetUrl = process.argv[2] ?? DEFAULT_URL;
-const outputPath = path.resolve(process.argv[3] ?? DEFAULT_OUTPUT);
+const args = process.argv.slice(2);
+const presetFlag = args.find((arg) => arg.startsWith("--"))?.replace(/^--/, "");
+const positional = args.filter((arg) => !arg.startsWith("--"));
 
-const VIEWPORT = { width: 390, height: 844 };
-const DEVICE_SCALE_FACTOR = 3;
+if (presetFlag && !(presetFlag in PRESETS)) {
+  console.error(`Unbekannte Voreinstellung "--${presetFlag}". Erlaubt: --mobile, --desktop`);
+  process.exit(1);
+}
+
+const preset = PRESETS[presetFlag ?? "mobile"];
+const targetUrl = positional[0] ?? DEFAULT_URL;
+const outputPath = path.resolve(positional[1] ?? DEFAULT_OUTPUT);
 
 async function waitForVisibleImages(page, timeoutMs) {
   // Nur Bilder abwarten, die aktuell im Viewport sichtbar sind. Weiter unten
@@ -62,12 +89,7 @@ async function main() {
   await mkdir(path.dirname(outputPath), { recursive: true });
 
   const browser = await chromium.launch();
-  const context = await browser.newContext({
-    viewport: VIEWPORT,
-    deviceScaleFactor: DEVICE_SCALE_FACTOR,
-    isMobile: true,
-    hasTouch: true,
-  });
+  const context = await browser.newContext(preset);
   const page = await context.newPage();
 
   try {
@@ -95,7 +117,8 @@ async function main() {
     await sharp(tempPngPath).webp({ quality: 82 }).toFile(outputPath);
     await unlink(tempPngPath);
 
-    console.log(`✓ ${path.relative(process.cwd(), outputPath)}`);
+    const { width, height } = await sharp(outputPath).metadata();
+    console.log(`✓ ${path.relative(process.cwd(), outputPath)} (${width}x${height})`);
   } finally {
     await context.close();
     await browser.close();

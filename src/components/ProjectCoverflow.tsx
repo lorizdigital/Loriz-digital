@@ -74,7 +74,7 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
         role="region"
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className="relative min-h-[610px] overflow-hidden rounded-[2rem] border border-border bg-surface-muted/45 px-4 py-10 sm:min-h-[650px] sm:px-8 lg:min-h-[720px] lg:px-12"
+        className="relative min-h-[610px] overflow-hidden rounded-[2rem] border border-border bg-surface-muted/45 px-4 py-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/45 sm:min-h-[650px] sm:px-8 lg:min-h-[720px] lg:px-12"
       >
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-[18%] bottom-10 h-20 rounded-full bg-clay/10 blur-3xl" />
 
@@ -165,6 +165,10 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                           tabIndex={-1}
                           onClick={(event) => {
                             event.stopPropagation();
+                            // Ein Klick fokussiert den Button. Da er aria-hidden ist
+                            // und nach dem Umklappen hinter der Rückseite liegt, darf
+                            // er den Fokus nicht behalten.
+                            event.currentTarget.blur();
                             if (wasDragged.current) return;
                             setFlippedIndex(index);
                           }}

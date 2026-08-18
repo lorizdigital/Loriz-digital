@@ -41,4 +41,18 @@ export const projects: readonly Project[] = [
       "Optimiert für Smartphone und Desktop",
     ],
   },
+  {
+    title: "Wünschi",
+    url: "https://xn--wnschi-3ya.de",
+    desktopImage: "/projects/wuenschi-desktop.webp",
+    mobileImage: "/projects/wuenschi-mobile.webp",
+    alt: "Startseite von Wünschi mit privaten Wunschlisten auf Desktop und Smartphone",
+    description:
+      "Eine Web-App für private Wunschlisten in der Familie. Eltern pflegen ihre Liste geschützt und geben sie gezielt an die Menschen weiter, die etwas schenken möchten.",
+    highlights: [
+      "Wünsche sammeln, sortieren und mit Details versehen",
+      "Teilen nur über persönlichen Link und Zugangscode",
+      "Reservieren ohne Konto, damit nichts doppelt kommt",
+    ],
+  },
 ];
