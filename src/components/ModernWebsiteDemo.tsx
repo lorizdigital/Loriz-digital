@@ -13,6 +13,11 @@ import { cn } from "@/lib/cn";
  * in einen ruhigen, weiterhin bedienbaren Endzustand über (Button togglet
  * zwischen zwei Mini-Abschnitten). Jede echte Nutzerinteraktion während der
  * automatischen Sequenz beendet diese sofort und sauber.
+ *
+ * Farben: Die simulierte Seite ist im Light Mode weiß und im Dark Mode dunkel.
+ * Nur die gemalten Flächen (Leiste, Adresszeile, Bildschirm) tragen deshalb
+ * eine dark:-Variante – die Inhalte darin laufen über die Theme-Tokens und
+ * kippen dadurch von allein mit.
  */
 
 type Step =
@@ -44,10 +49,12 @@ function stepAtLeast(current: Step, target: Step) {
 
 const DOT_COLORS = ["#e3aba1", "#e8cf9c", "#a9d0b4"];
 
+// Die Iconfarbe hängt am jeweiligen Kreis: --accent kippt im Dark Mode auf
+// Hell, ein weißes Icon würde darin verschwinden.
 const FEATURES = [
-  { icon: LayoutGrid, tint: "bg-accent" },
-  { icon: Smartphone, tint: "bg-clay" },
-  { icon: Sparkles, tint: "bg-[#8a9bb0]" },
+  { icon: LayoutGrid, tint: "bg-accent", ink: "text-accent-foreground" },
+  { icon: Smartphone, tint: "bg-clay", ink: "text-white dark:text-[#17160f]" },
+  { icon: Sparkles, tint: "bg-[#8a9bb0]", ink: "text-white" },
 ];
 
 const CURSOR_START = { x: 12, y: 86 };
@@ -241,10 +248,10 @@ export function ModernWebsiteDemo() {
           stepAtLeast(step, "frame") ? { opacity: 1, y: 0, scale: 1 } : undefined
         }
         transition={{ duration: d(0.5), ease: easeGlass }}
-        className="glass-elevated group relative overflow-hidden rounded-lg"
+        className="glass-elevated relative overflow-hidden rounded-lg"
       >
         {/* Browser-Leiste */}
-        <div className="flex items-center gap-2 border-b border-black/[0.06] bg-white/45 px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-black/[0.06] bg-white/45 px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.06]">
           <motion.div
             variants={dotContainerVariants}
             initial="hidden"
@@ -267,22 +274,22 @@ export function ModernWebsiteDemo() {
             initial={{ opacity: 0 }}
             animate={{ opacity: stepAtLeast(step, "chrome") ? 1 : 0 }}
             transition={{ duration: d(0.3), delay: d(0.15) }}
-            className="ml-2 h-6 flex-1 rounded-full bg-white/70"
+            className="ml-2 h-6 flex-1 rounded-full bg-white/70 dark:bg-white/[0.10]"
           />
           <button
             type="button"
             onClick={handleReplay}
-            aria-label="Animation erneut abspielen"
-            className="ml-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-foreground/40 opacity-0 transition-opacity duration-300 hover:text-foreground/70 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 group-hover:opacity-100"
+            className="ml-1 flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-[0.65rem] font-medium text-foreground/75 shadow-soft transition-colors hover:border-clay/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
           >
             <RotateCcw aria-hidden="true" className="h-3 w-3" strokeWidth={2} />
+            Neu abspielen
           </button>
         </div>
 
         {/* Sichtbares Fenster: feste aspect-ratio, Inhalt wird per translateY verschoben */}
         <div
           ref={portRef}
-          className="relative w-full overflow-hidden bg-white/[0.94]"
+          className="relative w-full overflow-hidden bg-white/[0.94] dark:bg-background"
           style={{ aspectRatio: "3 / 2" }}
         >
           <motion.div
@@ -364,7 +371,7 @@ export function ModernWebsiteDemo() {
                 variants={itemVariants}
                 transition={{ duration: d(0.35), ease: easeGlass }}
                 aria-hidden="true"
-                className="relative col-start-4 col-span-2 row-start-2 row-end-4 overflow-hidden rounded-lg bg-gradient-to-br from-clay/35 via-accent-soft to-[#e4e9ee]"
+                className="relative col-start-4 col-span-2 row-start-2 row-end-4 overflow-hidden rounded-lg bg-gradient-to-br from-clay/35 via-accent-soft to-[#e4e9ee] dark:to-[#2b3038]"
               />
             </motion.div>
 
@@ -385,7 +392,7 @@ export function ModernWebsiteDemo() {
                       feature.tint,
                     )}
                   >
-                    <feature.icon aria-hidden="true" className="h-3.5 w-3.5 text-white" strokeWidth={2} />
+                    <feature.icon aria-hidden="true" className={cn("h-3.5 w-3.5", feature.ink)} strokeWidth={2} />
                   </span>
                   <div className="h-1.5 w-full rounded-full bg-foreground/25" aria-hidden="true" />
                   <div className="h-1.5 w-2/3 rounded-full bg-foreground/15" aria-hidden="true" />
