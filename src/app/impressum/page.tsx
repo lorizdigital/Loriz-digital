@@ -30,6 +30,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
+        type: "image/png",
       },
     ],
   },
@@ -37,7 +38,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Impressum | Loriz Digital",
     description: "Impressum von Loriz Digital – Angaben gemäß § 5 DDG.",
-    images: ["/social/loriz-digital-light.png"],
+    images: [
+      {
+        url: "/social/loriz-digital-light.png",
+        alt: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
+      },
+    ],
   },
 };
 

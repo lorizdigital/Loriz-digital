@@ -134,7 +134,7 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                     <div className="relative h-[calc(100%-5rem)] overflow-hidden bg-surface-muted sm:h-[calc(100%-5.5rem)]">
                       <Image
                         src={project.desktopImage}
-                        alt={isActive ? project.alt : ""}
+                        alt={project.alt}
                         fill
                         sizes="(min-width: 1024px) 650px, 82vw"
                         className="hidden object-cover object-top sm:block"
@@ -144,7 +144,7 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                         <div className="relative h-full aspect-[1170/2532] overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-soft">
                           <Image
                             src={project.mobileImage}
-                            alt={isActive ? project.alt : ""}
+                            alt={project.alt}
                             fill
                             sizes="222px"
                             className="object-cover object-top"
@@ -201,7 +201,7 @@ export function ProjectCoverflow({ projects }: ProjectCoverflowProps) {
                       auf die Rückseite führt zurück zur Vorschau. Die beiden
                       Bedienelemente unten stoppen die Weitergabe selbst. */}
                   <div
-                    aria-hidden={!isFlipped}
+                    inert={!isFlipped}
                     onClick={(event) => {
                       event.stopPropagation();
                       if (wasDragged.current) return;

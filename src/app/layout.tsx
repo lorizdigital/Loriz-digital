@@ -20,6 +20,8 @@ export const metadata: Metadata = {
     default: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
     template: "%s | Loriz Digital",
   },
+  description:
+    "Moderne Webseiten und digitale Lösungen für kleine Unternehmen, Handwerksbetriebe und Selbstständige. Persönlich betreut von Lino Loriz.",
   authors: [{ name: "Lino Loriz" }],
   creator: "Lino Loriz",
   icons: {

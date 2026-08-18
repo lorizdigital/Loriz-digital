@@ -11,7 +11,7 @@ import { Footer } from "@/components/Footer";
 import { siteConfig } from "@/lib/site";
 
 const description =
-  "Loriz Digital entwickelt moderne Webseiten und digitale Lösungen für kleine Unternehmen, Handwerksbetriebe und Selbstständige. Persönlich betreut von Lino Loriz.";
+  "Moderne Webseiten und digitale Lösungen für kleine Unternehmen, Handwerksbetriebe und Selbstständige. Persönlich betreut von Lino Loriz.";
 
 const socialDescription =
   "Moderne Webseiten und digitale Lösungen für kleine Unternehmen, Handwerksbetriebe und Selbstständige – persönlich entwickelt von Lino Loriz.";
@@ -70,7 +70,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
     description: socialDescription,
-    images: ["/social/loriz-digital-light.png"],
+    images: [
+      {
+        url: "/social/loriz-digital-light.png",
+        alt: "Loriz Digital – Digitale Lösungen für Ihr Unternehmen",
+      },
+    ],
   },
   robots: {
     index: true,
