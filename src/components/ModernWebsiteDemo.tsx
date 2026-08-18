@@ -54,7 +54,7 @@ const DOT_COLORS = ["#e3aba1", "#e8cf9c", "#a9d0b4"];
 const FEATURES = [
   { icon: LayoutGrid, tint: "bg-accent", ink: "text-accent-foreground" },
   { icon: Smartphone, tint: "bg-clay", ink: "text-white dark:text-[#17160f]" },
-  { icon: Sparkles, tint: "bg-[#8a9bb0]", ink: "text-white" },
+  { icon: Sparkles, tint: "bg-[#6f8299]", ink: "text-white" },
 ];
 
 const CURSOR_START = { x: 12, y: 86 };
@@ -279,10 +279,11 @@ export function ModernWebsiteDemo() {
           <button
             type="button"
             onClick={handleReplay}
-            className="ml-1 flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-[0.65rem] font-medium text-foreground/75 shadow-soft transition-colors hover:border-clay/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="-my-2 ml-1 flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-clay/35 bg-accent-soft px-2.5 text-[0.65rem] font-medium text-foreground/80 transition-colors hover:border-clay/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-1 focus-visible:ring-offset-surface sm:h-auto sm:-my-0 sm:py-1"
           >
-            <RotateCcw aria-hidden="true" className="h-3 w-3" strokeWidth={2} />
-            Neu abspielen
+            <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
+            <span className="hidden sm:inline">Neu abspielen</span>
+            <span className="sr-only sm:hidden">Animation neu abspielen</span>
           </button>
         </div>
 
@@ -350,7 +351,7 @@ export function ModernWebsiteDemo() {
                   onPointerEnter={handleUserTakeover}
                   onFocus={handleUserTakeover}
                   aria-label="Beispiel-Website: Abschnitt wechseln"
-                  className="-m-2 flex h-11 w-fit items-center rounded-full p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-1 focus-visible:ring-offset-surface"
+                  className="-m-2 flex h-11 w-fit items-center rounded-full p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-1 focus-visible:ring-offset-surface"
                 >
                   <motion.span
                     animate={buttonControls}

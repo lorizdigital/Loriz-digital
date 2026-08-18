@@ -59,7 +59,7 @@ const FLIGHT_MS: Record<TrayId, number> = {
 };
 
 /** Zögerdauer je Durchgang – nimmt ab, weil das Muster ab dem dritten Mal bekannt ist. */
-const THINK_MS = [480, 420, 360, 320];
+const THINK_MS = [900, 900, 900, 900];
 
 /** Ruhe zwischen Flugende und dem nächsten Zögern. */
 const GAP_MS = [240, 220, 200, 0];
@@ -225,17 +225,18 @@ export function InboxSortingDemo() {
         className="glass-elevated relative overflow-hidden rounded-lg"
       >
         <div className="flex items-center gap-2 border-b border-black/[0.06] bg-white/[0.94] px-4 py-3 dark:border-white/[0.08] dark:bg-white/[0.05]">
-          <span className="text-[0.7rem] font-medium uppercase tracking-[0.18em] text-clay">
+          <span className="min-w-0 truncate text-[0.7rem] font-medium uppercase tracking-[0.18em] text-foreground/70">
             Posteingang
           </span>
           <span className="flex-1" />
           <button
             type="button"
             onClick={handleReplay}
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-[0.65rem] font-medium text-foreground/75 shadow-soft transition-colors hover:border-clay/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="-my-2 flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-clay/35 bg-accent-soft px-2.5 text-[0.65rem] font-medium text-foreground/80 transition-colors hover:border-clay/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay focus-visible:ring-offset-1 focus-visible:ring-offset-surface sm:h-auto sm:-my-0 sm:py-1"
           >
-            <RotateCcw aria-hidden="true" className="h-3 w-3" strokeWidth={2} />
-            Neu abspielen
+            <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
+            <span className="hidden sm:inline">Neu abspielen</span>
+            <span className="sr-only sm:hidden">Animation neu abspielen</span>
           </button>
         </div>
 
