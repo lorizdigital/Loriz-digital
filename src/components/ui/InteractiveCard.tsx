@@ -34,7 +34,6 @@ function getFinePointerServerSnapshot() {
 type InteractiveCardProps = {
   children: ReactNode;
   className?: string;
-  motionMode?: "tilt" | "highlight";
 };
 
 /**
@@ -42,7 +41,7 @@ type InteractiveCardProps = {
  * Auf Touch-Geräten und bei reduzierter Bewegung bleibt die Karte vollständig
  * statisch; Inhalt und interaktive Kindelemente bleiben uneingeschränkt nutzbar.
  */
-export function InteractiveCard({ children, className, motionMode = "tilt" }: InteractiveCardProps) {
+export function InteractiveCard({ children, className }: InteractiveCardProps) {
   const hasFinePointer = useSyncExternalStore(
     subscribeFinePointer,
     getFinePointerSnapshot,
@@ -50,7 +49,6 @@ export function InteractiveCard({ children, className, motionMode = "tilt" }: In
   );
   const prefersReducedMotion = usePrefersReducedMotion();
   const isInteractive = hasFinePointer && !prefersReducedMotion;
-  const hasTilt = isInteractive && motionMode === "tilt";
 
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
@@ -80,10 +78,8 @@ export function InteractiveCard({ children, className, motionMode = "tilt" }: In
 
     pointerX.set(localX);
     pointerY.set(localY);
-    if (hasTilt) {
-      horizontal.set((localX / rect.width - 0.5) * 2);
-      vertical.set((localY / rect.height - 0.5) * 2);
-    }
+    horizontal.set((localX / rect.width - 0.5) * 2);
+    vertical.set((localY / rect.height - 0.5) * 2);
   }
 
   function handlePointerEnter() {
@@ -101,18 +97,18 @@ export function InteractiveCard({ children, className, motionMode = "tilt" }: In
       onPointerEnter={handlePointerEnter}
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
-      whileHover={hasTilt ? { y: -4, scale: 1.004 } : undefined}
+      whileHover={isInteractive ? { y: -4, scale: 1.004 } : undefined}
       transition={{ type: "spring", stiffness: 170, damping: 24, mass: 0.7 }}
       style={{
-        rotateX: hasTilt ? rotateX : 0,
-        rotateY: hasTilt ? rotateY : 0,
+        rotateX: isInteractive ? rotateX : 0,
+        rotateY: isInteractive ? rotateY : 0,
         transformPerspective: 1200,
         transformStyle: "preserve-3d",
       }}
       className={cn(
         "relative isolate transition-[border-color,box-shadow] duration-500 ease-[var(--ease-glass)]",
         isInteractive && "hover:border-clay/25 hover:shadow-glass-md",
-        hasTilt && "will-change-transform",
+        isInteractive && "will-change-transform",
         className,
       )}
     >
