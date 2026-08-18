@@ -131,10 +131,7 @@ export function Services() {
 
             return (
               <Reveal key={service.index} variant={i % 2 === 0 ? "left" : "right"} delay={0.05}>
-                <InteractiveCard
-                  motionMode={i === 0 ? "tilt" : "highlight"}
-                  className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft"
-                >
+                <InteractiveCard className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft">
                   <div
                     className={cn(
                       "grid items-stretch",
