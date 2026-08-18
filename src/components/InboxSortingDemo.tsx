@@ -38,14 +38,15 @@ const ITEMS: Array<{ id: string; label: string; tray: TrayId }> = [
 ];
 
 /**
- * Flugweite bis zur Mitte der jeweiligen Ablagezeile, im Browser gemessen
- * (Desktop 185/217/249, Mobil 184/216/248 – die Höhen sind breitenunabhängig).
- * Zu kurze Werte sehen aus, als lösten sich die Vorgänge unterwegs auf.
+ * Startwerte für die Flugweite bis zur Mitte der jeweiligen Ablagezeile.
+ * Sie gelten nur für die Standard-Schriftgröße; die tatsächlichen Abstände
+ * misst die Komponente nach dem Mounten selbst, weil das Layout in rem
+ * gerechnet ist und sich mit der Schriftgröße des Browsers verschiebt.
  */
 const TRAY_OFFSET: Record<TrayId, number> = {
-  anfragen: 185,
-  termine: 217,
-  belege: 249,
+  anfragen: 188,
+  termine: 221,
+  belege: 254,
 };
 
 /**
@@ -59,7 +60,7 @@ const FLIGHT_MS: Record<TrayId, number> = {
 };
 
 /** Zögerdauer je Durchgang – nimmt ab, weil das Muster ab dem dritten Mal bekannt ist. */
-const THINK_MS = [900, 900, 900, 900];
+const THINK_MS = [480, 420, 360, 320];
 
 /** Ruhe zwischen Flugende und dem nächsten Zögern. */
 const GAP_MS = [240, 220, 200, 0];
@@ -96,8 +97,15 @@ export function InboxSortingDemo() {
     belege: plopBelege,
   };
 
+  const [offsets, setOffsets] = useState(TRAY_OFFSET);
+
   const frameRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const trayRefs = useRef<Partial<Record<TrayId, HTMLDivElement | null>>>({});
   const runIdRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+  /** Aktueller Präferenzwert für Callbacks, die außerhalb des Renders laufen. */
+  const reducedRef = useRef(prefersReducedMotion);
   const timeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
   const inView = useInView(frameRef, { once: true, amount: 0.4 });
@@ -145,7 +153,15 @@ export function InboxSortingDemo() {
   async function runSequence(myRunId: number) {
     const isCurrent = () => runIdRef.current === myRunId;
 
+    // Der Lauf startet immer im Ausgangszustand. Ohne das Zurücksetzen
+    // beginnt eine Sequenz, die aus dem Endzustand heraus startet (etwa wenn
+    // "Bewegung reduzieren" im System abgeschaltet wird), mitten im Ablauf –
+    // die Zähler laufen dann sichtbar rückwärts.
     setVisible(true);
+    setThinkingId(null);
+    setHighlightTray(null);
+    setSortedCount(0);
+    setLandedCount(0);
     await wait(INTRO_MS);
 
     for (let i = 0; i < ITEMS.length; i += 1) {
@@ -154,7 +170,7 @@ export function InboxSortingDemo() {
 
       if (!isCurrent()) return;
       setThinkingId(item.id); // wackelt: die Ablage wird gesucht
-      await wait(THINK_MS[i]);
+      await wait(THINK_MS[i] ?? THINK_MS[THINK_MS.length - 1]);
 
       if (!isCurrent()) return;
       setThinkingId(null); // steht still: entschieden
@@ -167,9 +183,40 @@ export function InboxSortingDemo() {
       if (!isCurrent()) return;
       playPlop(item.tray); // Landung, Zähler zieht mit
       setLandedCount(i + 1);
-      await wait(PLOP_LEAD_MS + GAP_MS[i]);
+      await wait(PLOP_LEAD_MS + (GAP_MS[i] ?? GAP_MS[GAP_MS.length - 1]));
     }
   }
+
+  useEffect(() => {
+    reducedRef.current = prefersReducedMotion;
+  }, [prefersReducedMotion]);
+
+  // Flugweiten aus dem echten Layout ableiten. Feste Pixelwerte stimmen nur
+  // bei Standard-Schriftgröße; bei größerer Browserschrift landet der Vorgang
+  // sonst sichtbar auf der falschen Ablage.
+  useEffect(() => {
+    const measure = () => {
+      const first = listRef.current?.querySelector<HTMLElement>("[data-vorgang]");
+      if (!first) return; // während des Ablaufs oder im Endzustand nicht messen
+      const firstRect = first.getBoundingClientRect();
+      const mitte = firstRect.top + firstRect.height / 2;
+      const next = { ...TRAY_OFFSET };
+      let ok = false;
+      for (const tray of TRAYS) {
+        const el = trayRefs.current[tray.id];
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        next[tray.id] = Math.round(r.top + r.height / 2 - mitte);
+        ok = true;
+      }
+      if (ok) setOffsets(next);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (listRef.current) ro.observe(listRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!inView) return;
@@ -193,6 +240,10 @@ export function InboxSortingDemo() {
       runIdRef.current += 1;
       timeouts.forEach(clearTimeout);
       timeouts.clear();
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, prefersReducedMotion]);
@@ -205,9 +256,14 @@ export function InboxSortingDemo() {
     setLandedCount(0);
     setThinkingId(null);
     setHighlightTray(null);
-    requestAnimationFrame(() => {
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      if (runIdRef.current !== myRunId) return; // zwischenzeitlich abgelöst
       setInstant(false);
-      if (prefersReducedMotion) {
+      // Über den Ref, nicht über die Closure: Die Präferenz kann sich zwischen
+      // Klick und nächstem Frame geändert haben.
+      if (reducedRef.current) {
         showEndState();
         return;
       }
@@ -243,7 +299,7 @@ export function InboxSortingDemo() {
         <div className="bg-white/[0.94] p-4 sm:p-5 dark:bg-background">
           {/* Eingang: die Fläche ist auf die volle Liste dimensioniert, damit
               die Karte beim Leerräumen nicht in der Höhe springt. */}
-          <div className="relative min-h-[168px]">
+          <div ref={listRef} className="relative min-h-[10.5rem]">
             <AnimatePresence initial={false}>
               {pending.map((item) => {
                 const thinking = thinkingId === item.id;
@@ -254,6 +310,7 @@ export function InboxSortingDemo() {
                 return (
                   <motion.div
                     key={item.id}
+                    data-vorgang=""
                     layout
                     initial={{ opacity: 0, y: 10 }}
                     animate={
@@ -268,7 +325,7 @@ export function InboxSortingDemo() {
                     }
                     exit={{
                       opacity: [1, 1, 0],
-                      y: TRAY_OFFSET[item.tray],
+                      y: offsets[item.tray],
                       scale: 0.9,
                       transition: {
                         duration: d(FLIGHT_MS[item.tray] / 1000),
@@ -337,6 +394,9 @@ export function InboxSortingDemo() {
               return (
                 <motion.div
                   key={tray.id}
+                  ref={(el) => {
+                    trayRefs.current[tray.id] = el;
+                  }}
                   animate={plopControls[tray.id]}
                   className="relative flex items-center gap-2.5 rounded-md px-1 py-0.5"
                 >
@@ -349,7 +409,7 @@ export function InboxSortingDemo() {
                       duration: d(highlightTray === tray.id ? 0.14 : 0.4),
                       ease: easeGlass,
                     }}
-                    className="pointer-events-none absolute inset-0 rounded-md bg-clay/[0.12] dark:bg-clay/[0.18]"
+                    className="pointer-events-none absolute inset-0 rounded-md bg-clay/25 dark:bg-clay/[0.18]"
                   />
                   <Icon
                     aria-hidden="true"
