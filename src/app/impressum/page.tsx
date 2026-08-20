@@ -7,6 +7,7 @@ import { siteConfig } from "@/lib/site";
 const toc: TocEntry[] = [
   { id: "angaben", label: "Angaben gemäß § 5 DDG" },
   { id: "kontakt", label: "Kontakt" },
+  { id: "umsatzsteuer", label: "Umsatzsteuer-Identifikationsnummer" },
   { id: "verantwortlich", label: "Verantwortlich für den Inhalt" },
   { id: "verbraucherstreitbeilegung", label: "Verbraucherstreitbeilegung" },
 ];
@@ -81,6 +82,18 @@ export default function ImpressumPage() {
             >
               hallo@loriz.digital
             </a>
+          </p>
+        </LegalSection>
+
+        <LegalSection id="umsatzsteuer" heading="Umsatzsteuer-Identifikationsnummer">
+          <p>
+            Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz:
+            <br />
+            {siteConfig.vatId}
+          </p>
+          <p>
+            Diese Nummer ist zugleich die Wirtschafts-Identifikationsnummer nach § 139c
+            Abgabenordnung.
           </p>
         </LegalSection>
 

@@ -5,6 +5,8 @@ export const siteConfig = {
   founder: "Lino Loriz",
   email: "hallo@loriz.digital",
   phone: "+49 160 3329300",
+  /** Zugleich Wirtschafts-Identifikationsnummer nach § 139c AO. */
+  vatId: "DE464421526",
   address: {
     street: "Wiesenweg 23",
     postalCode: "34379",

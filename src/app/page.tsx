@@ -26,6 +26,7 @@ const localBusinessJsonLd = {
   url: siteConfig.url,
   telephone: siteConfig.phone,
   email: siteConfig.email,
+  vatID: siteConfig.vatId,
   founder: { "@type": "Person", name: siteConfig.founder },
   address: {
     "@type": "PostalAddress",
