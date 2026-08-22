@@ -41,7 +41,7 @@ const services: Service[] = [
     index: "02",
     title: "KI-Implementierung & Automatisierung",
     lead: "Künstliche Intelligenz dort einsetzen, wo sie in Ihrem Unternehmen wirklich etwas bringt.",
-    body: "Ich zeige Ihnen konkrete Einsatzmöglichkeiten, binde die passenden Systeme an und sorge dafür, dass Ihre Daten dafür sauber vorbereitet sind, verständlich erklärt und ohne Fachchinesisch.",
+    body: "Ich zeige Ihnen konkrete Einsatzmöglichkeiten, binde die passenden Systeme an und sorge dafür, dass Ihre Daten dafür sauber vorbereitet sind – verständlich erklärt, ganz ohne Fachjargon.",
     visual: "automation",
   },
   {

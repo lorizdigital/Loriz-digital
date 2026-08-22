@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 const signals = [
   { icon: UserRound, label: "Ein fester Ansprechpartner – von der Idee bis zum Livegang" },
-  { icon: MessagesSquare, label: "Klar und verständlich statt Fachchinesisch" },
+  { icon: MessagesSquare, label: "Klar und verständlich statt Fachjargon" },
   { icon: MapPin, label: "Aus Calden – persönlich statt anonym" },
 ];
 
