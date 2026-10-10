@@ -37,7 +37,13 @@ const localBusinessJsonLd = {
   telephone: siteConfig.phone,
   email: siteConfig.email,
   vatID: siteConfig.vatId,
-  founder: { "@type": "Person", name: siteConfig.founder },
+  founder: {
+    "@type": "Person",
+    name: siteConfig.founder,
+    sameAs: [siteConfig.profiles.founderLinkedIn],
+  },
+  sameAs: [siteConfig.profiles.instagram, siteConfig.profiles.github],
+  hasMap: siteConfig.profiles.googleMaps,
   address: {
     "@type": "PostalAddress",
     streetAddress: siteConfig.address.street,

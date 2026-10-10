@@ -13,6 +13,14 @@ export const siteConfig = {
     city: "Calden",
     countryCode: "DE",
   },
+  /** Fließen als sameAs/hasMap in die strukturierten Daten, damit Google und
+   * KI-Assistenten die Profile Loriz Digital zuordnen. */
+  profiles: {
+    instagram: "https://www.instagram.com/loriz.digital/",
+    github: "https://github.com/lorizdigital",
+    founderLinkedIn: "https://www.linkedin.com/in/lino-loriz-041a40122",
+    googleMaps: "https://www.google.com/maps?cid=4342593538926168440",
+  },
   navigation: [
     { label: "Start", href: "/#start" },
     { label: "Leistungen", href: "/#leistungen" },
