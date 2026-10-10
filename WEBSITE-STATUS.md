@@ -34,6 +34,7 @@ Die Seite wurde vor dem Skill gebaut. Eingestiegen am 10.10.2026 in Phase 7 mit 
 - 10.10.2026: Hero-Überschrift blendet per CSS ab dem ersten Paint ein statt nach der Hydrierung.
 - 10.10.2026: Wiesenweg 23 ist eine reine Wohnadresse. Adresse in Google, Bing und Verzeichnissen ausblenden, nur Einzugsgebiet zeigen. Apple Karten entfällt.
 - 10.10.2026: Auf der Website werden nur Geschäftsprofile verknüpft, keine privaten Konten.
+- Eröffnungsdatum laut Google-Unternehmensprofil: August 2026.
 
 ## Stand SEO und GEO (10.10.2026)
 
@@ -49,7 +50,8 @@ Die Seite wurde vor dem Skill gebaut. Eingestiegen am 10.10.2026 in Phase 7 mit 
 - [ ] Search Console in zwei bis drei Tagen ansehen: Die Sitemap stand direkt nach dem Einreichen auf „Konnte nicht abgerufen werden“, obwohl sie für Googlebot Status 200 liefert. Das ist bei neuen Properties üblich, sollte sich aber auf „Erfolgreich“ ändern.
 - [x] Cloudflare „Always Use HTTPS“ eingeschaltet (10.10.2026, geprüft: http und www leiten per 301 um).
 - [x] Bing Webmaster Tools: aus der Search Console importiert, Sitemap eingereicht (10.10.2026).
-- [ ] Google-Unternehmensprofil (liegt in einem anderen Google-Konto): Hauptkategorie „Webdesigner“, Einzugsgebiet Kassel und Landkreis Kassel statt vermutlich Hessen, neue Beschreibung und Leistungen. Texte in `recherche/profil-abgleich.md`.
+- [x] Google-Unternehmensprofil (zweites Google-Konto, in Chrome als authuser=1 angemeldet) am 10.10.2026 angepasst: Hauptkategorie Webdesigner, weitere Kategorie Softwareentwickler/-hersteller, neue Beschreibung, Einzugsgebiet Kassel, Landkreis Kassel, Calden (Hessen und Bad Wilhelmshöhe entfernt), vier eigene Leistungen mit Beschreibung, „Entwicklung von mobilen Apps“ entfernt. Google prüft die Änderungen (bis zu einem Tag).
+- [ ] Google-Unternehmensprofil: Fotos ergänzen (letztes Foto 87 Tage alt), erste Kunden um Rezensionen bitten (bisher 0, Link über „Um Rezensionen bitten“).
 - [ ] Profile abgleichen nach `recherche/profil-abgleich.md`: Instagram @loriz.digital, LinkedIn persönlich, LinkedIn-Unternehmensseite neu, Bing Places, Verzeichnisse (Das Örtliche, Gelbe Seiten, kennstdueinen, Bestenlisten).
 - [x] `sameAs` (Instagram, GitHub, LinkedIn beim Gründer) und `hasMap` (Google-Profil) in den strukturierten Daten (10.10.2026). LinkedIn-Unternehmensseite nachtragen, sobald sie existiert.
 - [ ] Referenzprojekte: mitgefeiert.de (Vorschaubild zeigt auf localhost, robots.txt und Sitemap fehlen), wünschi.de (Link auf loriz.digital, USt-IdNr.).
