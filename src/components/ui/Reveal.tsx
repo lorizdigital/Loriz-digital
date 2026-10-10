@@ -7,6 +7,8 @@ import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 type RevealProps = {
   children: React.ReactNode;
   className?: string;
+  /** "li" fuer Eintraege in <ol>/<ul>, damit kein <div> zwischen Liste und Eintrag steht. */
+  as?: "div" | "li";
   variant?: "up" | "fade" | "left" | "right" | "scale";
   delay?: number;
   duration?: number;
@@ -38,6 +40,7 @@ const offsets: Record<NonNullable<RevealProps["variant"]>, Variants> = {
 export function Reveal({
   children,
   className,
+  as = "div",
   variant = "up",
   delay = 0,
   duration = 0.7,
@@ -45,11 +48,14 @@ export function Reveal({
   const shouldReduceMotion = usePrefersReducedMotion();
 
   if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
+    const Static = as;
+    return <Static className={className}>{children}</Static>;
   }
 
+  const Animated = as === "li" ? motion.li : motion.div;
+
   return (
-    <motion.div
+    <Animated
       className={cn(className)}
       initial="hidden"
       whileInView="visible"
@@ -58,6 +64,6 @@ export function Reveal({
       transition={{ duration, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
-    </motion.div>
+    </Animated>
   );
 }

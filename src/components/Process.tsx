@@ -51,20 +51,23 @@ export function Process() {
           />
           <ol className="space-y-10 sm:space-y-12">
             {steps.map((step, index) => (
-              <Reveal key={step.title} delay={index * 0.06}>
-                <li className="relative flex gap-6 sm:gap-8">
-                  <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-clay/25 bg-accent-soft text-sm font-medium text-clay shadow-soft">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <div className="pt-1.5">
-                    <h3 className="text-lg font-medium tracking-tight text-foreground">
-                      {step.title}
-                    </h3>
-                    <p className="mt-1.5 text-[0.95rem] leading-relaxed text-muted-foreground">
-                      {step.description}
-                    </p>
-                  </div>
-                </li>
+              <Reveal
+                key={step.title}
+                as="li"
+                delay={index * 0.06}
+                className="relative flex gap-6 sm:gap-8"
+              >
+                <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-clay/25 bg-accent-soft text-sm font-medium text-clay shadow-soft">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="pt-1.5">
+                  <h3 className="text-lg font-medium tracking-tight text-foreground">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1.5 text-[0.95rem] leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
+                </div>
               </Reveal>
             ))}
           </ol>
