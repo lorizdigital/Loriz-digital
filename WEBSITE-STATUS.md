@@ -54,7 +54,9 @@ Die Seite wurde vor dem Skill gebaut. Eingestiegen am 10.10.2026 in Phase 7 mit 
 - [ ] Google-Unternehmensprofil: Fotos ergänzen (letztes Foto 87 Tage alt), erste Kunden um Rezensionen bitten (bisher 0, Link über „Um Rezensionen bitten“).
 - [ ] Profile abgleichen nach `recherche/profil-abgleich.md`: Instagram @loriz.digital, LinkedIn persönlich, LinkedIn-Unternehmensseite neu, Bing Places, Verzeichnisse (Das Örtliche, Gelbe Seiten, kennstdueinen, Bestenlisten).
 - [x] `sameAs` (Instagram, GitHub, LinkedIn beim Gründer) und `hasMap` (Google-Profil) in den strukturierten Daten (10.10.2026). LinkedIn-Unternehmensseite nachtragen, sobald sie existiert.
-- [ ] Referenzprojekte: mitgefeiert.de (Vorschaubild zeigt auf localhost, robots.txt und Sitemap fehlen), wünschi.de (Link auf loriz.digital, USt-IdNr.).
+- [x] mitgefeiert.de (10.10.2026 live): Vorschaubild und Favicon auf echter Domain, robots.txt und Sitemap, Impressum mit Loriz Digital und USt-IdNr.
+- [ ] mitgefeiert.de in der Search Console anlegen und `https://mitgefeiert.de/sitemap.xml` einreichen.
+- [ ] wünschi.de: USt-IdNr. und Credit „Designed and developed by Loriz Digital“ sind auf origin/main gepusht (dea4655), Deploy mit `npm run cloudflare:deploy:production` steht noch aus. Lokaler `main` dort enthält einen alten, nie gepushten Commit (02042b1), nicht pushen.
 - [ ] GitHub: prüfen, ob die öffentlichen Repositories (u. a. Kundenprojekte) öffentlich bleiben sollen. Auch dieses Website-Repo und damit diese Datei sind öffentlich.
 - [ ] Nachmessung am 31.10.2026 (Kalender „Arbeit“, 10:00). Ausgangsmessung in `recherche/keywords-geo.md`. Der Ordner `recherche/` ist über `.git/info/exclude` vom Repo ausgenommen.
 
