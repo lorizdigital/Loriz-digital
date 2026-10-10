@@ -56,7 +56,7 @@ Die Seite wurde vor dem Skill gebaut. Eingestiegen am 10.10.2026 in Phase 7 mit 
 - [x] `sameAs` (Instagram, GitHub, LinkedIn beim Gründer) und `hasMap` (Google-Profil) in den strukturierten Daten (10.10.2026). LinkedIn-Unternehmensseite nachtragen, sobald sie existiert.
 - [x] mitgefeiert.de (10.10.2026 live): Vorschaubild und Favicon auf echter Domain, robots.txt und Sitemap, Impressum mit Loriz Digital und USt-IdNr.
 - [ ] mitgefeiert.de in der Search Console anlegen und `https://mitgefeiert.de/sitemap.xml` einreichen.
-- [ ] wünschi.de: USt-IdNr. und Credit „Designed and developed by Loriz Digital“ sind auf origin/main gepusht (dea4655), Deploy mit `npm run cloudflare:deploy:production` steht noch aus. Lokaler `main` dort enthält einen alten, nie gepushten Commit (02042b1), nicht pushen.
+- [x] wünschi.de (10.10.2026 live, dea4655): Impressum mit USt-IdNr. und „Ein Projekt von Loriz Digital“, Credit „Designed and developed by Loriz Digital“ im Footer der Startseite. Lokaler `main` dort enthält einen alten, nie gepushten Commit (02042b1), nicht pushen.
 - [ ] GitHub: prüfen, ob die öffentlichen Repositories (u. a. Kundenprojekte) öffentlich bleiben sollen. Auch dieses Website-Repo und damit diese Datei sind öffentlich.
 - [ ] Nachmessung am 31.10.2026 (Kalender „Arbeit“, 10:00). Ausgangsmessung in `recherche/keywords-geo.md`. Der Ordner `recherche/` ist über `.git/info/exclude` vom Repo ausgenommen.
 
