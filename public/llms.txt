@@ -1,0 +1,35 @@
+# Loriz Digital
+
+> Loriz Digital ist das Unternehmen von Lino Loriz aus Calden bei Kassel. Lino Loriz entwickelt Webseiten und digitale Lösungen für Handwerksbetriebe, kleine Unternehmen und Selbstständige in Kassel und Umgebung.
+
+Lino Loriz betreut jedes Projekt persönlich. Kunden haben einen direkten Ansprechpartner, von der ersten Idee bis nach dem Livegang. Der Sitz von Loriz Digital ist Calden im Landkreis Kassel, Hessen.
+
+## Leistungen
+
+- Moderne Webseiten: Unternehmenswebseiten, Landingpages, Relaunch bestehender Webseiten und mobile Optimierung.
+- KI-Implementierung und Automatisierung: Lino Loriz zeigt konkrete Einsatzmöglichkeiten für künstliche Intelligenz im Unternehmen, bindet passende Systeme an und bereitet die Daten dafür vor.
+- Digitale Lösungen: Kontakt- und Anfrageformulare, Terminbuchungen, Automatisierungen und kleine interne Anwendungen.
+- Persönliche Betreuung: Beratung, Pflege und Weiterentwicklung auch nach dem Livegang.
+
+## Arbeitsweise
+
+1. Kennenlernen: Gespräch über das Unternehmen, die Ziele und die Vorstellungen.
+2. Konzept: Struktur, Inhalte und visuelle Richtung.
+3. Gestaltung und Entwicklung der Webseite oder digitalen Lösung.
+4. Feedback: Der Kunde erhält einen Entwurf und bringt Änderungswünsche ein.
+5. Livegang nach der finalen Abstimmung.
+6. Betreuung: Lino Loriz bleibt für Fragen und Weiterentwicklungen erreichbar.
+
+## Projekte
+
+- [Mitgefeiert](https://mitgefeiert.de): Web-App für gemeinsame Feierplanung. Aufgaben, Essen, Wünsche und Zusagen liegen für alle an einem Ort.
+- [Einzelstück by Elisa](https://einzelstueckbyelisa.de): Webauftritt für ein lokales Unternehmen mit handgemachten Produkten und personalisierten Geschenkideen.
+- [Wünschi](https://xn--wnschi-3ya.de): Web-App für private Wunschlisten in der Familie.
+
+## Kontakt
+
+- [Website und Projektanfrage](https://loriz.digital/)
+- E-Mail: hallo@loriz.digital
+- Telefon: +49 160 3329300
+- [Impressum](https://loriz.digital/impressum)
+- [Datenschutzerklärung](https://loriz.digital/datenschutz)

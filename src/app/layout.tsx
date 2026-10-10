@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Loriz Digital",
   },
   description:
-    "Moderne Webseiten und digitale Lösungen für kleine Unternehmen, Handwerksbetriebe und Selbstständige. Persönlich betreut von Lino Loriz.",
+    "Moderne Webseiten und digitale Lösungen für Handwerksbetriebe, kleine Unternehmen und Selbstständige in Kassel und Umgebung. Persönlich betreut von Lino Loriz aus Calden.",
   authors: [{ name: "Lino Loriz" }],
   creator: "Lino Loriz",
   icons: {
