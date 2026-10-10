@@ -95,14 +95,12 @@ export function Hero() {
           className="hero-pointer-parallax"
           style={{ x: textMouseX, y: textMouseY }}
         >
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={textStepAtLeast(textStep, "claim") ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.8, ease: easeGlass }}
-            className="balance text-[2.75rem] font-semibold leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-[3.25rem] lg:text-[3.6rem]"
-          >
+          {/* Die Headline blendet per CSS ab dem ersten Paint ein statt erst
+              nach der Hydrierung. Sie ist das LCP-Element, auf langsamen
+              Handys lag sie sonst Sekunden unsichtbar im fertigen HTML. */}
+          <h1 className="hero-claim-in balance text-[2.75rem] font-semibold leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-[3.25rem] lg:text-[3.6rem]">
             {siteConfig.slogan}
-          </motion.h1>
+          </h1>
 
           {/* Mobil fliegt genau eine Logo-Instanz aus diesem Platzhalter zur
               Navigation und bleibt dort angedockt. */}

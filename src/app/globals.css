@@ -334,6 +334,24 @@
   will-change: auto;
 }
 
+.hero-claim-in {
+  animation: hero-claim-in 800ms var(--ease-glass) both;
+}
+
+/* Startwert 0.01 statt 0: Chrome wertet Elemente mit opacity 0 nicht als
+   LCP-Kandidat, und eine reine Compositor-Animation loest keinen neuen Paint
+   aus. Bei 0 faellt das LCP sonst auf den spaeter eingeblendeten Absatz. */
+@keyframes hero-claim-in {
+  from {
+    opacity: 0.01;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes hero-logo-reveal-dark {
   from {
     opacity: 0;
