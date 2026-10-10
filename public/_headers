@@ -10,6 +10,10 @@
 # aus. Der einzige wirksame Hebel ist eine Cache Rule im Cloudflare-Dashboard
 # auf starts_with(http.request.uri.path, "/_next/image").
 
+# Ohne charset dekodieren Browser die Umlaute als Windows-1252.
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
 # Versionierte Marken-Assets, werden bei Aenderung unter neuem Namen abgelegt.
 /icons/*
   Cache-Control: public,max-age=31536000,immutable
