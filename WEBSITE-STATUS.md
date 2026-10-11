@@ -38,6 +38,7 @@ Die Seite wurde vor dem Skill gebaut. Eingestiegen am 10.10.2026 in Phase 7 mit 
 - 11.10.2026: Prüfung auf Cookies und AGB (Phase 7, Schritt 2) nachgeholt. Kein Cookie-Banner und keine AGB nötig, weil über die Seite nichts verkauft oder gebucht wird.
 - 11.10.2026: Bot Fight Mode in Cloudflare bleibt an. Das Cookie `cf_clearance` aus der Bot-Erkennung steht in der Datenschutzerklärung (Abschnitt 11).
 - 11.10.2026: Cloudflare Web Analytics für loriz.digital deaktiviert. Zahlen zur Suche kommen aus der Search Console.
+- 11.10.2026: Keine LinkedIn-Unternehmensseite vorerst. Die Zielgruppe sucht kaum auf LinkedIn, und eine ungepflegte Seite bringt wenig. Texte liegen in `recherche/profil-abgleich.md`, falls sie später kommt.
 - 11.10.2026: Besucher bekommen keine Eingangsbestätigung per E-Mail mehr. Brevo lässt das Tracking in Transaktionsmails nicht abschalten, der Schalter wählt nur zwischen anonym und pro Empfänger. Über Brevo geht nur noch die interne Mail an hallo@loriz.digital.
 
 ## Stand SEO und GEO (10.10.2026)
@@ -58,7 +59,9 @@ Die Seite wurde vor dem Skill gebaut. Eingestiegen am 10.10.2026 in Phase 7 mit 
 - [x] Bing Webmaster Tools: aus der Search Console importiert, Sitemap eingereicht (10.10.2026).
 - [x] Google-Unternehmensprofil (zweites Google-Konto, in Chrome als authuser=1 angemeldet) am 10.10.2026 angepasst: Hauptkategorie Webdesigner, weitere Kategorie Softwareentwickler/-hersteller, neue Beschreibung, Einzugsgebiet Kassel, Landkreis Kassel, Calden (Hessen und Bad Wilhelmshöhe entfernt), vier eigene Leistungen mit Beschreibung, „Entwicklung von mobilen Apps“ entfernt. Google prüft die Änderungen (bis zu einem Tag).
 - [ ] Google-Unternehmensprofil: Fotos ergänzen (letztes Foto 87 Tage alt), erste Kunden um Rezensionen bitten (bisher 0, Link über „Um Rezensionen bitten“).
-- [ ] Profile abgleichen nach `recherche/profil-abgleich.md`: Instagram @loriz.digital, LinkedIn persönlich, LinkedIn-Unternehmensseite neu, Bing Places, Verzeichnisse (Das Örtliche, Gelbe Seiten, kennstdueinen, Bestenlisten).
+- [x] LinkedIn persönlich (11.10.2026): Überschrift und Info mit Handwerk und Kassel statt „KMU“, neuer Text im Erfahrungs-Eintrag Loriz Digital, Website unter Kontaktinfo, Projekte Mitgefeiert, Wünschi und Einzelstück by Elisa. Nichts geteilt oder gepostet.
+- [ ] Profile abgleichen nach `recherche/profil-abgleich.md`: Bing Places, Instagram @loriz.digital, Verzeichnisse (Das Örtliche, Gelbe Seiten, kennstdueinen, Bestenlisten).
+- [ ] wünschi.de hat keine Open-Graph-Angaben (`og:title`, `og:image`). LinkedIn und andere Netzwerke zeigen deshalb keine Vorschau, im LinkedIn-Projekt steht der Link nur im Text.
 - [x] `sameAs` (Instagram, GitHub, LinkedIn beim Gründer) und `hasMap` (Google-Profil) in den strukturierten Daten (10.10.2026). LinkedIn-Unternehmensseite nachtragen, sobald sie existiert.
 - [x] mitgefeiert.de (10.10.2026 live): Vorschaubild und Favicon auf echter Domain, robots.txt und Sitemap, Impressum mit Loriz Digital und USt-IdNr.
 - [ ] mitgefeiert.de in der Search Console anlegen und `https://mitgefeiert.de/sitemap.xml` einreichen.
