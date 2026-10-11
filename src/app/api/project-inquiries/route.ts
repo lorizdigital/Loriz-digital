@@ -1,10 +1,7 @@
 import { safeParseInquirySubmission } from "@/lib/inquiry/schema";
 import type { InquirySubmission } from "@/lib/inquiry/types";
 import { sendBrevoEmail } from "@/lib/inquiry/server/brevo";
-import {
-  buildInquiryConfirmationEmail,
-  buildInquiryNotificationEmail,
-} from "@/lib/inquiry/server/emailFormat";
+import { buildInquiryNotificationEmail } from "@/lib/inquiry/server/emailFormat";
 import { normalizeInquiryInput } from "@/lib/inquiry/server/normalizeInput";
 import { presentInquiryForEmail } from "@/lib/inquiry/server/presentInquiry";
 import { createInMemoryRateLimiter } from "@/lib/inquiry/server/rateLimit";
@@ -88,16 +85,6 @@ function handlers() {
         recipient: env.toEmail,
         identity,
         inquiry,
-      }),
-    buildConfirmation: ({ requestId, inquiry }) =>
-      buildInquiryConfirmationEmail({
-        requestId,
-        identity,
-        contactEmail: env.toEmail,
-        recipient: {
-          email: inquiry.contact.email,
-          name: inquiry.contact.name,
-        },
       }),
     sendEmail: (message) =>
       sendBrevoEmail({ apiKey: env.brevoApiKey, message }),

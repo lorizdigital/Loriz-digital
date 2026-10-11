@@ -57,13 +57,6 @@ function dependencies(overrides?: Record<string, unknown>) {
       textContent: "Test",
       htmlContent: "<p>Test</p>",
     })),
-    buildConfirmation: vi.fn(() => ({
-      sender: { email: env.fromEmail },
-      to: [{ email: "kunde@example.com" }],
-      subject: "Bestätigung",
-      textContent: "Test",
-      htmlContent: "<p>Test</p>",
-    })),
     sendEmail,
     ...overrides,
   };
@@ -87,13 +80,16 @@ describe("project inquiry route", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
   });
 
-  it("sends the notification and concise confirmation after validation", async () => {
+  it("sends only the internal notification after validation", async () => {
     const deps = dependencies();
     const handlers = createInquiryRouteHandlers(deps);
     const response = await handlers.POST(request(validEnvelope));
 
     expect(response.status).toBe(200);
-    expect(deps.sendEmail).toHaveBeenCalledTimes(2);
+    expect(deps.sendEmail).toHaveBeenCalledTimes(1);
+    expect(deps.sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ to: [{ email: env.toEmail }] }),
+    );
     expect(deps.verifyTurnstile).toHaveBeenCalledWith(
       expect.objectContaining({ expectedAction: "project_inquiry" }),
     );
@@ -121,21 +117,6 @@ describe("project inquiry route", () => {
     await expect(response.json()).resolves.toMatchObject({
       ok: false,
       code: "delivery_failed",
-    });
-  });
-
-  it("reports a failed confirmation without losing the accepted inquiry", async () => {
-    const sendEmail = vi
-      .fn()
-      .mockResolvedValueOnce({ ok: true as const })
-      .mockResolvedValueOnce({ ok: false as const, reason: "unavailable" });
-    const handlers = createInquiryRouteHandlers(dependencies({ sendEmail }));
-    const response = await handlers.POST(request(validEnvelope));
-
-    expect(response.status).toBe(502);
-    await expect(response.json()).resolves.toMatchObject({
-      ok: false,
-      code: "confirmation_failed",
     });
   });
 

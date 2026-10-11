@@ -18,21 +18,20 @@ const toc: TocEntry[] = [
   { id: "allgemeine-hinweise", label: "2. Allgemeine Hinweise" },
   { id: "bereitstellung-der-website", label: "3. Bereitstellung der Website" },
   { id: "hosting-und-content-delivery", label: "4. Hosting und Content Delivery" },
-  { id: "cloudflare-web-analytics", label: "5. Cloudflare Web Analytics" },
-  { id: "schriftarten", label: "6. Schriftarten" },
-  { id: "kontaktaufnahme", label: "7. Kontaktaufnahme" },
-  { id: "gefuehrte-projektanfrage", label: "8. Geführte Projektanfrage" },
-  { id: "turnstile-missbrauchsschutz", label: "9. Turnstile und Missbrauchsschutz" },
-  { id: "brevo", label: "10. E-Mail-Versand über Brevo" },
-  { id: "kommunikation-per-e-mail", label: "11. Kommunikation per E-Mail (iCloud Mail)" },
-  { id: "cookies", label: "12. Cookies und Zugriffe auf Endeinrichtungen" },
-  { id: "speicherdauer", label: "13. Speicherdauer" },
-  { id: "empfaenger-personenbezogener-daten", label: "14. Empfänger personenbezogener Daten" },
-  { id: "ihre-rechte", label: "15. Ihre Rechte" },
-  { id: "beschwerderecht", label: "16. Beschwerderecht" },
-  { id: "widerspruchsrecht", label: "17. Widerspruchsrecht" },
-  { id: "datensicherheit", label: "18. Datensicherheit" },
-  { id: "aenderungen", label: "19. Änderungen dieser Datenschutzerklärung" },
+  { id: "schriftarten", label: "5. Schriftarten" },
+  { id: "kontaktaufnahme", label: "6. Kontaktaufnahme" },
+  { id: "gefuehrte-projektanfrage", label: "7. Geführte Projektanfrage" },
+  { id: "turnstile-missbrauchsschutz", label: "8. Turnstile und Missbrauchsschutz" },
+  { id: "brevo", label: "9. E-Mail-Versand über Brevo" },
+  { id: "kommunikation-per-e-mail", label: "10. Kommunikation per E-Mail (iCloud Mail)" },
+  { id: "cookies", label: "11. Cookies und Zugriffe auf Endeinrichtungen" },
+  { id: "speicherdauer", label: "12. Speicherdauer" },
+  { id: "empfaenger-personenbezogener-daten", label: "13. Empfänger personenbezogener Daten" },
+  { id: "ihre-rechte", label: "14. Ihre Rechte" },
+  { id: "beschwerderecht", label: "15. Beschwerderecht" },
+  { id: "widerspruchsrecht", label: "16. Widerspruchsrecht" },
+  { id: "datensicherheit", label: "17. Datensicherheit" },
+  { id: "aenderungen", label: "18. Änderungen dieser Datenschutzerklärung" },
 ];
 
 export const metadata: Metadata = {
@@ -75,7 +74,7 @@ export default function DatenschutzPage() {
   return (
     <>
       <Navigation />
-      <LegalPageLayout title="Datenschutzerklärung" subtitle="Stand: Juli 2026" toc={toc}>
+      <LegalPageLayout title="Datenschutzerklärung" subtitle="Stand: Oktober 2026" toc={toc}>
         <div className="space-y-10">
           <LegalSection id="verantwortlicher" heading="1. Verantwortlicher">
             <p>
@@ -183,7 +182,7 @@ export default function DatenschutzPage() {
                 "Cloudflare Workers",
                 "Cloudflare CDN",
                 "DNS-Dienste",
-                "Sicherheitsfunktionen",
+                "Sicherheitsfunktionen einschließlich Bot-Erkennung",
                 "Performance-Optimierungen",
               ]}
             />
@@ -222,49 +221,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="cloudflare-web-analytics" heading="5. Cloudflare Web Analytics">
-            <p>Diese Website verwendet Cloudflare Web Analytics.</p>
-            <p>
-              Cloudflare Web Analytics ermöglicht die statistische Auswertung der Nutzung meiner
-              Website, ohne klassische Tracking-Cookies einzusetzen.
-            </p>
-            <p>Hierbei werden insbesondere Informationen verarbeitet über</p>
-            <LegalList
-              items={[
-                "aufgerufene Seiten",
-                "Browsertyp",
-                "Betriebssystem",
-                "Geräteeigenschaften",
-                "Referrer",
-                "Zeitpunkt des Seitenaufrufs",
-                "Ladezeiten",
-                "Performance-Daten",
-              ]}
-            />
-            <p>
-              Nach Angaben von Cloudflare werden hierfür keine Cookies auf Ihrem Endgerät
-              gespeichert.
-            </p>
-            <p>Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO.</p>
-            <p>Mein berechtigtes Interesse besteht darin,</p>
-            <LegalList
-              items={[
-                "die Benutzerfreundlichkeit meiner Website zu verbessern,",
-                "technische Fehler zu erkennen,",
-                "die Performance zu optimieren und",
-                "mein Angebot kontinuierlich weiterzuentwickeln.",
-              ]}
-            />
-            <p>
-              Weitere Informationen finden Sie unter:
-              <br />
-              <a href="https://developers.cloudflare.com/web-analytics/" className={linkClass} {...externalLinkProps}>
-                https://developers.cloudflare.com/web-analytics/
-              </a>
-            </p>
-          </LegalSection>
-
-          <LegalSection id="schriftarten" heading="6. Schriftarten">
+          <LegalSection id="schriftarten" heading="5. Schriftarten">
             <p>Auf dieser Website werden ausschließlich lokal eingebundene Schriftarten verwendet.</p>
             <p>
               Beim Laden der Website erfolgt daher keine Verbindung zu Servern von Google oder
@@ -276,7 +233,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="kontaktaufnahme" heading="7. Kontaktaufnahme">
+          <LegalSection id="kontaktaufnahme" heading="6. Kontaktaufnahme">
             <p>
               Wenn Sie mich per E-Mail oder telefonisch kontaktieren, verarbeite ich Ihre Angaben
               ausschließlich zur Bearbeitung Ihrer Anfrage.
@@ -309,7 +266,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="gefuehrte-projektanfrage" heading="8. Geführte Projektanfrage">
+          <LegalSection id="gefuehrte-projektanfrage" heading="7. Geführte Projektanfrage">
             <p>
               Über die geführte Projektanfrage können Sie Ihr Vorhaben strukturiert beschreiben und
               anschließend eine persönliche Kontaktaufnahme anfragen.
@@ -329,7 +286,7 @@ export default function DatenschutzPage() {
               Die Eingaben werden im Browser als strukturierter Formularzustand geführt und vor der
               weiteren Verarbeitung auf dem Server validiert und normalisiert. Es besteht keine
               eigene Formulardatenbank. Nach erfolgreicher Prüfung wird die vollständige Anfrage als
-              E-Mail versendet.
+              E-Mail an mich versendet. Sie selbst erhalten keine automatische E-Mail.
             </p>
             <p>Die Verarbeitung erfolgt</p>
             <LegalList
@@ -354,7 +311,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="turnstile-missbrauchsschutz" heading="9. Cloudflare Turnstile und Missbrauchsschutz">
+          <LegalSection id="turnstile-missbrauchsschutz" heading="8. Cloudflare Turnstile und Missbrauchsschutz">
             <p>
               Zum Schutz der Projektanfrage vor automatisierten Eingaben, Spam und missbräuchlicher
               Nutzung wird Cloudflare Turnstile eingesetzt. Beim Aufruf des betreffenden
@@ -410,20 +367,18 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="brevo" heading="10. E-Mail-Versand über Brevo">
+          <LegalSection id="brevo" heading="9. E-Mail-Versand über Brevo">
             <p>
               Die Projektanfrage wird nicht unmittelbar aus Ihrem Browser per E-Mail versendet. Nach
               erfolgreicher serverseitiger Prüfung wird die Brevo Transactional API für den Versand
               verwendet. Dienstleister ist die im Brevo-Konto beziehungsweise im
               Auftragsverarbeitungsvertrag ausgewiesene Gesellschaft der Brevo-Gruppe.
             </p>
-            <p>Dabei werden zwei E-Mails versendet:</p>
-            <LegalList
-              items={[
-                "die vollständige interne Projektanfrage an hallo@loriz.digital und",
-                "eine kurze Eingangsbestätigung an die von Ihnen angegebene E-Mail-Adresse, ohne vollständige Wiederholung Ihrer Projektangaben.",
-              ]}
-            />
+            <p>
+              Dabei wird ausschließlich die vollständige interne Projektanfrage an
+              hallo@loriz.digital versendet. An die von Ihnen angegebene E-Mail-Adresse verschickt
+              Brevo keine E-Mail.
+            </p>
             <p>
               Ihre zuvor validierte E-Mail-Adresse wird ausschließlich als Reply-To-Adresse der
               internen Nachricht verwendet. Brevo verarbeitet für den Versand insbesondere Absender,
@@ -434,18 +389,6 @@ export default function DatenschutzPage() {
               Nach der aktuellen Kontoeinstellung werden Transaktionslogs für einen Monat gespeichert.
               Vollständige E-Mail-Vorschauen werden im Brevo-Konto nicht gespeichert. Brevo verarbeitet
               den Nachrichteninhalt dennoch technisch, soweit dies für den Versand erforderlich ist.
-            </p>
-            <p>
-              Das anonymisierte Öffnungs- und Klicktracking ist aktiviert. Brevo kann daher Öffnungs-
-              und Klickereignisse technisch erfassen. Nach der aktuellen Einstellung werden diese
-              Ereignisse anonymisiert verarbeitet und nicht einzelnen Empfängern zugeordnet. Es findet
-              keine individuelle Auswertung oder Profilbildung anhand dieser Ereignisse statt.
-            </p>
-            <p>
-              Soweit das Öffnungs- oder Klicktracking Informationen auf einer Endeinrichtung speichert
-              oder daraus ausliest, richtet sich die Zulässigkeit dieses Zugriffs zusätzlich nach § 25
-              TDDDG. Die Kenntnisnahme der Datenschutzhinweise im Anfrageformular ist keine
-              Einwilligung in ein E-Mail-Tracking.
             </p>
             <p>
               Die Verarbeitung erfolgt zur Bearbeitung konkreter Projekt- und Vertragsanbahnungen gemäß
@@ -475,7 +418,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="kommunikation-per-e-mail" heading="11. Kommunikation per E-Mail (iCloud Mail)">
+          <LegalSection id="kommunikation-per-e-mail" heading="10. Kommunikation per E-Mail (iCloud Mail)">
             <p>
               Für den Empfang der internen Projektanfrage sowie für die anschließende persönliche
               Kommunikation verwende ich iCloud Mail mit einer eigenen E-Mail-Domain.
@@ -527,13 +470,22 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="cookies" heading="12. Cookies und Zugriffe auf Endeinrichtungen">
+          <LegalSection id="cookies" heading="11. Cookies und Zugriffe auf Endeinrichtungen">
             <p>
-              Diese Website verwendet keine Cookies zu Werbe-, Marketing- oder
+              Diese Website verwendet keine Cookies zu Analyse-, Werbe-, Marketing- oder
               Profilbildungszwecken.
             </p>
             <p>
-              Im Zusammenhang mit Cloudflare und Turnstile können technisch erforderliche
+              Zum Schutz vor automatisierten Zugriffen führt Cloudflare beim Aufruf der Website ein
+              Prüfskript zur Bot-Erkennung aus und setzt das Cookie{" "}
+              <code className="rounded bg-surface-muted px-1.5 py-0.5 text-[0.9em]">
+                cf_clearance
+              </code>
+              . Es speichert das Ergebnis dieser Prüfung, kann von Skripten der Website nicht
+              ausgelesen werden und läuft nach einem Jahr ab.
+            </p>
+            <p>
+              Darüber hinaus können im Zusammenhang mit Cloudflare und Turnstile technisch erforderliche
               Informationen auf Ihrer Endeinrichtung gespeichert oder daraus ausgelesen werden,
               soweit dies für die sichere Bereitstellung der Website und den Schutz des
               Anfrageformulars unbedingt erforderlich ist.
@@ -546,7 +498,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="speicherdauer" heading="13. Speicherdauer">
+          <LegalSection id="speicherdauer" heading="12. Speicherdauer">
             <p>
               Personenbezogene Daten werden nur so lange gespeichert, wie dies zur Erfüllung des
               jeweiligen Zwecks erforderlich ist.
@@ -572,7 +524,7 @@ export default function DatenschutzPage() {
             <p>Anschließend werden die Daten gelöscht.</p>
           </LegalSection>
 
-          <LegalSection id="empfaenger-personenbezogener-daten" heading="14. Empfänger personenbezogener Daten">
+          <LegalSection id="empfaenger-personenbezogener-daten" heading="13. Empfänger personenbezogener Daten">
             <p>Personenbezogene Daten werden nur dann an Dritte übermittelt, wenn</p>
             <LegalList
               items={[
@@ -599,7 +551,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="ihre-rechte" heading="15. Ihre Rechte">
+          <LegalSection id="ihre-rechte" heading="14. Ihre Rechte">
             <p>Sie haben nach der DSGVO insbesondere folgende Rechte:</p>
             <LegalList
               items={[
@@ -620,7 +572,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="beschwerderecht" heading="16. Beschwerderecht">
+          <LegalSection id="beschwerderecht" heading="15. Beschwerderecht">
             <p>
               Sie haben das Recht, sich bei einer Datenschutzaufsichtsbehörde über die
               Verarbeitung Ihrer personenbezogenen Daten zu beschweren.
@@ -641,7 +593,7 @@ export default function DatenschutzPage() {
             </address>
           </LegalSection>
 
-          <LegalSection id="widerspruchsrecht" heading="17. Widerspruchsrecht">
+          <LegalSection id="widerspruchsrecht" heading="16. Widerspruchsrecht">
             <p>
               Werden personenbezogene Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
               verarbeitet, haben Sie das Recht, aus Gründen, die sich aus Ihrer besonderen
@@ -662,7 +614,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="datensicherheit" heading="18. Datensicherheit">
+          <LegalSection id="datensicherheit" heading="17. Datensicherheit">
             <p>Diese Website verwendet eine SSL- beziehungsweise TLS-Verschlüsselung.</p>
             <p>Dadurch werden übermittelte Daten während der Übertragung geschützt.</p>
             <p>
@@ -672,7 +624,7 @@ export default function DatenschutzPage() {
             </p>
           </LegalSection>
 
-          <LegalSection id="aenderungen" heading="19. Änderungen dieser Datenschutzerklärung">
+          <LegalSection id="aenderungen" heading="18. Änderungen dieser Datenschutzerklärung">
             <p>
               Ich behalte mir vor, diese Datenschutzerklärung anzupassen, wenn dies aufgrund
               technischer Weiterentwicklungen, gesetzlicher Änderungen oder neuer Angebote

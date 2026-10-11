@@ -44,10 +44,6 @@ export type InquiryRouteDependencies<T> = {
     requestId: string;
     inquiry: InquiryEmailData;
   }): TransactionalEmail;
-  buildConfirmation(input: {
-    requestId: string;
-    inquiry: InquiryEmailData;
-  }): TransactionalEmail;
   sendEmail(message: TransactionalEmail): Promise<ServiceResult>;
   now?: () => number;
 };
@@ -266,17 +262,6 @@ export function createInquiryRouteHandlers<T>(
           502,
           "delivery_failed",
           "Ihre Anfrage konnte noch nicht gesendet werden. Ihre Angaben bleiben erhalten.",
-        );
-      }
-
-      const confirmation = await dependencies.sendEmail(
-        dependencies.buildConfirmation({ requestId, inquiry }),
-      );
-      if (!confirmation.ok) {
-        return error(
-          502,
-          "confirmation_failed",
-          "Ihre Anfrage ist eingegangen, die Eingangsbestätigung konnte jedoch noch nicht versendet werden. Bitte versuchen Sie es erneut.",
         );
       }
 

@@ -393,9 +393,6 @@ function InquirySuccessStep({ chat }: { chat: InquiryChatController }) {
       <p className="mt-3 max-w-xl text-[0.96rem] leading-relaxed text-muted-foreground">
         Ich sehe mir Ihre Angaben persönlich an und melde mich zeitnah bei Ihnen.
       </p>
-      <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-        Eine kurze Eingangsbestätigung wurde an Ihre E-Mail-Adresse gesendet.
-      </p>
       <button
         type="button"
         onClick={chat.resetInquiry}
